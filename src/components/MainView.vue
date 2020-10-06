@@ -4,18 +4,13 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
-
-export default defineComponent({
-  name: 'HelloWorld',
+<script>
+export default {
+  name: 'MainView',
   props: {
-    msg: {
-      type: String,
-      required: false,
-    },
+    msg: String,
   },
-})
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
