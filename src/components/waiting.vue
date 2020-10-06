@@ -1,6 +1,6 @@
 <template>
   <section waiting>
-    <img src="/img/hourglass_color.gif" alt="working..." />
+    <!-- <img src="/img/hourglass_color.gif" alt="working..." /> -->
   </section>
 </template>
 

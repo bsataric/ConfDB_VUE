@@ -10,9 +10,11 @@ import { panels, PanelState, panelTitle } from '../../panels'
 import WaitingPanel from '../../components/waiting.vue'
 import UnknownPanel from '../../components/unknownPanel.vue'
 import ErrorPanel from '../../components/errorPanel.vue'
+import { makePanelConfig } from './makePanelConfig'
 import { GenericVueInstance } from './types'
 import { VueConstructor } from 'vue/types/vue'
 import goStyle from '../../lib/to'
+import { GLSet } from './glSync'
 
 class UnknownPanelError extends Error {
   constructor(panelTitle: string) {
@@ -163,7 +165,7 @@ function registerPanelMounter(instance: GoldenLayout) {
       const mountEl = document.createElement('div')
       rootEl.appendChild(mountEl)
 
-      insertWaitingComponent(mountEl)
+      //insertWaitingComponent(mountEl)
 
       // panel name is given in the vueComponent constructor
       const [err, vueEl] = await goStyle(getPanel(panelState.title))
@@ -180,7 +182,8 @@ function registerPanelMounter(instance: GoldenLayout) {
         // the constructor creates a new Vue instance
         // normally this would be invisible, except that you'd lose your link to the store
         // therefore add the store in the Vue constructor
-        vueElInstance = new vueEl({ store: stores.root, vuetify })
+        //vueElInstance = new vueEl({ store: stores.root, vuetify })
+        vueElInstance = new vueEl()
       }
 
       attachContainer(container, vueElInstance)
@@ -202,9 +205,41 @@ function registerPanelMounter(instance: GoldenLayout) {
   )
 }
 
+// loads a vue panel by the given title
+// will be lazy loaded if this is the first use
+// will return an error if an invalid title is given
+async function getPanel(title: panelTitle): Promise<VueConstructor<Vue>> {
+  if (panels[title]) {
+    return panels[title]()
+  } else {
+    return Promise.reject(new UnknownPanelError(title))
+  }
+}
+
 function insertWaitingComponent(container: HTMLElement) {
   const el = new WaitingPanel()
   const div = document.createElement('div')
   container.appendChild(div)
-  el.$mount(div)
+  //el.$mount(div)
+}
+
+function attachResizeEvent(
+  container: Container,
+  vueInstance: GenericVueInstance
+) {
+  if (vueInstance.resize) {
+    container.on('resize', vueInstance.resize)
+  }
+}
+
+function attachContainer(
+  container: Container,
+  vueInstance: GenericVueInstance
+) {
+  if (
+    vueInstance.setGLContainer &&
+    typeof vueInstance.setGLContainer == 'function'
+  ) {
+    vueInstance.setGLContainer(container)
+  }
 }

@@ -3,13 +3,10 @@ import { VueConstructor } from 'vue/types/umd'
 //////////
 // Add panel names here
 //////////
-type PanelName = 'I am' | 'Editor' | 'Table' | 'Manual Editor' | 'Fancy Table'
+type PanelName = 'I am' | 'Editor'
 const items: PanelsConf = {
   'I am': 'IAm',
   Editor: 'Edit',
-  Table: 'Table',
-  'Fancy Table': 'TableEditor',
-  'Manual Editor': 'Code',
 }
 
 //////////
