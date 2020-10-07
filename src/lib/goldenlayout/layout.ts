@@ -44,7 +44,9 @@ export class Layout {
     this.id = id
     this.lsKey = 'layout ' + id
     this.defaultLayout = defaultLayout
-    this.goldenLayout = this.makeGoldenLayout(mountpoint, layout)
+    console.log(mountpoint)
+    console.log(this.defaultLayout)
+    this.goldenLayout = this.makeGoldenLayout(mountpoint, this.defaultLayout)
   }
 
   public resetLayout(layout: ItemConfigType[]) {
@@ -76,6 +78,8 @@ export class Layout {
     const config = layout // make our config either from
       ? this.makeConfigFromLayout(layout) // the layout parameter if given
       : this.readConfig() // any previous config, or the default layout
+
+    console.log(config)
     const gl = new GoldenLayout(config, mountpoint)
     registerPanelMounter(gl)
 
@@ -169,20 +173,23 @@ function registerPanelMounter(instance: GoldenLayout) {
 
       // panel name is given in the vueComponent constructor
       const [err, vueEl] = await goStyle(getPanel(panelState.title))
-      let vueElInstance: any //BSATARIC: changed to any because of typing mismatch from Glenn's code for some reason
+      //let vueElInstance: any //BSATARIC: changed to any because of typing mismatch from Glenn's code for some reason
+      let vueElInstance: GenericVueInstance
+
       if (err && err instanceof UnknownPanelError) {
-        vueElInstance = new UnknownPanel()
+        //vueElInstance = new UnknownPanel()
       } else if (err || !vueEl) {
         console.error('error while loading panel', {
           panel: panelState.title,
           err,
         })
-        vueElInstance = new ErrorPanel()
+        //vueElInstance = new ErrorPanel()
       } else {
         // the constructor creates a new Vue instance
         // normally this would be invisible, except that you'd lose your link to the store
         // therefore add the store in the Vue constructor
         //vueElInstance = new vueEl({ store: stores.root, vuetify })
+        console.log(vueEl)
         vueElInstance = new vueEl()
       }
 

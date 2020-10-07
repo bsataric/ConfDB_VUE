@@ -10,5 +10,5 @@ export const init = (mount: HTMLElement) => {
   }
   const firstgroup = Object.keys(workspaces)[0]
   const firstLayout = Object.keys(workspaces[firstgroup])[0]
-  layout = new Layout('pstools', mount, workspaces[firstgroup][firstLayout])
+  layout = new Layout('ConfDB_VUE', mount, workspaces[firstgroup][firstLayout])
 }

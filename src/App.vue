@@ -1,17 +1,18 @@
 <template>
   <v-app>
     <section pstools>
-      <Header ref="header" />
+      <!--       <Header ref="header" />
+ -->
       <!-- this is where golden-layout gets mounted -->
       <section workspace ref="workspace"></section>
-      <Notifications />
+      <!--       <Notifications />
       <footer>
         <component
           v-for="name in footerElements"
           :key="name"
           v-bind:is="name"
         ></component>
-      </footer>
+      </footer> -->
     </section>
   </v-app>
 </template>
@@ -35,24 +36,22 @@
 </style>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator'
+import { Vue, Options } from 'vue-class-component'
 
 //import Header from './components/header.vue'
 //import Notifications from './components/notifications.vue'
 import * as mainLayout from './lib/goldenlayout/mainLayout'
 
-@Component({
-  components: {
-    // Header,
-    // Notifications,
+@Options({
+  watch: {
+    themename: (value) => {
+      document.body.setAttribute('theme', value)
+      localStorage['theme'] = value
+    },
   },
 })
 export default class extends Vue {
-  @Watch('themename')
-  private themeChanged(themename: string) {
-    document.body.setAttribute('theme', themename)
-    localStorage['theme'] = themename
-  }
+  themename = 'dark'
 
   /*   get footerElements() {
     return this.$store.state.footer.footerElements

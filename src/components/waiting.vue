@@ -5,10 +5,10 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Vue, Options } from 'vue-class-component'
 
-@Component
-export default class extends Vue {}
+@Options({})
+export default class Waiting extends Vue {}
 </script>
 
 <style scoped lang="scss">

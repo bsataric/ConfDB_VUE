@@ -6,7 +6,6 @@
     "noImplicitAny": false,
     "module": "commonjs",
     "moduleResolution": "node",
-
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "target": "es5",
@@ -15,7 +14,8 @@
     "allowJs": true,
     "typeRoots": ["node_modules/@types"],
     "baseUrl": "./",
-    "paths": {}
+    "paths": {},
+    "esModuleInterop": true
   },
   "exclude": ["node_modules", "**/*.spec.ts"]
 }

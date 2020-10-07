@@ -6,12 +6,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Vue, Options } from 'vue-class-component'
 // eslint-disable-next-line no-unused-vars
 import { Container } from 'golden-layout'
-
-@Component
-export default class extends Vue {
+@Options({})
+export default class ErrorPanel extends Vue {
   private container?: Container
 
   get panelTitle() {
