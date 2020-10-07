@@ -1,20 +1,7 @@
 <template>
-  <v-app>
-    <section pstools>
-      <!--       <Header ref="header" />
- -->
-      <!-- this is where golden-layout gets mounted -->
-      <section workspace ref="workspace"></section>
-      <!--       <Notifications />
-      <footer>
-        <component
-          v-for="name in footerElements"
-          :key="name"
-          v-bind:is="name"
-        ></component>
-      </footer> -->
-    </section>
-  </v-app>
+  <section pstools>
+    <section workspace ref="workspace"></section>
+  </section>
 </template>
 
 <style lang="scss" scoped>
@@ -36,39 +23,51 @@
 </style>
 
 <script lang="ts">
-import { Vue, Options } from 'vue-class-component'
+import { default as GoldenLayout } from 'golden-layout'
+import 'jquery'
 
-//import Header from './components/header.vue'
-//import Notifications from './components/notifications.vue'
-import * as mainLayout from './lib/goldenlayout/mainLayout'
-
-@Options({
-  watch: {
-    themename: (value) => {
-      document.body.setAttribute('theme', value)
-      localStorage['theme'] = value
+let config = {
+  content: [
+    {
+      type: 'row',
+      content: [
+        {
+          type: 'component',
+          componentName: 'testComponent',
+          componentState: { label: 'A' },
+        },
+        {
+          type: 'column',
+          content: [
+            {
+              type: 'component',
+              componentName: 'testComponent',
+              componentState: { label: 'B' },
+            },
+            {
+              type: 'component',
+              componentName: 'testComponent',
+              componentState: { label: 'C' },
+            },
+          ],
+        },
+      ],
     },
+  ],
+}
+
+export default {
+  setup() {
+    let myLayout = null
+    myLayout = new GoldenLayout(config)
+    myLayout.registerComponent('testComponent', function(
+      container,
+      componentState
+    ) {
+      container.getElement().html('<h2>' + componentState.label + '</h2>')
+    })
+    myLayout.init()
+    return myLayout
   },
-})
-export default class extends Vue {
-  themename = 'dark'
-
-  /*   get footerElements() {
-    return this.$store.state.footer.footerElements
-  } */
-
-  /*   get themename() {
-    return this.$vuetify.theme.dark ? 'dark' : 'light'
-  } */
-
-  public mounted() {
-    //const t = localStorage['theme']
-    /*   if (t) {
-      this.$vuetify.theme.dark = t == 'dark'
-    }
-    this.themeChanged(t || this.themename) */
-    mainLayout.init(this.$refs.workspace as HTMLElement)
-    //;(this.$refs.header as Header).mountDraggers()
-  }
 }
 </script>
