@@ -12,10 +12,22 @@
     "lib": ["dom", "es5"],
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
-    "typeRoots": ["node_modules/@types"],
+    "typeRoots": [
+      "node_modules/@types",
+      "./node_modules/@types",
+      "./node_modules/vuetify/types"
+    ],
+    "types": ["vuetify"],
     "baseUrl": "./",
     "paths": {},
     "esModuleInterop": true
   },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+    "tests/**/*.ts",
+    "tests/**/*.tsx"
+  ],
   "exclude": ["node_modules", "**/*.spec.ts"]
 }

@@ -10,11 +10,13 @@
   "dependencies": {
     "core-js": "^3.6.5",
     "golden-layout": "^1.5.9",
-    "vue": "^3.0.0-0",
+    "material-design-icons": "^3.0.1",
+    "vue": "^2.6.10",
     "vue-class-component": "^8.0.0-beta.4",
-    "vuetify": "^2.3.12"
+    "vuetify": "^2.3.13"
   },
   "devDependencies": {
+    "@types/jquery": "^3.3.38",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",
     "@vue/cli-plugin-babel": "~4.5.0",
@@ -27,9 +29,13 @@
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^7.0.0-0",
     "node-sass": "^4.14.1",
+    "sass": "^1.17.4",
     "sass-loader": "^10.0.2",
     "typescript": "~3.9.3",
-    "vue-cli-plugin-vuetify": "~2.0.7"
+    "vue-cli-plugin-vuetify": "~2.0.7",
+    "vue-template-compiler": "^2.6.10",
+    "vuetify-loader": "^1.2.2",
+    "jquery": "^3.5.1"
   },
   "eslintConfig": {
     "root": true,
