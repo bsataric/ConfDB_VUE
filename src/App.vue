@@ -8,67 +8,73 @@
 
 <script lang="ts">
 import TreeView from './components/TreeView.vue'
+import { Component, Vue } from 'vue-property-decorator'
+
 import { default as GoldenLayout } from 'golden-layout'
 import 'jquery'
 
-export default {
-  name: 'App',
-  data() {
-    return {
-      myLayout: null,
-      showPassword: false,
-      config: {
+@Component({
+  components: { TreeView },
+})
+export default class App extends Vue {
+  private name: any = 'App'
+  private counter: number = 0
+  private myLayout: any = null
+  private showPassword: any = false
+  private config: any = {
+    content: [
+      {
+        type: 'row',
         content: [
           {
-            type: 'row',
+            type: 'component',
+            componentName: 'testComponent',
+            componentState: { label: 'Config Tree' },
+          },
+          {
+            type: 'column',
             content: [
               {
                 type: 'component',
                 componentName: 'testComponent',
-                componentState: { label: 'Config Tree' },
+                componentState: { label: 'Parameters' },
               },
               {
-                type: 'column',
-                content: [
-                  {
-                    type: 'component',
-                    componentName: 'testComponent',
-                    componentState: { label: 'Parameters' },
-                  },
-                  {
-                    type: 'component',
-                    componentName: 'testComponent',
-                    componentState: { label: 'Snippet' },
-                  },
-                ],
+                type: 'component',
+                componentName: 'testComponent',
+                componentState: { label: 'Snippet' },
               },
             ],
           },
         ],
       },
-    }
-  },
-  mounted: function() {
+    ],
+  }
+  public mounted() {
     this.myLayout = new GoldenLayout(
       this.config,
       this.$refs.workspace as HTMLElement
     )
-    this.myLayout.registerComponent('testComponent', function(
-      container,
-      componentState
-    ) {
-      container.getElement().html('<h2>' + componentState.label + '</h2>')
-      const rootEl = container.getElement()[0]
+    if (this.counter++ == 0) {
+      console.log('COUNTER' + this.counter)
+      this.myLayout.registerComponent('testComponent', function(
+        container,
+        componentState
+      ) {
+        console.log('AAA')
+        container.getElement().html('<h2>' + componentState.label + '</h2>')
+        const rootEl = container.getElement()[0]
 
-      const mountEl = document.createElement('div')
-      rootEl.appendChild(mountEl)
+        const mountEl = document.createElement('div')
+        rootEl.appendChild(mountEl)
 
-      let vueElInstance = new TreeView()
+        let vueElInstance = new TreeView()
 
-      vueElInstance.$mount(mountEl)
-    })
-    this.myLayout.init()
-  },
+        vueElInstance.$mount(mountEl)
+      })
+      this.myLayout.init()
+    }
+  }
 }
 </script>
 

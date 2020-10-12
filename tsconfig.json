@@ -1,14 +1,17 @@
 {
   "compilerOptions": {
+    "target": "es5",
+    "module": "esnext",
+    "strict": true,
+    "jsx": "preserve",
+    "importHelpers": true,
     "outDir": "dist",
     "sourceMap": true,
     "inlineSources": true,
     "noImplicitAny": false,
-    "module": "commonjs",
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "target": "es5",
     "lib": ["dom", "es5"],
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
@@ -17,10 +20,13 @@
       "./node_modules/@types",
       "./node_modules/vuetify/types"
     ],
-    "types": ["vuetify"],
-    "baseUrl": "./",
-    "paths": {},
-    "esModuleInterop": true
+    "types": ["webpack-env", "vuetify"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "esModuleInterop": true,
+    "strictFunctionTypes": false
   },
   "include": [
     "src/**/*.ts",
