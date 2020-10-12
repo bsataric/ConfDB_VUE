@@ -1,9 +1,7 @@
 import Vue from 'vue'
 import App from './App.vue'
 import Vuetify from 'vuetify/lib'
-
-import 'golden-layout/src/css/goldenlayout-base.css'
-import 'golden-layout/src/css/goldenlayout-light-theme.css'
+import Vuex from 'vuex'
 
 Vue.config.productionTip = false
 //Vue.config.silent = true
@@ -11,6 +9,7 @@ Vue.config.productionTip = false
 const opts = {}
 
 Vue.use(Vuetify)
+Vue.use(Vuex)
 
 new Vue({
   vuetify: new Vuetify(opts),

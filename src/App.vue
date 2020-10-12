@@ -1,20 +1,39 @@
 <template>
   <v-app>
     <section confdb>
-      <section workspace ref="workspace"><TreeView /></section>
+      <section workspace ref="workspace">
+        <v-container class="grey lighten-5">
+          <v-row>
+            <v-col>
+              <v-card class="pa-2" outlined tile>
+                <TreeView />
+              </v-card>
+            </v-col>
+            <v-col cols="7">
+              <v-card class="pa-2" outlined tile>
+                <TableView />
+              </v-card>
+              <v-row no-gutters>
+                <v-col cols="15">
+                  <SnippetView />
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
+        </v-container>
+      </section>
     </section>
   </v-app>
 </template>
 
 <script lang="ts">
 import TreeView from './components/TreeView.vue'
+import TableView from './components/TableView.vue'
+import SnippetView from './components/SnippetView.vue'
 import { Component, Vue } from 'vue-property-decorator'
 
-import { default as GoldenLayout } from 'golden-layout'
-import 'jquery'
-
 @Component({
-  components: { TreeView },
+  components: { TreeView, TableView, SnippetView },
 })
 export default class App extends Vue {
   private name: any = 'App'
@@ -22,77 +41,8 @@ export default class App extends Vue {
   private myLayout: any = null
   private showPassword: any = false
   private vueElInstance: any = null
-  private config: any = {
-    content: [
-      {
-        type: 'row',
-        content: [
-          {
-            type: 'component',
-            componentName: 'testComponent',
-            componentState: { label: 'Config Tree' },
-          },
-          {
-            type: 'column',
-            content: [
-              {
-                type: 'component',
-                componentName: 'testComponent1',
-                componentState: { label: 'Parameters' },
-              },
-              {
-                type: 'component',
-                componentName: 'testComponent2',
-                componentState: { label: 'Snippet' },
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  }
-  public mounted() {
-    this.myLayout = new GoldenLayout(
-      this.config,
-      this.$refs.workspace as HTMLElement
-    )
-    //if (this.counter++ == 0) {
-    console.log('COUNTER' + this.counter)
-    this.myLayout.registerComponent('testComponent', function(
-      container,
-      componentState,
-      vueElInstance
-    ) {
-      console.log('AAA')
-      container.getElement().html('<h2>' + componentState.label + '</h2>')
-      const rootEl = container.getElement()[0]
 
-      const mountEl = document.createElement('div')
-      rootEl.appendChild(mountEl)
-
-      if (vueElInstance == null) {
-        console.log('NEW TREEVIEW')
-        vueElInstance = new TreeView()
-      }
-      vueElInstance.$mount(mountEl)
-    })
-    this.myLayout.registerComponent('testComponent1', function(
-      container,
-      componentState
-    ) {
-      console.log('BBB')
-      container.getElement().html('<h2>' + componentState.label + '</h2>')
-    })
-    this.myLayout.registerComponent('testComponent2', function(
-      container,
-      componentState
-    ) {
-      console.log('CCC')
-      container.getElement().html('<h2>' + componentState.label + '</h2>')
-    })
-    //this.myLayout.init()
-    //}
-  }
+  public mounted() {}
 }
 </script>
 
