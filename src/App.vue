@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <section confdb>
-      <section workspace ref="workspace"></section>
+      <section workspace ref="workspace"><TreeView /></section>
     </section>
   </v-app>
 </template>
@@ -21,6 +21,7 @@ export default class App extends Vue {
   private counter: number = 0
   private myLayout: any = null
   private showPassword: any = false
+  private vueElInstance: any = null
   private config: any = {
     content: [
       {
@@ -36,12 +37,12 @@ export default class App extends Vue {
             content: [
               {
                 type: 'component',
-                componentName: 'testComponent',
+                componentName: 'testComponent1',
                 componentState: { label: 'Parameters' },
               },
               {
                 type: 'component',
-                componentName: 'testComponent',
+                componentName: 'testComponent2',
                 componentState: { label: 'Snippet' },
               },
             ],
@@ -55,25 +56,42 @@ export default class App extends Vue {
       this.config,
       this.$refs.workspace as HTMLElement
     )
-    if (this.counter++ == 0) {
-      console.log('COUNTER' + this.counter)
-      this.myLayout.registerComponent('testComponent', function(
-        container,
-        componentState
-      ) {
-        console.log('AAA')
-        container.getElement().html('<h2>' + componentState.label + '</h2>')
-        const rootEl = container.getElement()[0]
+    //if (this.counter++ == 0) {
+    console.log('COUNTER' + this.counter)
+    this.myLayout.registerComponent('testComponent', function(
+      container,
+      componentState,
+      vueElInstance
+    ) {
+      console.log('AAA')
+      container.getElement().html('<h2>' + componentState.label + '</h2>')
+      const rootEl = container.getElement()[0]
 
-        const mountEl = document.createElement('div')
-        rootEl.appendChild(mountEl)
+      const mountEl = document.createElement('div')
+      rootEl.appendChild(mountEl)
 
-        let vueElInstance = new TreeView()
-
-        vueElInstance.$mount(mountEl)
-      })
-      this.myLayout.init()
-    }
+      if (vueElInstance == null) {
+        console.log('NEW TREEVIEW')
+        vueElInstance = new TreeView()
+      }
+      vueElInstance.$mount(mountEl)
+    })
+    this.myLayout.registerComponent('testComponent1', function(
+      container,
+      componentState
+    ) {
+      console.log('BBB')
+      container.getElement().html('<h2>' + componentState.label + '</h2>')
+    })
+    this.myLayout.registerComponent('testComponent2', function(
+      container,
+      componentState
+    ) {
+      console.log('CCC')
+      container.getElement().html('<h2>' + componentState.label + '</h2>')
+    })
+    //this.myLayout.init()
+    //}
   }
 }
 </script>
