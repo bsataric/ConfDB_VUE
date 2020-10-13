@@ -1,30 +1,40 @@
 <template>
-  <v-treeview
-    v-model="tree"
-    :open="open"
-    :items="items"
-    activatable
-    item-key="name"
-    open-on-click
-  >
-    <template v-slot:prepend="{ item, open }">
-      <v-icon v-if="!item.file">
-        {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
-      </v-icon>
-      <v-icon v-else>
-        {{ files[item.file] }}
-      </v-icon>
-    </template>
-  </v-treeview>
+  <div>
+    {{ user.name }}
+    <v-treeview
+      v-model="tree"
+      :open="open"
+      :items="items"
+      activatable
+      item-key="name"
+      open-on-click
+    >
+      <template v-slot:prepend="{ item, open }">
+        <v-icon v-if="!item.file">
+          {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
+        </v-icon>
+        <v-icon v-else>
+          {{ files[item.file] }}
+        </v-icon>
+      </template>
+    </v-treeview>
+    {{ getEventById(2) }}
+  </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
+import { mapState, mapGetters } from 'vuex'
 
-@Component
-export default class extends Vue {
-  open: any = ['public']
-  files: any = {
+@Component({
+  computed: {
+    ...mapGetters(['getEventById']),
+    ...mapState(['user', 'categories']),
+  },
+})
+export default class TreeView extends Vue {
+  private open: any = ['public']
+  private files: any = {
     html: 'mdi-language-html5',
     js: 'mdi-nodejs',
     json: 'mdi-code-json',
@@ -34,8 +44,8 @@ export default class extends Vue {
     txt: 'mdi-file-document-outline',
     xls: 'mdi-file-excel',
   }
-  tree: any = []
-  items: any = [
+  private tree: any = []
+  private items: any = [
     {
       name: '.git',
     },
