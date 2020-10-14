@@ -2,7 +2,7 @@
   <v-app>
     <section confdb>
       <section workspace ref="workspace">
-        <NotificationContainer />
+        <!--  <NotificationContainer /> -->
         <v-container class="grey lighten-5">
           <v-row>
             <v-col>
@@ -16,8 +16,8 @@
               </v-card>
               <v-row no-gutters>
                 <v-col cols="15">
-                  <!-- <SnippetView /> -->
-                  <EventCard />
+                  <SnippetView />
+                  <!-- <EventCard /> -->
                 </v-col>
               </v-row>
             </v-col>

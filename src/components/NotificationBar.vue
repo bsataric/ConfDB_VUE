@@ -6,32 +6,36 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
 import { mapActions } from 'vuex'
-export default {
+
+@Component({
   props: {
     notification: {
       type: Object,
       required: true,
     },
   },
-  data() {
-    return {
-      timeout: null,
-    }
-  },
-  mounted() {
-    this.timeout = setTimeout(() => this.remove(this.notification), 5000)
-  },
-  beforeMount() {
-    clearTimeout(this.timeout)
-  },
   computed: {
     notificationTypeClass() {
       return '-text-${this.notification.type}'
     },
   },
-  methods: mapActions('notification', ['remove']),
+  methods: {
+    ...mapActions('notification', ['remove']),
+  },
+})
+export default class NotificationBar extends Vue {
+  private timeout: any = null
+
+  mounted() {
+    //this.timeout = setTimeout(() => this.remove(this.notification), 5000) //this is difficult in TS
+  }
+
+  beforeMount() {
+    clearTimeout(this.timeout)
+  }
 }
 </script>
 

@@ -8,16 +8,21 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import NotificationBar from '@/components/NotificationBar.vue'
+import { Component, Vue } from 'vue-property-decorator'
+
 import { mapState } from 'vuex'
 
-export default {
+@Component({
   components: {
     NotificationBar,
   },
-  computed: mapState('notification', ['notifications']),
-}
+  computed: {
+    ...mapState(['notifications']),
+  },
+})
+export default class NotificationContainer extends Vue {}
 </script>
 
 <style scoped>

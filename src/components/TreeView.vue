@@ -18,18 +18,19 @@
         </v-icon>
       </template>
     </v-treeview>
-    {{ getEventById(2) }}
+    <!--     {{ getEventById(2) }}
+ -->
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { mapState, mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 
 @Component({
   computed: {
-    ...mapGetters(['getEventById']),
-    ...mapState(['user', 'categories']),
+    /*     ...mapGetters(['getEventById']),
+     */ ...mapState(['user', 'categories']),
   },
 })
 export default class TreeView extends Vue {
