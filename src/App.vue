@@ -6,7 +6,7 @@
         <v-container class="grey lighten-5">
           <v-row>
             <v-col>
-              <v-card class="pa-2" outlined tile>
+              <v-card class="pa-2" outlined tile width="700px">
                 <TreeView />
               </v-card>
             </v-col>
@@ -72,5 +72,13 @@ export default class App extends Vue {
     flex: 1;
     overflow: auto; // fixes bug where resizing to smaller size malfunctions in goldenlayout
   }
+}
+.v-card {
+  display: flex !important;
+  flex-direction: column;
+}
+.v-card__text {
+  flex-grow: 1;
+  overflow: auto;
 }
 </style>
