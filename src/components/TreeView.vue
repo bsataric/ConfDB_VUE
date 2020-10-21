@@ -1,6 +1,6 @@
 <template>
   <!-- change key into some computed key or something and not name since they can be same-->
-  <div max-height="600px" overflow-y="scroll">
+  <div>
     {{ user.name }}
     <v-treeview
       v-model="tree"
@@ -28,6 +28,8 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { mapState } from 'vuex'
 
+const axios = require('axios').default
+
 @Component({
   computed: {
     /*     ...mapGetters(['getEventById']),
@@ -36,14 +38,18 @@ import { mapState } from 'vuex'
 })
 export default class TreeView extends Vue {
   private open: any = ['public']
+  private globalSequencesObject: Object = {}
+  private globalPathsObject: Object = {}
+  private globalModulesObject: Object = {}
+
   private iconTypes: any = {
     sequence: 'mdi-view-sequential',
     module: 'mdi-view-module',
     path: 'mdi-filmstrip',
   }
   private tree: any = []
-  private items: any = [
-    {
+  //private items: any = [
+  /*   {
       name: 'Sequences',
       type: 'seqs',
       children: [
@@ -84,8 +90,8 @@ export default class TreeView extends Vue {
           ],
         },
       ],
-    },
-    {
+    }, */
+  /*     {
       name: 'Paths',
       type: 'paths',
       children: [
@@ -149,8 +155,8 @@ export default class TreeView extends Vue {
           ],
         },
       ],
-    },
-    {
+    }, */
+  /*     {
       name: 'Modules',
       type: 'mods',
       children: [
@@ -304,8 +310,8 @@ export default class TreeView extends Vue {
           ],
         },
       ],
-    },
-    {
+    }, */
+  /*  {
       name: 'PSets',
       type: 'psets',
       children: [
@@ -351,7 +357,194 @@ export default class TreeView extends Vue {
           ],
         },
       ],
-    },
-  ]
+    }, */
+  //]
+
+  get items() {
+    return [
+      this.globalSequencesObject,
+      this.globalPathsObject,
+      this.globalModulesObject,
+    ]
+  }
+  public parseSequences(sequenceData: any) {
+    let sequencesObject: Object = {
+      name: 'Sequences',
+      type: 'seqs',
+      children: [],
+    }
+
+    //console.log(sequencesObject)
+    for (const [key, value] of Object.entries(sequenceData)) {
+      //loop over sequnces - create new Sequence object and add it to children of the seqs
+      let sequenceObject: Object = {
+        type: 'sequence',
+        name: key,
+        iconType: 'sequence',
+        iconColor: 'red',
+        children: [],
+      }
+      //console.log(`${key}`)
+      // eslint-disable-next-line no-unused-vars
+      for (const [key1, value1] of Object.entries(Object(value))) {
+        //loop over sequence entries
+        let nestedSequenceObject: Object = {}
+        //console.log(`${key1}`)
+        if (Object(value1)[0] === 'modules') {
+          //console.log('MODULE')
+          nestedSequenceObject['type'] = 'modules'
+          nestedSequenceObject['name'] = Object(value1)[1]
+          nestedSequenceObject['iconType'] = 'module'
+        } else if (Object(value1)[0] === 'sequences') {
+          //console.log('SEQUENCE')
+          nestedSequenceObject['type'] = 'sequences'
+          nestedSequenceObject['name'] = Object(value1)[1]
+          nestedSequenceObject['iconType'] = 'sequence'
+          nestedSequenceObject['iconColor'] = 'red'
+        }
+        sequenceObject['children'].push(nestedSequenceObject)
+      }
+      sequencesObject['children'].push(sequenceObject)
+    }
+    console.log(sequencesObject)
+    //this.items = Object.values(sequencesObject)
+    //this.items[0] = sequencesObject
+    //console.log(this.items[0])
+    //console.log(this.pera)
+    //this.items = JSON.stringify(sequencesObject)
+    this.globalSequencesObject = sequencesObject
+  }
+
+  public parsePaths(pathData: any) {
+    let pathsObject: Object = {
+      name: 'Paths',
+      type: 'paths',
+      children: [],
+    }
+
+    //console.log(pathsObject)
+    for (const [key, value] of Object.entries(pathData)) {
+      //loop over sequnces - create new Sequence object and add it to children of the seqs
+      let pathObject: Object = {
+        type: 'paths',
+        name: key,
+        iconType: 'path',
+        iconColor: 'green',
+        children: [],
+      }
+      //console.log(`${key}`)
+      // eslint-disable-next-line no-unused-vars
+      for (const [key1, value1] of Object.entries(Object(value))) {
+        //loop over sequence entries
+        let nestedPathObject: Object = {}
+        //console.log(`${key1}`)
+        if (Object(value1)[0] === 'modules') {
+          //console.log('MODULE')
+          nestedPathObject['type'] = 'modules'
+          nestedPathObject['name'] = Object(value1)[1]
+          nestedPathObject['iconType'] = 'module'
+        } else if (Object(value1)[0] === 'sequences') {
+          //console.log('SEQUENCE')
+          nestedPathObject['type'] = 'sequences'
+          nestedPathObject['name'] = Object(value1)[1]
+          nestedPathObject['iconType'] = 'sequence'
+          nestedPathObject['iconColor'] = 'red'
+        }
+        pathObject['children'].push(nestedPathObject)
+      }
+      pathsObject['children'].push(pathObject)
+    }
+    console.log(pathsObject)
+    //this.items = Object.values(pathsObject)
+    //this.items[0] = pathsObject
+    //console.log(this.items[0])
+    //console.log(this.pera)
+    //this.items = JSON.stringify(pathsObject)
+    this.globalPathsObject = pathsObject
+  }
+
+  public parseModules(moduleData: any) {
+    let modulesObject: Object = {
+      name: 'Modules',
+      type: 'mods',
+      children: [],
+    }
+
+    //console.log(modulesObject)
+    for (const [key, value] of Object.entries(moduleData)) {
+      //loop over sequnces - create new Sequence object and add it to children of the seqs
+      let moduleObject: Object = {
+        type: 'modules',
+        name: key,
+        iconType: 'module',
+        children: [],
+      }
+      //console.log(`${key}`)
+      // eslint-disable-next-line no-unused-vars
+      for (const [key1, value1] of Object.entries(Object(value))) {
+        //loop over sequence entries
+        let nestedModuleObject: Object = {}
+        console.log(`${key1}`)
+        if (key1 === 'params') {
+          // eslint-disable-next-line no-unused-vars
+          for (const [key2, value2] of Object.entries(Object(value1))) {
+            //console.log(key2)
+            for (const [key3, value3] of Object.entries(Object(value2))) {
+              if (key3 == 'type') nestedModuleObject['type'] = value3
+              else if (key3 == 'value') nestedModuleObject['value'] = value3
+
+              console.log(key3)
+              console.log(value3)
+            }
+          }
+        } else if (key1 === 'ctype') {
+          nestedModuleObject['ctype'] = value1
+        } else if (key1 === 'pytype') {
+          nestedModuleObject['pytype'] = value1
+        } //TODO: fix this
+        let cmsTypeLenght = nestedModuleObject['type'].toString().length()
+        let cmsType = nestedModuleObject['type'].substring(
+          nestedModuleObject['type'].indexOf('.'),
+          cmsTypeLenght
+        )
+        nestedModuleObject['name'] =
+          cmsType + ' = ' + nestedModuleObject['value']
+        moduleObject['name'] = moduleObject['children'].push(nestedModuleObject)
+      }
+      modulesObject['children'].push(moduleObject)
+    }
+    console.log(modulesObject)
+    //this.items = Object.values(modulesObject)
+    //this.items[0] = modulesObject
+    //console.log(this.items[0])
+    //console.log(this.pera)
+    //this.items = JSON.stringify(modulesObject)
+    //this.globalModulesObject = modulesObject
+  }
+
+  public fetchGroup(name: string) {
+    axios
+      .get('http://localhost:3000/' + name) //will have to do separate requests for all entities
+      .then((response) => {
+        // handle success
+        if (name == 'seqs') this.parseSequences(response.data)
+        else if (name == 'paths') this.parsePaths(response.data)
+        else if (name == 'mods') this.parseModules(response.data)
+      })
+      .catch((error) => {
+        // handle error
+        console.log(error)
+      })
+      .then(function() {
+        // always executed
+      })
+  }
+
+  created() {
+    // Make a request for config parts
+    this.fetchGroup('seqs')
+    this.fetchGroup('paths')
+    this.fetchGroup('mods')
+  }
 }
 </script>

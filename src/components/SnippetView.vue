@@ -1,6 +1,6 @@
 <template>
   <v-textarea
-    rows="8"
+    rows="17"
     background-color="white"
     outlined
     name="input-7-4"

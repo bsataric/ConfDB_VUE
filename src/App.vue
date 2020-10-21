@@ -6,20 +6,18 @@
         <v-container class="grey lighten-5">
           <v-row>
             <v-col>
-              <v-card class="pa-2" outlined tile width="700px">
+              <v-card class="v-card-treeview" outlined tile>
                 <TreeView />
               </v-card>
             </v-col>
-            <v-col cols="7">
-              <v-card class="pa-2" outlined tile>
+            <v-col>
+              <v-card class="pa-2, v-card-tableview" outlined tile>
                 <TableView />
               </v-card>
-              <v-row no-gutters>
-                <v-col cols="15">
-                  <SnippetView />
-                  <!-- <EventCard /> -->
-                </v-col>
-              </v-row>
+              <v-card class="pa-2, v-card-snippetview" outlined tile>
+                <SnippetView />
+                <!-- <EventCard /> -->
+              </v-card>
             </v-col>
           </v-row>
         </v-container>
@@ -73,12 +71,22 @@ export default class App extends Vue {
     overflow: auto; // fixes bug where resizing to smaller size malfunctions in goldenlayout
   }
 }
-.v-card {
-  display: flex !important;
-  flex-direction: column;
-}
-.v-card__text {
-  flex-grow: 1;
+.v-card-treeview {
   overflow: auto;
+  max-height: 1000px;
+  height: 1000px;
+  //max-width: 750px;
+}
+.v-card-tableview {
+  overflow: auto;
+  max-height: 500px;
+  height: 500px;
+  //max-width: 750px;
+}
+.v-card-snippetview {
+  overflow: auto;
+  max-height: 500px;
+  height: 500px;
+  //max-width: 750px;
 }
 </style>
