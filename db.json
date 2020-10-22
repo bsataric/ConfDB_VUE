@@ -331,7 +331,7 @@
       "pytype": "EDProducer"
     },
     "hltDoubletRecoveryPFlowPixelSeeds": {
-      "params": { "para_name": { "type": "cms.double", "value": 1.0 } },
+      "params": { "para_name": { "type": "cms.double", "value": 1.01 } },
       "ctype": "SeedCreatorFromRegionConsecutiveHitsEDProducer",
       "pytype": "EDProducer"
     },
@@ -358,7 +358,7 @@
       "pytype": "EDProducer"
     },
     "hltElePixelSeedsDoublets": {
-      "params": { "para_name": { "type": "cms.double", "value": 1.0 } },
+      "params": { "para_name": { "type": "cms.double", "value": 1.05 } },
       "ctype": "SeedCreatorFromRegionConsecutiveHitsEDProducer",
       "pytype": "EDProducer"
     },
@@ -953,7 +953,7 @@
       "pytype": "EDProducer"
     },
     "hltPixelVertices": {
-      "params": { "para_name": { "type": "cms.double", "value": 1.0 } },
+      "params": { "para_name": { "type": "cms.double", "value": 99.99 } },
       "ctype": "PixelVertexProducer",
       "pytype": "EDProducer"
     },
