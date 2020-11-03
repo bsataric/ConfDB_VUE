@@ -10,13 +10,13 @@ const apiClient = axios.create({
 })
 
 export default {
-  getEvents() {
-    return apiClient.get('/events')
+  getSequences() {
+    return apiClient.get('/seqs')
   },
-  getEvent(id) {
-    return apiClient.get('/events/' + id)
+  getSequence(id) {
+    return apiClient.get('/seqs/' + id)
   },
-  postEvent(event) {
-    return apiClient.post('/events', event)
+  postSequence(sequence) {
+    return apiClient.post('/seqs', sequence)
   },
 }

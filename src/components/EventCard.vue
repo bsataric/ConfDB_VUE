@@ -2,7 +2,7 @@
   <div>
     <h1>
       Create an Event
-      <form @submit.prevent="createEvent">
+      <form @submit.prevent="createSequence">
         <label>Select a category</label>
         <select v-model="event.category">
           <option v-for="cat in categories" :key="cat">{{ cat }}</option>
@@ -71,9 +71,9 @@ export default class EventCard extends Vue {
     }
   }
 
-  public createEvent() {
+  public createSequence() {
     this.$store
-      .dispatch('event/createEvent', this.event)
+      .dispatch('event/createSequence', this.event)
       .then(() => {
         this.event = this.createFreshEventObject()
       })

@@ -21,7 +21,7 @@
         </span>
       </template>
     </v-treeview>
-    <!--     {{ getEventById(2) }}
+    <!--     {{ getSequenceById(2) }}
  -->
   </div>
 </template>
@@ -34,7 +34,7 @@ const axios = require('axios').default
 
 @Component({
   computed: {
-    /*     ...mapGetters(['getEventById']),
+    /*     ...mapGetters(['getSequenceById']),
      */ ...mapState(['user', 'categories']),
   },
 })
