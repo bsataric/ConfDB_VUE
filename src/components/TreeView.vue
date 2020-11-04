@@ -7,6 +7,7 @@
       :items="items"
       activatable
       item-key="name"
+      item-text=""
       open-on-click
     >
       <template v-slot:prepend="{ item, open }">
@@ -17,7 +18,13 @@
           {{ iconTypes[item.iconType] }}
         </v-icon>
         <span class="param-style" v-if="item.cmsType">
-          {{ item.cmsType + ' = ' }}
+          {{ item.cmsType }}
+        </span>
+        <span :class="item.globalType == 'parameter' ? 'param-name-style' : ''">
+          {{ item.name }}
+        </span>
+        <span class="param-value-style" v-if="item.value">
+          {{ item.value }}
         </span>
       </template>
     </v-treeview>
@@ -533,6 +540,7 @@ export default class TreeView extends Vue {
   }
 
   public parseModules(moduleData: any) {
+    //TODO refractor this nesting goes deeper with multiple parameters now
     let modulesObject: Object = {
       name: 'Modules',
       type: 'mods',
@@ -558,8 +566,11 @@ export default class TreeView extends Vue {
         if (key1 === 'params') {
           // eslint-disable-next-line no-unused-vars
           for (const [key2, value2] of Object.entries(Object(value1))) {
+            //key2 should be parameter name
             //aviod para_name level
-            //console.log(key2)
+            console.log(key2)
+            nestedModuleObject['name'] = key2 + ' = '
+
             for (const [key3, value3] of Object.entries(Object(value2))) {
               if (key3 === 'type') nestedModuleObject['type'] = value3
               else if (key3 === 'value') {
@@ -594,7 +605,6 @@ export default class TreeView extends Vue {
                       nestedModuleObject['value'] += splitString[i] + ' \r\n'
                     } */
                   //}
-                  nestedModuleObject['name'] = nestedModuleObject['value']
                 }
               }
               //console.log(key3)
@@ -620,6 +630,7 @@ export default class TreeView extends Vue {
           nestedModuleObject['cmsType'] = cmsType
           //nestedModuleObject['name'] = nestedModuleObject['value']
           moduleObject['children'].push(nestedModuleObject)
+          console.log(nestedModuleObject)
         }
       }
       modulesObject['children'].push(moduleObject)
@@ -757,5 +768,12 @@ export default class TreeView extends Vue {
 <style lang="scss" scoped>
 .param-style {
   color: green;
+}
+.param-value-style {
+  color: blue;
+  font-weight: bold;
+}
+.param-name-style {
+  font-weight: bold;
 }
 </style>

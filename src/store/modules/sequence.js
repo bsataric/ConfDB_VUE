@@ -12,10 +12,7 @@ export const mutations = {
     state.sequences.push(sequence)
   },
   SET_SEQUENCES(state, sequences) {
-    console.log('BEFORE SET SEQUENCES')
     state.sequences = sequences
-    console.log(state.sequences)
-    console.log('AFTER SET SEQUENCES')
   },
   SET_SEQUENCE(state, sequence) {
     state.sequence = sequence
@@ -46,7 +43,6 @@ export const actions = {
     return SequenceService.getSequences()
       .then((response) => {
         commit('SET_SEQUENCES', response.data)
-        console.log('LOADED')
       })
       .catch((error) => {
         const notification = {

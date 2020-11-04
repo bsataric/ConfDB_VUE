@@ -1,7 +1,7 @@
 <template>
   <v-textarea
     rows="17"
-    background-color="white"
+    background-color="#212121"
     outlined
     name="input-7-4"
     label="Outlined textarea"
