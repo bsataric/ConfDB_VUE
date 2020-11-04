@@ -39,7 +39,7 @@ export const actions = {
       })
   },
   fetchPSets({ commit, dispatch }) {
-    PSetService.getPSets()
+    return PSetService.getPSets()
       .then((response) => {
         commit('SET_PSETS', response.data)
       })
@@ -56,7 +56,7 @@ export const actions = {
     if (pset) {
       commit('SET_PSET', pset)
     } else {
-      PSetService.getPSet(id)
+      return PSetService.getPSet(id)
         .then((response) => {
           commit('SET_PSET', response.data)
         })
@@ -76,5 +76,8 @@ export const getters = {
   },
   getPSetById: (state) => (id) => {
     return state.psets.find((pset) => pset.id == id)
+  },
+  getPSets: (state) => {
+    return state.psets
   },
 }

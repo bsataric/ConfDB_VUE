@@ -39,7 +39,7 @@ export const actions = {
       })
   },
   fetchModules({ commit, dispatch }) {
-    ModuleService.getModules()
+    return ModuleService.getModules()
       .then((response) => {
         commit('SET_MODULES', response.data)
       })
@@ -56,7 +56,7 @@ export const actions = {
     if (module) {
       commit('SET_MODULE', module)
     } else {
-      ModuleService.getModule(id)
+      return ModuleService.getModule(id)
         .then((response) => {
           commit('SET_MODULE', response.data)
         })
@@ -76,5 +76,8 @@ export const getters = {
   },
   getModuleById: (state) => (id) => {
     return state.modules.find((module) => module.id == id)
+  },
+  getModules: (state) => {
+    return state.modules
   },
 }

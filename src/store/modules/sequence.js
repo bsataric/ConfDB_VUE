@@ -12,7 +12,10 @@ export const mutations = {
     state.sequences.push(sequence)
   },
   SET_SEQUENCES(state, sequences) {
+    console.log('BEFORE SET SEQUENCES')
     state.sequences = sequences
+    console.log(state.sequences)
+    console.log('AFTER SET SEQUENCES')
   },
   SET_SEQUENCE(state, sequence) {
     state.sequence = sequence
@@ -40,9 +43,10 @@ export const actions = {
       })
   },
   fetchSequences({ commit, dispatch }) {
-    SequenceService.getSequences()
+    return SequenceService.getSequences()
       .then((response) => {
         commit('SET_SEQUENCES', response.data)
+        console.log('LOADED')
       })
       .catch((error) => {
         const notification = {
@@ -57,7 +61,7 @@ export const actions = {
     if (sequence) {
       commit('SET_SEQUENCE', sequence)
     } else {
-      SequenceService.getSequence(id)
+      return SequenceService.getSequence(id)
         .then((response) => {
           commit('SET_SEQUENCE', response.data)
         })
@@ -77,5 +81,8 @@ export const getters = {
   },
   getSequenceById: (state) => (id) => {
     return state.sequences.find((sequence) => sequence.id == id)
+  },
+  getSequences: (state) => {
+    return state.sequences
   },
 }

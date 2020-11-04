@@ -39,7 +39,7 @@ export const actions = {
       })
   },
   fetchPaths({ commit, dispatch }) {
-    PathService.getPaths()
+    return PathService.getPaths()
       .then((response) => {
         commit('SET_PATHS', response.data)
       })
@@ -56,7 +56,7 @@ export const actions = {
     if (path) {
       commit('SET_PATH', path)
     } else {
-      PathService.getPath(id)
+      return PathService.getPath(id)
         .then((response) => {
           commit('SET_PATH', response.data)
         })
@@ -76,5 +76,8 @@ export const getters = {
   },
   getPathById: (state) => (id) => {
     return state.paths.find((path) => path.id == id)
+  },
+  getPaths: (state) => {
+    return state.paths
   },
 }

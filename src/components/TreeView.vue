@@ -28,18 +28,28 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 
-const axios = require('axios').default
+//const axios = require('axios').default
 
 @Component({
   computed: {
-    /*     ...mapGetters(['getSequenceById']),
-     */ ...mapState(['user', 'categories']),
+    ...mapGetters({
+      getSequences: 'sequence/getSequences',
+      getPaths: 'path/getPaths',
+      getModules: 'module/getModules',
+      getPSets: 'pset/getPSets',
+    }),
+    // ...mapState('sequence', ['sequences']),
   },
 })
 export default class TreeView extends Vue {
   private open: any = ['public']
+  private getSequences!: any[] // are assigned via mapState
+  private getPaths!: any[]
+  private getModules!: any[]
+  private getPSets!: any[]
+
   private globalSequencesObject: Object = {}
   private globalPathsObject: Object = {}
   private globalModulesObject: Object = {}
@@ -718,23 +728,20 @@ export default class TreeView extends Vue {
     this.globalPSetsObject = psetsObject
   }
 
-  public fetchGroup(name: string) {
-    axios
-      .get('http://localhost:3000/' + name) //will have to do separate requests for all entities
-      .then((response) => {
-        // handle success
-        if (name == 'seqs') this.parseSequences(response.data)
-        else if (name == 'paths') this.parsePaths(response.data)
-        else if (name == 'mods') this.parseModules(response.data)
-        else if (name == 'psets') this.parsePSets(response.data)
-      })
-      .catch((error) => {
-        // handle error
-        console.log(error)
-      })
-      .then(function() {
-        // always executed
-      })
+  async fetchGroup(name: string) {
+    if (name == 'seqs') {
+      await this.$store.dispatch('sequence/fetchSequences') // note the "await"
+      this.parseSequences(this.getSequences)
+    } else if (name == 'paths') {
+      await this.$store.dispatch('path/fetchPaths')
+      this.parsePaths(this.getPaths)
+    } else if (name == 'mods') {
+      await this.$store.dispatch('module/fetchModules')
+      this.parseModules(this.getModules)
+    } else if (name == 'psets') {
+      await this.$store.dispatch('pset/fetchPSets')
+      this.parsePSets(this.getPSets)
+    }
   }
 
   created() {
