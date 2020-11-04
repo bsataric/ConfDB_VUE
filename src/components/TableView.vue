@@ -5,7 +5,14 @@
       :items="desserts"
       :items-per-page="8"
       class="elevation-1"
-    ></v-data-table>
+    >
+      <template v-slot:[`item.glutenfree`]="{ item }">
+        <v-simple-checkbox
+          v-model="item.glutenfree"
+          disabled
+        ></v-simple-checkbox>
+      </template>
+    </v-data-table>
   </div>
 </template>
 
@@ -26,6 +33,7 @@ export default class TableView extends Vue {
     { text: 'Carbs (g)', value: 'carbs' },
     { text: 'Protein (g)', value: 'protein' },
     { text: 'Iron (%)', value: 'iron' },
+    { text: 'Gluten-Free', value: 'glutenfree' },
   ]
   private desserts: any = [
     {
@@ -35,6 +43,7 @@ export default class TableView extends Vue {
       carbs: 24,
       protein: 4.0,
       iron: '1%',
+      glutenfree: true,
     },
     {
       name: 'Ice cream sandwich',
@@ -43,6 +52,7 @@ export default class TableView extends Vue {
       carbs: 37,
       protein: 4.3,
       iron: '1%',
+      glutenfree: false,
     },
     {
       name: 'Eclair',
@@ -51,6 +61,7 @@ export default class TableView extends Vue {
       carbs: 23,
       protein: 6.0,
       iron: '7%',
+      glutenfree: false,
     },
     {
       name: 'Cupcake',
@@ -59,6 +70,7 @@ export default class TableView extends Vue {
       carbs: 67,
       protein: 4.3,
       iron: '8%',
+      glutenfree: true,
     },
     {
       name: 'Gingerbread',
@@ -67,6 +79,7 @@ export default class TableView extends Vue {
       carbs: 49,
       protein: 3.9,
       iron: '16%',
+      glutenfree: true,
     },
     {
       name: 'Jelly bean',
@@ -75,6 +88,7 @@ export default class TableView extends Vue {
       carbs: 94,
       protein: 0.0,
       iron: '0%',
+      glutenfree: false,
     },
     {
       name: 'Lollipop',
@@ -83,6 +97,7 @@ export default class TableView extends Vue {
       carbs: 98,
       protein: 0,
       iron: '2%',
+      glutenfree: false,
     },
     {
       name: 'Honeycomb',
@@ -91,6 +106,7 @@ export default class TableView extends Vue {
       carbs: 87,
       protein: 6.5,
       iron: '45%',
+      glutenfree: false,
     },
     {
       name: 'Donut',
@@ -99,6 +115,7 @@ export default class TableView extends Vue {
       carbs: 51,
       protein: 4.9,
       iron: '22%',
+      glutenfree: false,
     },
     {
       name: 'KitKat',
@@ -107,6 +124,7 @@ export default class TableView extends Vue {
       carbs: 65,
       protein: 7,
       iron: '6%',
+      glutenfree: false,
     },
   ]
 }
