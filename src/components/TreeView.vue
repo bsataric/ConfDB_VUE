@@ -6,7 +6,7 @@
       :open="open"
       :items="items"
       activatable
-      item-key="name"
+      item-key="id"
       item-text=""
       open-on-click
     >
@@ -61,6 +61,8 @@ export default class TreeView extends Vue {
   private globalPathsObject: Object = {}
   private globalModulesObject: Object = {}
   private globalPSetsObject: Object = {}
+
+  private idCounter = 0 //TODO: this is dummy this has to be provided from the server
 
   private iconTypes: any = {
     sequence: 'mdi-view-sequential',
@@ -402,6 +404,7 @@ export default class TreeView extends Vue {
       let sequenceObject: Object = {
         type: 'sequence',
         name: key,
+        id: this.idCounter++,
         iconType: 'sequence',
         iconColor: 'red',
         children: [],
@@ -410,7 +413,7 @@ export default class TreeView extends Vue {
       // eslint-disable-next-line no-unused-vars
       for (const [key1, value1] of Object.entries(Object(value))) {
         //loop over sequence entries
-        let nestedSequenceObject: Object = {}
+        let nestedSequenceObject: Object = { id: this.idCounter++ }
         //console.log(`${key1}`)
         if (Object(value1)[0] === 'modules') {
           //console.log('MODULE')
@@ -450,6 +453,7 @@ export default class TreeView extends Vue {
       let pathObject: Object = {
         type: 'paths',
         name: key,
+        id: this.idCounter++,
         iconType: 'path',
         iconColor: 'green',
         children: [],
@@ -457,8 +461,8 @@ export default class TreeView extends Vue {
       //console.log(`${key}`)
       // eslint-disable-next-line no-unused-vars
       for (const [key1, value1] of Object.entries(Object(value))) {
-        //loop over sequence entries
-        let nestedPathObject: Object = {}
+        //loop over path entries
+        let nestedPathObject: Object = { id: this.idCounter++ }
         //console.log(`${key1}`)
         if (Object(value1)[0] === 'modules') {
           //console.log('MODULE')
@@ -488,53 +492,107 @@ export default class TreeView extends Vue {
   public buildRecursiveVPSetObject(vpSetObject: Object, body: any) {
     //console.log(JSON.stringify(vpSetObject))
     //console.log(body)
-
+    //if the body has more then 0 keys it is an unnamed nested PSet
+    if (Object.entries(Object(body)).length > 1) {
+      //console.log('NESTED UNNAMED PSET')
+    }
     // eslint-disable-next-line no-unused-vars
     for (const [key, value] of Object.entries(Object(body))) {
+      if (vpSetObject['name'] === 'qualityTests') {
+        //console.log('LOOPING 1')
+        //console.log('key: ' + key)
+      }
       //loop over VPSet entries
-      let nestedVPSetObject: Object = {}
+      if (vpSetObject['name'] === 'regressionConfig') {
+        //console.log(JSON.stringify(key))
+        //console.log(JSON.stringify(value))
+        //console.log('key: ' + key)
+        //console.log('value: ' + value)
+      }
+      let nestedNoNamePSetObject: Object = {} //might or might not be used
+      if (Object.entries(Object(body)).length > 1) {
+        nestedNoNamePSetObject['id'] = this.idCounter++
+        nestedNoNamePSetObject['globalType'] = 'parameter'
+        nestedNoNamePSetObject['type'] == 'PSet'
+        nestedNoNamePSetObject['name'] = 'PSet' //no name
+        nestedNoNamePSetObject['children'] = []
+      }
       //console.log(JSON.stringify(key), JSON.stringify(value))
       // eslint-disable-next-line no-unused-vars
       for (const [key1, value1] of Object.entries(Object(value))) {
-        //console.log(JSON.stringify(key1), JSON.stringify(value1))
+        let nestedVPSetObject: Object = { id: this.idCounter++ }
+        nestedVPSetObject['globalType'] = 'parameter'
+
+        //this is parameter loop
+        if (vpSetObject['name'] === 'regressionConfig') {
+          //console.log(JSON.stringify(key1), JSON.stringify(value1))
+        }
         for (const [key2, value2] of Object.entries(Object(value1))) {
-          //console.log(JSON.stringify(key2), JSON.stringify(value2))
+          if (vpSetObject['name'] === 'regressionConfig') {
+            //console.log(JSON.stringify(key2), JSON.stringify(value2))
+          }
           if (key2 === 'type') nestedVPSetObject['type'] = value2
           else if (key2 === 'value') {
             if (
               nestedVPSetObject['type'] == 'cms.VPSet' ||
               nestedVPSetObject['type'] == 'cms.PSet'
             ) {
-              if (nestedVPSetObject['type'] == 'cms.VPSet')
-                nestedVPSetObject['name'] = 'VPSet'
-              else nestedVPSetObject['name'] = 'PSet'
+              if (vpSetObject['name'] === 'regressionConfig') {
+                //console.log('type PSET')
+              }
+              nestedVPSetObject['name'] = key1
+              if (key1 === 'qualityTests') {
+                //console.log('AAAAA')
+                //console.log('value2: ' + JSON.stringify(value2))
+              }
 
-              nestedVPSetObject['globalType'] = 'parameter'
+              /*     if (nestedVPSetObject['type'] == 'cms.VPSet')
+                nestedVPSetObject['name'] = 'VPSet'
+              else nestedVPSetObject['name'] = 'PSet' */
+
               nestedVPSetObject['children'] = []
 
               this.buildRecursiveVPSetObject(nestedVPSetObject, value2)
             } else {
+              nestedVPSetObject['name'] = key1 + ' = '
+
+              if (vpSetObject['name'] === 'regressionConfig') {
+                //console.log('type ' + nestedVPSetObject['type'])
+              }
               nestedVPSetObject['value'] = JSON.stringify(value2) //simple value
-              nestedVPSetObject['name'] = nestedVPSetObject['value']
+              //nestedVPSetObject['name'] = nestedVPSetObject['value']
             }
           }
+          if (vpSetObject['name'] === 'regressionConfig') {
+            //console.log(JSON.stringify(nestedVPSetObject))
+          }
         }
-      }
-      nestedVPSetObject['globalType'] = 'parameter'
-      /*    console.log(
+        if (nestedVPSetObject['type'] != undefined) {
+          let cmsTypeLenght = nestedVPSetObject['type'].length
+          let cmsType = nestedVPSetObject['type'].substring(
+            //cmsType is necessary for printing out in tree
+            nestedVPSetObject['type'].indexOf('.') + 1,
+            cmsTypeLenght
+          )
+          nestedVPSetObject['cmsType'] = cmsType
+        }
+        /*    console.log(
           'NESTED MODULE OBJECT: ' + JSON.stringify(nestedModuleObject)
         ) */
-      //console.log('NESTED MODULE TYPE ' + nestedModuleObject['type'])
-      if (nestedVPSetObject['type'] != undefined) {
-        let cmsTypeLenght = nestedVPSetObject['type'].length
-        let cmsType = nestedVPSetObject['type'].substring(
-          //cmsType is necessary for printing out in tree
-          nestedVPSetObject['type'].indexOf('.') + 1,
-          cmsTypeLenght
-        )
-        nestedVPSetObject['cmsType'] = cmsType
+        //console.log('NESTED MODULE TYPE ' + nestedModuleObject['type'])
+
         //nestedModuleObject['name'] = nestedModuleObject['value']
-        vpSetObject['children'].push(nestedVPSetObject)
+        if (vpSetObject['name'] === 'regressionConfig') {
+          //console.log(nestedVPSetObject)
+        }
+        if (Object.entries(Object(body)).length == 1) {
+          vpSetObject['children'].push(nestedVPSetObject)
+        } else {
+          nestedNoNamePSetObject['children'].push(nestedVPSetObject)
+        }
+      }
+      if (Object.entries(Object(body)).length > 1) {
+        vpSetObject['children'].push(nestedNoNamePSetObject)
       }
     }
   }
@@ -554,46 +612,48 @@ export default class TreeView extends Vue {
       let moduleObject: Object = {
         type: 'modules',
         name: key,
+        id: this.idCounter++,
         iconType: 'module',
         children: [],
       }
       //console.log(`${key}`)
       // eslint-disable-next-line no-unused-vars
       for (const [key1, value1] of Object.entries(Object(value))) {
-        //loop over sequence entries
-        let nestedModuleObject: Object = {}
+        //loop over module entries
+        //let nestedModuleObject: Object = { children: [] }
         //console.log(`${key1}`)
         if (key1 === 'params') {
           // eslint-disable-next-line no-unused-vars
           for (const [key2, value2] of Object.entries(Object(value1))) {
             //key2 should be parameter name
             //aviod para_name level
-            console.log(key2)
-            nestedModuleObject['name'] = key2 + ' = '
+            //console.log(key2)
+
+            let nestedParameterObject: Object = {
+              id: this.idCounter++,
+              children: [],
+            }
+            nestedParameterObject['globalType'] = 'parameter'
 
             for (const [key3, value3] of Object.entries(Object(value2))) {
-              if (key3 === 'type') nestedModuleObject['type'] = value3
+              if (key3 === 'type') nestedParameterObject['type'] = value3
               else if (key3 === 'value') {
                 if (
-                  nestedModuleObject['type'] == 'cms.VPSet' ||
-                  nestedModuleObject['type'] == 'cms.PSet'
+                  nestedParameterObject['type'] == 'cms.VPSet' ||
+                  nestedParameterObject['type'] == 'cms.PSet'
                 ) {
-                  if (nestedModuleObject['type'] == 'cms.VPSet')
-                    nestedModuleObject['name'] = 'VPSet'
-                  /*+ this.makeid(5)*/
-                  //dummy name to avoid same names
-                  else nestedModuleObject['name'] = 'PSet' /*+ this.makeid(5)*/
+                  nestedParameterObject['children'] = []
+                  nestedParameterObject['name'] = key2
 
-                  nestedModuleObject['globalType'] = 'parameter'
-                  nestedModuleObject['children'] = []
-
-                  this.buildRecursiveVPSetObject(nestedModuleObject, value3)
+                  this.buildRecursiveVPSetObject(nestedParameterObject, value3)
                 } else {
-                  nestedModuleObject['value'] = JSON.stringify(value3) //simple value
-                  if (nestedModuleObject['value'].length > 70) {
+                  nestedParameterObject['name'] = key2 + ' = '
+                  //simple type
+                  nestedParameterObject['value'] = JSON.stringify(value3) //simple value
+                  if (nestedParameterObject['value'].length > 70) {
                     //shorten the string and put three dots in the end
-                    nestedModuleObject['value'] =
-                      nestedModuleObject['value'].substring(1, 70) + '...'
+                    nestedParameterObject['value'] =
+                      nestedParameterObject['value'].substring(1, 70) + '...'
                   }
                   //if (nestedModuleObject['value'].indexOf('OR') != -1) {
                   //probably need more operators
@@ -609,29 +669,32 @@ export default class TreeView extends Vue {
               }
               //console.log(key3)
             }
+            nestedParameterObject['globalType'] = 'parameter'
+            if (nestedParameterObject['type'] != undefined) {
+              let cmsTypeLenght = nestedParameterObject['type'].length
+              let cmsType = nestedParameterObject['type'].substring(
+                //cmsType is necessary for printing out in tree
+                nestedParameterObject['type'].indexOf('.') + 1,
+                cmsTypeLenght
+              )
+              nestedParameterObject['cmsType'] = cmsType
+              //nestedModuleObject['name'] = nestedModuleObject['value']
+              //console.log(nestedParameterObject)
+            }
+            //push parameter into module children
+            moduleObject['children'].push(nestedParameterObject)
           }
         } else if (key1 === 'ctype') {
-          nestedModuleObject['ctype'] = value1
+          moduleObject['ctype'] = value1
         } else if (key1 === 'pytype') {
-          nestedModuleObject['pytype'] = value1
+          moduleObject['pytype'] = value1
         } //TODO: fix this
-        nestedModuleObject['globalType'] = 'parameter'
         /*    console.log(
           'NESTED MODULE OBJECT: ' + JSON.stringify(nestedModuleObject)
         ) */
         //console.log('NESTED MODULE TYPE ' + nestedModuleObject['type'])
-        if (nestedModuleObject['type'] != undefined) {
-          let cmsTypeLenght = nestedModuleObject['type'].length
-          let cmsType = nestedModuleObject['type'].substring(
-            //cmsType is necessary for printing out in tree
-            nestedModuleObject['type'].indexOf('.') + 1,
-            cmsTypeLenght
-          )
-          nestedModuleObject['cmsType'] = cmsType
-          //nestedModuleObject['name'] = nestedModuleObject['value']
-          moduleObject['children'].push(nestedModuleObject)
-          console.log(nestedModuleObject)
-        }
+
+        //moduleObject['children'].push(nestedModuleObject)
       }
       modulesObject['children'].push(moduleObject)
     }
@@ -657,60 +720,59 @@ export default class TreeView extends Vue {
       let psetObject: Object = {
         type: 'pset',
         name: key,
+        id: this.idCounter++,
         iconType: 'pset',
         children: [],
       }
       //console.log(`${key}`)
       // eslint-disable-next-line no-unused-vars
       for (const [key1, value1] of Object.entries(Object(value))) {
-        //loop over sequence entries
-        let nestedPSetObject: Object = {}
+        //loop over pset entries
+        if (key == 'HLTPSetPixelLessStepTrajectoryFilter') {
+          console.log(`${key1}, ${value1}`)
+        }
+        let nestedPSetObject: Object = { id: this.idCounter++ }
         //console.log(`${key1}, ${value1}`)
-        if (key1 === 'para_name') {
-          // eslint-disable-next-line no-unused-vars
-          for (const [key2, value2] of Object.entries(Object(value1))) {
-            //aviod para_name level
-            //console.log('ANYTHING')
-            console.log(`${key2}, ${value2}`)
-            if (key2 === 'type') nestedPSetObject['type'] = value2
-            else if (key2 === 'value') {
-              if (
-                nestedPSetObject['type'] == 'cms.VPSet' ||
-                nestedPSetObject['type'] == 'cms.PSet'
-              ) {
-                if (nestedPSetObject['type'] == 'cms.VPSet')
-                  nestedPSetObject['name'] = 'VPSet'
-                /*+ this.makeid(5)*/
-                //dummy name to avoid same names
-                else nestedPSetObject['name'] = 'PSet' /*+ this.makeid(5)*/
+        //if (key1 === 'para_name') {
+        // eslint-disable-next-line no-unused-vars
+        for (const [key2, value2] of Object.entries(Object(value1))) {
+          //aviod para_name level
+          //console.log('ANYTHING')
+          console.log(`${key2}, ${value2}`)
+          if (key2 === 'type') nestedPSetObject['type'] = value2
+          else if (key2 === 'value') {
+            if (
+              nestedPSetObject['type'] == 'cms.VPSet' ||
+              nestedPSetObject['type'] == 'cms.PSet'
+            ) {
+              nestedPSetObject['name'] = key1
+              nestedPSetObject['globalType'] = 'parameter'
+              nestedPSetObject['children'] = []
 
-                nestedPSetObject['globalType'] = 'parameter'
-                nestedPSetObject['children'] = []
-
-                this.buildRecursiveVPSetObject(nestedPSetObject, value2)
-              } else {
-                nestedPSetObject['value'] = JSON.stringify(value2) //simple value
-                if (nestedPSetObject['value'].length > 70) {
-                  //shorten the string and put three dots in the end
-                  nestedPSetObject['value'] =
-                    nestedPSetObject['value'].substring(1, 70) + '...'
-                }
-                //if (nestedPSetObject['value'].indexOf('OR') != -1) {
-                //probably need more operators
-                //console.log('FOUND OR OPERATOR')
-                //let splitString = nestedPSetObject['value'].split('OR')
-                //console.log('SPLIT STRING: ' + splitString)
-                /*    nestedPSetObject['value'] = ''
+              this.buildRecursiveVPSetObject(nestedPSetObject, value2)
+            } else {
+              nestedPSetObject['value'] = JSON.stringify(value2) //simple value
+              if (nestedPSetObject['value'].length > 70) {
+                //shorten the string and put three dots in the end
+                nestedPSetObject['value'] =
+                  nestedPSetObject['value'].substring(1, 70) + '...'
+              }
+              //if (nestedPSetObject['value'].indexOf('OR') != -1) {
+              //probably need more operators
+              //console.log('FOUND OR OPERATOR')
+              //let splitString = nestedPSetObject['value'].split('OR')
+              //console.log('SPLIT STRING: ' + splitString)
+              /*    nestedPSetObject['value'] = ''
                     for (let i = 0; i < splitString.length; i++) {
                       nestedPSetObject['value'] += splitString[i] + ' \r\n'
                     } */
-                //}
-                nestedPSetObject['name'] = nestedPSetObject['value']
-              }
+              //}
+              nestedPSetObject['name'] = key1 + ' = '
             }
-            //console.log(key3)
           }
+          //console.log(key3)
         }
+        //}
         nestedPSetObject['globalType'] = 'parameter'
         /*    console.log(
           'NESTED MODULE OBJECT: ' + JSON.stringify(nestedModuleObject)
@@ -767,10 +829,10 @@ export default class TreeView extends Vue {
 
 <style lang="scss" scoped>
 .param-style {
-  color: green;
+  color: lightgreen;
 }
 .param-value-style {
-  color: blue;
+  color: lightblue;
   font-weight: bold;
 }
 .param-name-style {
