@@ -16,6 +16,9 @@ export default {
   getModule(id) {
     return apiClient.get('/mods/' + id)
   },
+  getModuleByName(name) {
+    return apiClient.get('/mods/' + name)
+  },
   postModule(module) {
     return apiClient.post('/mods', module)
   },

@@ -3,28 +3,32 @@
   <div>
     <v-treeview
       v-model="tree"
-      :open="open"
       :items="items"
       activatable
+      dense
       item-key="id"
       item-text=""
       open-on-click
     >
       <template v-slot:prepend="{ item, open }">
-        <v-icon v-if="!item.iconType && item.globalType != 'parameter'">
-          {{ open ? 'mdi-minus-thick' : 'mdi-plus-thick' }}
-        </v-icon>
-        <v-icon v-else :style="{ color: item.iconColor }">
-          {{ iconTypes[item.iconType] }}
-        </v-icon>
-        <span class="param-style" v-if="item.cmsType">
-          {{ item.cmsType }}
-        </span>
-        <span :class="item.globalType == 'parameter' ? 'param-name-style' : ''">
-          {{ item.name }}
-        </span>
-        <span class="param-value-style" v-if="item.value">
-          {{ item.value }}
+        <span @click="fetchNode1(item.name)">
+          <v-icon v-if="!item.iconType && item.globalType != 'parameter'">
+            {{ open ? 'mdi-minus-thick' : 'mdi-plus-thick' }}
+          </v-icon>
+          <v-icon v-else :style="{ color: item.iconColor }">
+            {{ iconTypes[item.iconType] }}
+          </v-icon>
+          <span class="param-style" v-if="item.cmsType">
+            {{ item.cmsType }}
+          </span>
+          <span
+            :class="item.globalType == 'parameter' ? 'param-name-style' : ''"
+          >
+            {{ item.name }}
+          </span>
+          <span class="param-value-style" v-if="item.value">
+            {{ item.value }}
+          </span>
         </span>
       </template>
     </v-treeview>
@@ -45,13 +49,15 @@ import { mapGetters } from 'vuex'
       getSequences: 'sequence/getSequences',
       getPaths: 'path/getPaths',
       getModules: 'module/getModules',
+      getModuleByName: 'module/getModuleByName',
       getPSets: 'pset/getPSets',
     }),
     // ...mapState('sequence', ['sequences']),
   },
 })
 export default class TreeView extends Vue {
-  private open: any = ['public']
+  //private open: any = []
+  private active: any = []
   private getSequences!: any[] // are assigned via mapState
   private getPaths!: any[]
   private getModules!: any[]
@@ -391,8 +397,18 @@ export default class TreeView extends Vue {
       this.globalPSetsObject,
     ]
   }
+
+  /*   get getOpen() {
+    return this.open
+  } */
+
+  /*   get open() {
+    return ['Paths']
+  } */
+
   public parseSequences(sequenceData: any) {
     let sequencesObject: Object = {
+      id: 1,
       name: 'Sequences',
       type: 'seqs',
       children: [],
@@ -729,7 +745,7 @@ export default class TreeView extends Vue {
       for (const [key1, value1] of Object.entries(Object(value))) {
         //loop over pset entries
         if (key == 'HLTPSetPixelLessStepTrajectoryFilter') {
-          console.log(`${key1}, ${value1}`)
+          //console.log(`${key1}, ${value1}`)
         }
         let nestedPSetObject: Object = { id: this.idCounter++ }
         //console.log(`${key1}, ${value1}`)
@@ -738,7 +754,7 @@ export default class TreeView extends Vue {
         for (const [key2, value2] of Object.entries(Object(value1))) {
           //aviod para_name level
           //console.log('ANYTHING')
-          console.log(`${key2}, ${value2}`)
+          //console.log(`${key2}, ${value2}`)
           if (key2 === 'type') nestedPSetObject['type'] = value2
           else if (key2 === 'value') {
             if (
@@ -817,12 +833,29 @@ export default class TreeView extends Vue {
     }
   }
 
+  public fetchNode() {
+    console.log('AAAA')
+    //console.log(this.items)
+    //console.log(this.open[0])
+    //console.log('VALUE: ' + this.getOpen)
+    //if (!this.open.length) return undefined
+    //const id = this.open[0]
+    //console.log(id)
+    //return this.users.find(user => user.id === id)
+  }
+
+  public fetchNode1(name: string) {
+    console.log(name)
+  }
+
   created() {
     // Make a request for config parts
     this.fetchGroup('seqs')
     this.fetchGroup('paths')
     this.fetchGroup('mods')
     this.fetchGroup('psets')
+
+    //this.open = [1]
   }
 }
 </script>

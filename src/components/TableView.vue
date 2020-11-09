@@ -2,15 +2,15 @@
   <div>
     <v-data-table
       :headers="headers"
-      :items="desserts"
+      :items="parameters"
       :items-per-page="8"
       class="elevation-1"
     >
-      <template v-slot:[`item.glutenfree`]="{ item }">
-        <v-simple-checkbox
-          v-model="item.glutenfree"
-          disabled
-        ></v-simple-checkbox>
+      <template v-slot:[`item.dft`]="{ item }">
+        <v-simple-checkbox v-model="item.dft"></v-simple-checkbox>
+      </template>
+      <template v-slot:[`item.trkd`]="{ item }">
+        <v-simple-checkbox v-model="item.trkd"></v-simple-checkbox>
       </template>
     </v-data-table>
   </div>
@@ -18,113 +18,106 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
+import { mapGetters } from 'vuex'
 
-@Component
+@Component({
+  computed: {
+    ...mapGetters({
+      getModuleByName: 'module/getModuleByName',
+    }),
+    // ...mapState('sequence', ['sequences']),
+  },
+  watch: {
+    '$store.state.drawer': function() {
+      console.log(this.$store.state.drawer)
+    },
+  },
+})
 export default class TableView extends Vue {
   private headers: any = [
     {
-      text: 'Dessert (100g serving)',
+      text: 'Name',
       align: 'start',
-      sortable: false,
+      sortable: true,
       value: 'name',
     },
-    { text: 'Calories', value: 'calories' },
-    { text: 'Fat (g)', value: 'fat' },
-    { text: 'Carbs (g)', value: 'carbs' },
-    { text: 'Protein (g)', value: 'protein' },
-    { text: 'Iron (%)', value: 'iron' },
-    { text: 'Gluten-Free', value: 'glutenfree' },
+    { text: 'Type', value: 'type' },
+    { text: 'Value', value: 'value' },
+    { text: 'Dft', value: 'dft' },
+    { text: 'Trkd', value: 'trkd' },
   ]
-  private desserts: any = [
+  private parameters: any = [
     {
-      name: 'Frozen Yogurt',
-      calories: 159,
-      fat: 6.0,
-      carbs: 24,
-      protein: 4.0,
-      iron: '1%',
-      glutenfree: true,
+      name: 'allHadPtCut',
+      type: 'double',
+      value: 380,
+      dft: true,
+      trkd: true,
     },
     {
-      name: 'Ice cream sandwich',
-      calories: 237,
-      fat: 9.0,
-      carbs: 37,
-      protein: 4.3,
-      iron: '1%',
-      glutenfree: false,
+      name: 'semiE_dRMin',
+      type: 'double',
+      value: 0.5,
+      dft: true,
+      trkd: true,
     },
     {
-      name: 'Eclair',
-      calories: 262,
-      fat: 16.0,
-      carbs: 23,
-      protein: 6.0,
-      iron: '7%',
-      glutenfree: false,
+      name: 'allHadRapidityCut',
+      type: 'double',
+      value: 16.0,
+      dft: true,
+      trkd: true,
     },
     {
-      name: 'Cupcake',
-      calories: 305,
-      fat: 3.7,
-      carbs: 67,
-      protein: 4.3,
-      iron: '8%',
-      glutenfree: true,
+      name: 'elecSelect',
+      type: 'string',
+      value:
+        'pt > 45.0 & abs(eta)<2.5 & abs(gsfTrack.d0)<1 & abs(gsfTrack.dz)<20',
+      dft: true,
+      trkd: true,
     },
     {
-      name: 'Gingerbread',
-      calories: 356,
-      fat: 16.0,
-      carbs: 49,
-      protein: 3.9,
-      iron: '16%',
-      glutenfree: true,
+      name: 'muonSrc',
+      type: 'InputTag',
+      value: 'muons',
+      dft: true,
+      trkd: true,
     },
     {
-      name: 'Jelly bean',
-      calories: 375,
-      fat: 0.0,
-      carbs: 94,
-      protein: 0.0,
-      iron: '0%',
-      glutenfree: false,
+      name: 'jetLabels',
+      type: 'VInputTag',
+      value:
+        'ak4PFJets, ak4PFJetsPuppi, ak8PFJetsPuppi, ak8PFJetsPuppiSoftDrop',
+      dft: true,
+      trkd: true,
     },
     {
-      name: 'Lollipop',
-      calories: 392,
-      fat: 0.2,
-      carbs: 98,
-      protein: 0,
-      iron: '2%',
-      glutenfree: false,
+      name: 'semiE_LepJetPtCut',
+      type: 'double',
+      value: 30,
+      dft: true,
+      trkd: true,
     },
     {
       name: 'Honeycomb',
-      calories: 408,
-      fat: 3.2,
-      carbs: 87,
-      protein: 6.5,
-      iron: '45%',
-      glutenfree: false,
+      type: 408,
+      value: 3.2,
+      dft: true,
+      trkd: true,
     },
     {
       name: 'Donut',
-      calories: 452,
-      fat: 25.0,
-      carbs: 51,
-      protein: 4.9,
-      iron: '22%',
-      glutenfree: false,
+      type: 452,
+      value: 25.0,
+      dft: true,
+      trkd: true,
     },
     {
       name: 'KitKat',
-      calories: 518,
-      fat: 26.0,
-      carbs: 65,
-      protein: 7,
-      iron: '6%',
-      glutenfree: false,
+      type: 518,
+      value: 26.0,
+      dft: true,
+      trkd: true,
     },
   ]
 }

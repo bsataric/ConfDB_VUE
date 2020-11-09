@@ -69,6 +69,24 @@ export const actions = {
         })
     }
   },
+  fetchModuleByName({ commit, getters, dispatch }, name) {
+    let module = getters.getModuleByName(name)
+    if (module) {
+      commit('SET_MODULE', module)
+    } else {
+      return ModuleService.getModuleByName(name)
+        .then((response) => {
+          commit('SET_MODULE', response.data)
+        })
+        .catch((error) => {
+          const notification = {
+            type: 'error',
+            message: 'There was a problem fetching module ' + error.message,
+          }
+          dispatch('notification/add', notification, { root: true })
+        })
+    }
+  },
 }
 export const getters = {
   moduleLength: (state) => {
@@ -76,6 +94,9 @@ export const getters = {
   },
   getModuleById: (state) => (id) => {
     return state.modules.find((module) => module.id == id)
+  },
+  getModuleByName: (state) => (name) => {
+    return state.modules.find((module) => module.name == name)
   },
   getModules: (state) => {
     return state.modules
