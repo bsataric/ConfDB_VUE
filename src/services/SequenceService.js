@@ -16,6 +16,9 @@ export default {
   getSequence(id) {
     return apiClient.get('/seqs/' + id)
   },
+  getSequenceByName(name) {
+    return apiClient.get('/seqs/' + name)
+  },
   postSequence(sequence) {
     return apiClient.post('/seqs', sequence)
   },

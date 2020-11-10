@@ -16,6 +16,9 @@ export default {
   getPath(id) {
     return apiClient.get('/paths/' + id)
   },
+  getPathByName(name) {
+    return apiClient.get('/paths/' + name)
+  },
   postPath(path) {
     return apiClient.post('/paths', path)
   },

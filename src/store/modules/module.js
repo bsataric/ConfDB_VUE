@@ -16,6 +16,7 @@ export const mutations = {
   },
   SET_MODULE(state, module) {
     state.module = module
+    //console.log(state.module)
   },
 }
 export const actions = {
@@ -96,9 +97,20 @@ export const getters = {
     return state.modules.find((module) => module.id == id)
   },
   getModuleByName: (state) => (name) => {
-    return state.modules.find((module) => module.name == name)
+    //console.log('getModuleByName ' + name)
+    //return state.modules.find((module) => module.name == name)
+    for (const [key, value] of Object.entries(state.modules)) {
+      if (key == name) {
+        //console.log('VALUE: ' + JSON.stringify(value))
+        return value
+      }
+    }
   },
   getModules: (state) => {
+    //console.log('MODULES' + state.modules)
     return state.modules
+  },
+  getSelectedModule: (state) => {
+    return state.module
   },
 }

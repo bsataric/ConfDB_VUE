@@ -11,7 +11,7 @@
       open-on-click
     >
       <template v-slot:prepend="{ item, open }">
-        <span @click="fetchNode1(item.name)">
+        <span @click="fetchNodeByName(item.type, item.name)">
           <v-icon v-if="!item.iconType && item.globalType != 'parameter'">
             {{ open ? 'mdi-minus-thick' : 'mdi-plus-thick' }}
           </v-icon>
@@ -397,14 +397,6 @@ export default class TreeView extends Vue {
       this.globalPSetsObject,
     ]
   }
-
-  /*   get getOpen() {
-    return this.open
-  } */
-
-  /*   get open() {
-    return ['Paths']
-  } */
 
   public parseSequences(sequenceData: any) {
     let sequencesObject: Object = {
@@ -833,19 +825,18 @@ export default class TreeView extends Vue {
     }
   }
 
-  public fetchNode() {
-    console.log('AAAA')
-    //console.log(this.items)
-    //console.log(this.open[0])
-    //console.log('VALUE: ' + this.getOpen)
-    //if (!this.open.length) return undefined
-    //const id = this.open[0]
-    //console.log(id)
-    //return this.users.find(user => user.id === id)
-  }
-
-  public fetchNode1(name: string) {
-    console.log(name)
+  async fetchNodeByName(itemType: string, itemName: string) {
+    console.log(itemType)
+    console.log(itemName)
+    if (itemType == 'sequence') {
+      await this.$store.dispatch('sequence/fetchSequenceByName', itemName) // note the "await"
+    } else if (itemType == 'paths') {
+      await this.$store.dispatch('path/fetchPathByName', itemName)
+    } else if (itemType == 'modules') {
+      await this.$store.dispatch('module/fetchModuleByName', itemName)
+    } else if (itemType == 'pset') {
+      await this.$store.dispatch('pset/fetchPSetByName', itemName)
+    }
   }
 
   created() {

@@ -69,6 +69,24 @@ export const actions = {
         })
     }
   },
+  fetchPSetByName({ commit, getters, dispatch }, name) {
+    let pset = getters.getPSetByName(name)
+    if (pset) {
+      commit('SET_PSET', pset)
+    } else {
+      return PSetService.getPSetByName(name)
+        .then((response) => {
+          commit('SET_PSET', response.data)
+        })
+        .catch((error) => {
+          const notification = {
+            type: 'error',
+            message: 'There was a problem fetching pset ' + error.message,
+          }
+          dispatch('notification/add', notification, { root: true })
+        })
+    }
+  },
 }
 export const getters = {
   psetLength: (state) => {
@@ -76,6 +94,9 @@ export const getters = {
   },
   getPSetById: (state) => (id) => {
     return state.psets.find((pset) => pset.id == id)
+  },
+  getPSetByName: (state) => (name) => {
+    return state.psets.find((pset) => pset.name == name)
   },
   getPSets: (state) => {
     return state.psets

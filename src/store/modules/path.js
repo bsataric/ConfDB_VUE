@@ -69,6 +69,24 @@ export const actions = {
         })
     }
   },
+  fetchPathByName({ commit, getters, dispatch }, name) {
+    let path = getters.getPathByName(name)
+    if (path) {
+      commit('SET_PATH', path)
+    } else {
+      return PathService.getPathByName(name)
+        .then((response) => {
+          commit('SET_PATH', response.data)
+        })
+        .catch((error) => {
+          const notification = {
+            type: 'error',
+            message: 'There was a problem fetching path ' + error.message,
+          }
+          dispatch('notification/add', notification, { root: true })
+        })
+    }
+  },
 }
 export const getters = {
   pathLength: (state) => {
@@ -76,6 +94,9 @@ export const getters = {
   },
   getPathById: (state) => (id) => {
     return state.paths.find((path) => path.id == id)
+  },
+  getPathByName: (state) => (name) => {
+    return state.paths.find((path) => path.name == name)
   },
   getPaths: (state) => {
     return state.paths

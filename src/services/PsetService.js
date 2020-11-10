@@ -16,6 +16,9 @@ export default {
   getPSet(id) {
     return apiClient.get('/psets/' + id)
   },
+  getPSetByName(name) {
+    return apiClient.get('/psets/' + name)
+  },
   postPSet(pset) {
     return apiClient.post('/psets', pset)
   },

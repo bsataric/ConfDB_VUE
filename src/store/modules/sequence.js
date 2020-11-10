@@ -70,6 +70,24 @@ export const actions = {
         })
     }
   },
+  fetchSequenceByName({ commit, getters, dispatch }, name) {
+    let sequence = getters.getSequenceByName(name)
+    if (sequence) {
+      commit('SET_SEQUENCE', sequence)
+    } else {
+      return SequenceService.getSequenceByName(name)
+        .then((response) => {
+          commit('SET_SEQUENCE', response.data)
+        })
+        .catch((error) => {
+          const notification = {
+            type: 'error',
+            message: 'There was a problem fetching sequence ' + error.message,
+          }
+          dispatch('notification/add', notification, { root: true })
+        })
+    }
+  },
 }
 export const getters = {
   seqLength: (state) => {
@@ -77,6 +95,9 @@ export const getters = {
   },
   getSequenceById: (state) => (id) => {
     return state.sequences.find((sequence) => sequence.id == id)
+  },
+  getSequenceByName: (state) => (name) => {
+    return state.sequences.find((sequences) => sequences.name == name)
   },
   getSequences: (state) => {
     return state.sequences

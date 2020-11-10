@@ -13,6 +13,7 @@
         <v-simple-checkbox v-model="item.trkd"></v-simple-checkbox>
       </template>
     </v-data-table>
+    <!--     {{ this.getSelectedModule }} -->
   </div>
 </template>
 
@@ -24,16 +25,14 @@ import { mapGetters } from 'vuex'
   computed: {
     ...mapGetters({
       getModuleByName: 'module/getModuleByName',
+      getSelectedModule: 'module/getSelectedModule',
     }),
     // ...mapState('sequence', ['sequences']),
   },
-  watch: {
-    '$store.state.drawer': function() {
-      console.log(this.$store.state.drawer)
-    },
-  },
 })
 export default class TableView extends Vue {
+  private getSelectedModule!: any[]
+
   private headers: any = [
     {
       text: 'Name',
@@ -46,7 +45,7 @@ export default class TableView extends Vue {
     { text: 'Dft', value: 'dft' },
     { text: 'Trkd', value: 'trkd' },
   ]
-  private parameters: any = [
+  /*   private parameters1: any = [
     {
       name: 'allHadPtCut',
       type: 'double',
@@ -119,7 +118,81 @@ export default class TableView extends Vue {
       dft: true,
       trkd: true,
     },
-  ]
+  ] */
+
+  public parseParams(params: any) {
+    let paramsArray: any = []
+
+    //console.log(moduleData)
+    //console.log(modulesObject)
+    for (const [key, value] of Object.entries(params)) {
+      //loop over sequnces - create new Sequence object and add it to children of the seqs
+      //console.log('KEY: ' + key)
+      //console.log('VALUE: ' + value)
+
+      if (key === 'params') {
+        // eslint-disable-next-line no-unused-vars
+        for (const [key1, value1] of Object.entries(Object(value))) {
+          //console.log('KEY1: ' + key1)
+          //console.log('VALUE1: ' + value1)
+
+          let nestedParameterObject: Object = {
+            //id: this.idCounter++,
+            //children: [],
+            dft: true,
+            trkd: true,
+          }
+
+          for (const [key2, value2] of Object.entries(Object(value1))) {
+            if (key2 === 'type') nestedParameterObject['type'] = value2
+            else if (key2 === 'value') {
+              if (
+                nestedParameterObject['type'] == 'cms.VPSet' ||
+                nestedParameterObject['type'] == 'cms.PSet'
+              ) {
+                //nestedParameterObject['children'] = []
+                nestedParameterObject['name'] = key2
+
+                //this.buildRecursiveVPSetObject(nestedParameterObject, value3)
+              } else {
+                nestedParameterObject['name'] = key1
+                //simple type
+                nestedParameterObject['value'] = JSON.stringify(value2) //simple value
+                if (nestedParameterObject['value'].length > 70) {
+                  //shorten the string and put three dots in the end
+                  nestedParameterObject['value'] =
+                    nestedParameterObject['value'].substring(1, 70) + '...'
+                }
+              }
+            }
+            //console.log(key3)
+          }
+
+          if (nestedParameterObject['type'] != undefined) {
+            //console.log('AAAA')
+            let cmsTypeLenght = nestedParameterObject['type'].length
+            let cmsType = nestedParameterObject['type'].substring(
+              //cmsType is necessary for printing out in tree
+              nestedParameterObject['type'].indexOf('.') + 1,
+              cmsTypeLenght
+            )
+            nestedParameterObject['type'] = cmsType
+            //nestedModuleObject['name'] = nestedModuleObject['value']
+            //console.log(nestedParameterObject)
+          }
+          //push parameter into module children
+          paramsArray.push(nestedParameterObject)
+        }
+      }
+    }
+    return paramsArray
+  }
+
+  get parameters() {
+    let params = this.parseParams(this.getSelectedModule)
+    console.log(params)
+    return params
+  }
 }
 </script>
 
