@@ -21,7 +21,9 @@
       @selection-change="blabla"
       @filter-change="filterChanged"
       @page-change="pageChanged"
+      :call-children="callChildren"
     >
+      <!-- Possible memory leak but I don't know why-->
       <template v-slot:trkd="cell">
         <v-checkbox v-model="cell.row.trkd"></v-checkbox>
       </template>
@@ -29,7 +31,8 @@
         <v-checkbox v-model="cell.row.dft"></v-checkbox>
       </template>
     </vue-ads-table>
-    <!--     {{ this.getSelectedModule }} -->
+    <!--     {{ this.getSelectedModule }}
+ -->
   </div>
 </template>
 
@@ -182,140 +185,163 @@ export default class TableView extends Vue {
       collapseIcon: true,
     },
   ]
-  private rows: any = [
+  private rows2: any = [
     {
-      name: 'allHadPtCut',
-      type: 'double',
-      value: 380,
-      dft: true,
-      trkd: false,
-    },
-    {
-      name: 'semiE_dRMin',
-      type: 'double',
-      value: 0.5,
       dft: true,
       trkd: true,
+      type: 'PSet',
+      _children: [
+        {
+          value: '"none"',
+          trkd: true,
+          dft: true,
+          type: 'string',
+          name: 'ComponentName',
+        },
+      ],
+      name: 'SeedComparitorPSet',
+      value: '',
     },
     {
-      name: 'allHadRapidityCut',
-      type: 'double',
-      value: 16.0,
       dft: true,
       trkd: true,
+      _children: [],
+      type: 'bool',
+      name: 'forceKinematicWithRegionDirection',
+      value: 'false',
     },
     {
-      name: 'elecSelect',
+      dft: true,
+      trkd: true,
+      _children: [],
       type: 'string',
-      value:
-        'pt > 45.0 & abs(eta)<2.5 & abs(gsfTrack.d0)<1 & abs(gsfTrack.dz)<20',
-      dft: true,
-      trkd: true,
+      name: 'magneticField',
+      value: '"ParabolicMf"',
     },
     {
-      name: 'muonSrc',
-      type: 'InputTag',
-      value: 'muons',
       dft: true,
       trkd: true,
-    },
-    {
-      name: 'jetLabels',
-      type: 'VInputTag',
-      value:
-        'ak4PFJets, ak4PFJetsPuppi, ak8PFJetsPuppi, ak8PFJetsPuppiSoftDrop',
-      dft: true,
-      trkd: true,
-    },
-    {
-      name: 'semiE_LepJetPtCut',
+      _children: [],
       type: 'double',
-      value: 30,
+      name: 'SeedMomentumForBOFF',
+      value: '5',
+    },
+    {
       dft: true,
       trkd: true,
+      _children: [],
+      type: 'string',
+      name: 'propagator',
+      value: '"PropagatorWithMaterialParabolicMf"',
+    },
+    {
+      dft: true,
+      trkd: true,
+      _children: [],
+      type: 'string',
+      name: 'TTRHBuilder',
+      value: '"hltESPTTRHBWithTrackAngle"',
+    },
+    {
+      dft: true,
+      trkd: true,
+      _children: [],
+      type: 'double',
+      name: 'MinOneOverPtError',
+      value: '1',
+    },
+    {
+      dft: true,
+      trkd: true,
+      _children: [],
+      type: 'InputTag',
+      name: 'seedingHitSets',
+      value: '"hltElePixelHitDoublets"',
+    },
+    {
+      dft: true,
+      trkd: true,
+      _children: [],
+      type: 'double',
+      name: 'OriginTransverseErrorMultiplier',
+      value: '1',
     },
   ]
   private rows1: any = [
     {
-      firstName: 'Josephine',
-      lastName: 'Astrid',
+      name: 'Josephine',
+      type: 'Astrid',
+      value: 'Josephine',
+      trkd: true,
+      dft: true,
     },
     {
-      firstName: 'Boudewijn',
-      lastName: 'Van Brabandt',
+      name: 'Josephine',
+      type: 'Astrid',
+      value: 'Josephine',
+      trkd: true,
+      dft: true,
     },
     {
-      firstName: 'Albert II',
-      lastName: 'Van Belgie',
+      name: 'Josephine',
+      type: 'Astrid',
+      value: 'Josephine',
+      trkd: true,
+      dft: true,
       _children: [
         {
-          firstName: 'Filip',
-          lastName: 'Van Belgie',
+          name: 'Josephine',
+          type: 'Astrid',
+          value: 'Josephine',
+          trkd: true,
+          dft: true,
           _children: [
             {
-              firstName: 'Elisabeth',
-              lastName: 'Van Brabant',
+              name: 'Josephine',
+              type: 'Astrid',
+              value: 'Josephine',
+              trkd: true,
+              dft: true,
             },
             {
-              firstName: 'Gabriel',
-              lastName: 'Boudwijn',
+              name: 'Josephine',
+              type: 'Astrid',
+              value: 'Josephine',
+              trkd: true,
+              dft: true,
             },
             {
-              firstName: 'Emmanuel',
-              lastName: 'Van Belgie',
+              name: 'Josephine',
+              type: 'Astrid',
+              value: 'Josephine',
+              trkd: true,
+              dft: true,
             },
             {
-              firstName: 'Eleonore',
-              lastName: 'Boudwijn',
+              name: 'Josephine',
+              type: 'Astrid',
+              value: 'Josephine',
+              trkd: true,
+              dft: true,
               _hasChildren: true,
             },
           ],
         },
         {
-          firstName: 'Astrid',
-          lastName: 'Van Belgie',
+          name: 'Josephine',
+          type: 'Astrid',
+          value: 'Josephine',
+          trkd: true,
+          dft: true,
         },
         {
-          firstName: 'Laurent',
-          lastName: 'Van Belgie',
+          name: 'Josephine',
+          type: 'Astrid',
+          value: 'Josephine',
+          trkd: true,
+          dft: true,
         },
       ],
-    },
-    {
-      firstName: 'Alexander',
-      lastName: 'Van Belgie',
-    },
-    {
-      firstName: 'Marie-Christine',
-      lastName: 'Leopoldine',
-    },
-    {
-      firstName: 'Marie-Esmeralda',
-      lastName: 'Leopoldine',
-    },
-    {
-      firstName: 'Alexander',
-      lastName: 'Van Belgie',
-    },
-    {
-      firstName: 'Marie-Christine',
-      lastName: 'Leopoldine',
-    },
-    {
-      firstName: 'Marie-Esmeralda',
-      lastName: 'Leopoldine',
-    },
-    {
-      firstName: 'Alexander',
-      lastName: 'Van Belgie',
-    },
-    {
-      firstName: 'Marie-Christine',
-      lastName: 'Leopoldine',
-    },
-    {
-      firstName: 'Marie-Esmeralda',
-      lastName: 'Leopoldine',
     },
   ]
 
@@ -331,8 +357,82 @@ export default class TableView extends Vue {
     console.log(rows)
   }
 
+  public buildRecursiveVPSetObject(vpSetObject: Object, body: any) {
+    console.log('BUILDING RECURSIVE VPSET')
+    //if the body has more then 0 keys it is an unnamed nested PSet
+    if (Object.entries(Object(body)).length > 1) {
+      //console.log('NESTED UNNAMED PSET')
+    }
+    // eslint-disable-next-line no-unused-vars
+    for (const [key, value] of Object.entries(Object(body))) {
+      let nestedNoNamePSetObject: Object = {} //might or might not be used
+      if (Object.entries(Object(body)).length > 1) {
+        //nestedNoNamePSetObject['id'] = this.idCounter++
+        nestedNoNamePSetObject['type'] == 'PSet'
+        nestedNoNamePSetObject['name'] = 'PSet' //no name
+        nestedNoNamePSetObject['dft'] = false
+        nestedNoNamePSetObject['trkd'] = true
+        nestedNoNamePSetObject['_children'] = []
+      }
+      //console.log(JSON.stringify(key), JSON.stringify(value))
+      // eslint-disable-next-line no-unused-vars
+      for (const [key1, value1] of Object.entries(Object(value))) {
+        let nestedVPSetObject: Object = {
+          /*  id: this.idCounter++ */
+          value: '',
+          trkd: true,
+          dft: true,
+        }
+        console.log('KEY1: ' + key1 + ' VALUE1: ' + value1)
+        //this is parameter loop
+        for (const [key2, value2] of Object.entries(Object(value1))) {
+          if (key2 === 'type') nestedVPSetObject['type'] = value2
+          else if (key2 === 'value') {
+            if (
+              nestedVPSetObject['type'] == 'cms.VPSet' ||
+              nestedVPSetObject['type'] == 'cms.PSet'
+            ) {
+              console.log('PSET NAME: ' + key1)
+              nestedVPSetObject['name'] = key1
+              nestedVPSetObject['_children'] = []
+
+              this.buildRecursiveVPSetObject(nestedVPSetObject, value2)
+            } else {
+              nestedVPSetObject['name'] = key1
+
+              nestedVPSetObject['value'] = JSON.stringify(value2) //simple value
+              //nestedVPSetObject['name'] = nestedVPSetObject['value']
+            }
+          }
+        }
+        if (nestedVPSetObject['type'] != undefined) {
+          let cmsTypeLenght = nestedVPSetObject['type'].length
+          let cmsType = nestedVPSetObject['type'].substring(
+            //cmsType is necessary for printing out in tree
+            nestedVPSetObject['type'].indexOf('.') + 1,
+            cmsTypeLenght
+          )
+          nestedVPSetObject['type'] = cmsType
+        }
+        //nestedModuleObject['name'] = nestedModuleObject['value']
+        if (Object.entries(Object(body)).length == 1) {
+          vpSetObject['_children'].push(nestedVPSetObject)
+        } else {
+          nestedNoNamePSetObject['_children'].push(nestedVPSetObject)
+        }
+      }
+      if (Object.entries(Object(body)).length > 1) {
+        vpSetObject['_children'].push(nestedNoNamePSetObject)
+      }
+      console.log(
+        'VPSET CHILDREN: ' + JSON.stringify(vpSetObject['_children'][0])
+      )
+    }
+  }
+
   public parseParams(params: any) {
     let paramsArray: any = []
+    //paramsArray.length = 0
 
     //console.log(moduleData)
     //console.log(modulesObject)
@@ -352,6 +452,8 @@ export default class TableView extends Vue {
             //children: [],
             dft: true,
             trkd: true,
+            /*             _children: [],
+             */
           }
 
           for (const [key2, value2] of Object.entries(Object(value1))) {
@@ -361,10 +463,16 @@ export default class TableView extends Vue {
                 nestedParameterObject['type'] == 'cms.VPSet' ||
                 nestedParameterObject['type'] == 'cms.PSet'
               ) {
-                //nestedParameterObject['children'] = []
-                nestedParameterObject['name'] = key2
+                nestedParameterObject['_children'] = []
+                nestedParameterObject['_hasChildren'] = true
+                nestedParameterObject['name'] = key1
+                nestedParameterObject['value'] = ''
 
-                //this.buildRecursiveVPSetObject(nestedParameterObject, value3)
+                this.buildRecursiveVPSetObject(nestedParameterObject, value2)
+
+                console.log(
+                  'VPSET BUILD: ' + JSON.stringify(nestedParameterObject)
+                )
               } else {
                 nestedParameterObject['name'] = key1
                 //simple type
@@ -396,13 +504,38 @@ export default class TableView extends Vue {
         }
       }
     }
+    console.log('paramsArray:' + JSON.stringify(paramsArray))
     return paramsArray
   }
 
-  get parameters() {
-    let params = this.parseParams(this.getSelectedModule)
-    console.log(params)
-    return params
+  get rows() {
+    //console.log(this.getSelectedModule)
+    let rows = this.parseParams(this.getSelectedModule)
+    //console.log(rows)
+    return rows
+    /*    return [
+      {
+        name: 'semiE_LepJetPtCut',
+        type: 'double',
+        value: 30,
+        dft: true,
+        trkd: true,
+      },
+    ] */
+  }
+
+  async callChildren() {
+    //await this.sleep(1000);
+    console.log('AAAA')
+    return [
+      {
+        value: '"none"',
+        trkd: true,
+        dft: true,
+        type: 'string',
+        name: 'ComponentName',
+      },
+    ]
   }
 }
 </script>

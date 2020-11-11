@@ -111,6 +111,7 @@ export const getters = {
     return state.modules
   },
   getSelectedModule: (state) => {
+    //console.log('CALLED')
     return state.module
   },
 }
