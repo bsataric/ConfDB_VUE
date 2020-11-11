@@ -853,10 +853,11 @@ export default class TreeView extends Vue {
 
 <style lang="scss" scoped>
 .param-style {
-  color: lightgreen;
+  color: darkgreen;
+  font-weight: bold;
 }
 .param-value-style {
-  color: lightblue;
+  color: blue;
   font-weight: bold;
 }
 .param-name-style {

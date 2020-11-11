@@ -14,9 +14,9 @@
               <v-card class="pa-2, v-card-tableview" outlined tile>
                 <TableView />
               </v-card>
+              <v-divider></v-divider>
               <v-card class="pa-2, v-card-snippetview" outlined tile>
                 <SnippetView />
-                <!-- <EventCard /> -->
               </v-card>
             </v-col>
           </v-row>
@@ -85,8 +85,9 @@ export default class App extends Vue {
 }
 .v-card-snippetview {
   overflow: auto;
-  max-height: 500px;
-  height: 500px;
+  max-height: 490px;
+  height: 490px;
+  margin-top: 10px;
   //max-width: 750px;
 }
 </style>

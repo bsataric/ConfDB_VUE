@@ -8,6 +8,6 @@ Vue.use(Vuetify, {
   },
 })
 
-const opts = { theme: { dark: true } } //TODO: change this to be dynamic
+const opts = {} //TODO: change this to be dynamic (no dark for now will have to be custom probably)
 
 export default new Vuetify(opts)

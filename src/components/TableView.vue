@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <v-data-table
+  <div class="mb-6">
+    <!--     <v-data-table
       :headers="headers"
       :items="parameters"
       :items-per-page="8"
@@ -12,7 +12,23 @@
       <template v-slot:[`item.trkd`]="{ item }">
         <v-simple-checkbox v-model="item.trkd"></v-simple-checkbox>
       </template>
-    </v-data-table>
+    </v-data-table> -->
+    <vue-ads-table
+      :columns="columns"
+      :rows="rows"
+      :page="page"
+      selectable
+      @selection-change="blabla"
+      @filter-change="filterChanged"
+      @page-change="pageChanged"
+    >
+      <template v-slot:trkd="cell">
+        <v-checkbox v-model="cell.row.trkd"></v-checkbox>
+      </template>
+      <template v-slot:dft="cell">
+        <v-checkbox v-model="cell.row.dft"></v-checkbox>
+      </template>
+    </vue-ads-table>
     <!--     {{ this.getSelectedModule }} -->
   </div>
 </template>
@@ -20,6 +36,9 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { mapGetters } from 'vuex'
+import { VueAdsTable } from 'vue-ads-table-tree'
+import { VueAdsPagination } from 'vue-ads-pagination'
+//import { VueAdsPageButton } from 'vue-ads-pagination/
 
 @Component({
   computed: {
@@ -29,11 +48,18 @@ import { mapGetters } from 'vuex'
     }),
     // ...mapState('sequence', ['sequences']),
   },
+  components: {
+    VueAdsTable,
+    VueAdsPagination,
+  },
 })
 export default class TableView extends Vue {
   private getSelectedModule!: any[]
 
-  private headers: any = [
+  private page: number = 0
+  private filter: string = ''
+
+  /*   private headers: any = [
     {
       text: 'Name',
       align: 'start',
@@ -44,7 +70,7 @@ export default class TableView extends Vue {
     { text: 'Value', value: 'value' },
     { text: 'Dft', value: 'dft' },
     { text: 'Trkd', value: 'trkd' },
-  ]
+  ] */
   /*   private parameters1: any = [
     {
       name: 'allHadPtCut',
@@ -119,6 +145,191 @@ export default class TableView extends Vue {
       trkd: true,
     },
   ] */
+
+  private columns: any = [
+    {
+      property: 'name',
+      title: 'Name',
+      direction: null,
+      filterable: true,
+    },
+    {
+      property: 'type',
+      title: 'Type',
+      direction: null,
+      filterable: true,
+      collapseIcon: true,
+    },
+    {
+      property: 'value',
+      title: 'Value',
+      direction: null,
+      filterable: true,
+      collapseIcon: true,
+    },
+    {
+      property: 'trkd',
+      title: 'Trkd',
+      direction: null,
+      filterable: true,
+      collapseIcon: true,
+    },
+    {
+      property: 'dft',
+      title: 'Dft',
+      direction: null,
+      filterable: true,
+      collapseIcon: true,
+    },
+  ]
+  private rows: any = [
+    {
+      name: 'allHadPtCut',
+      type: 'double',
+      value: 380,
+      dft: true,
+      trkd: false,
+    },
+    {
+      name: 'semiE_dRMin',
+      type: 'double',
+      value: 0.5,
+      dft: true,
+      trkd: true,
+    },
+    {
+      name: 'allHadRapidityCut',
+      type: 'double',
+      value: 16.0,
+      dft: true,
+      trkd: true,
+    },
+    {
+      name: 'elecSelect',
+      type: 'string',
+      value:
+        'pt > 45.0 & abs(eta)<2.5 & abs(gsfTrack.d0)<1 & abs(gsfTrack.dz)<20',
+      dft: true,
+      trkd: true,
+    },
+    {
+      name: 'muonSrc',
+      type: 'InputTag',
+      value: 'muons',
+      dft: true,
+      trkd: true,
+    },
+    {
+      name: 'jetLabels',
+      type: 'VInputTag',
+      value:
+        'ak4PFJets, ak4PFJetsPuppi, ak8PFJetsPuppi, ak8PFJetsPuppiSoftDrop',
+      dft: true,
+      trkd: true,
+    },
+    {
+      name: 'semiE_LepJetPtCut',
+      type: 'double',
+      value: 30,
+      dft: true,
+      trkd: true,
+    },
+  ]
+  private rows1: any = [
+    {
+      firstName: 'Josephine',
+      lastName: 'Astrid',
+    },
+    {
+      firstName: 'Boudewijn',
+      lastName: 'Van Brabandt',
+    },
+    {
+      firstName: 'Albert II',
+      lastName: 'Van Belgie',
+      _children: [
+        {
+          firstName: 'Filip',
+          lastName: 'Van Belgie',
+          _children: [
+            {
+              firstName: 'Elisabeth',
+              lastName: 'Van Brabant',
+            },
+            {
+              firstName: 'Gabriel',
+              lastName: 'Boudwijn',
+            },
+            {
+              firstName: 'Emmanuel',
+              lastName: 'Van Belgie',
+            },
+            {
+              firstName: 'Eleonore',
+              lastName: 'Boudwijn',
+              _hasChildren: true,
+            },
+          ],
+        },
+        {
+          firstName: 'Astrid',
+          lastName: 'Van Belgie',
+        },
+        {
+          firstName: 'Laurent',
+          lastName: 'Van Belgie',
+        },
+      ],
+    },
+    {
+      firstName: 'Alexander',
+      lastName: 'Van Belgie',
+    },
+    {
+      firstName: 'Marie-Christine',
+      lastName: 'Leopoldine',
+    },
+    {
+      firstName: 'Marie-Esmeralda',
+      lastName: 'Leopoldine',
+    },
+    {
+      firstName: 'Alexander',
+      lastName: 'Van Belgie',
+    },
+    {
+      firstName: 'Marie-Christine',
+      lastName: 'Leopoldine',
+    },
+    {
+      firstName: 'Marie-Esmeralda',
+      lastName: 'Leopoldine',
+    },
+    {
+      firstName: 'Alexander',
+      lastName: 'Van Belgie',
+    },
+    {
+      firstName: 'Marie-Christine',
+      lastName: 'Leopoldine',
+    },
+    {
+      firstName: 'Marie-Esmeralda',
+      lastName: 'Leopoldine',
+    },
+  ]
+
+  public filterChanged(filter) {
+    this.filter = filter
+  }
+
+  public pageChanged(page) {
+    this.page = page
+  }
+
+  public blabla(rows: any) {
+    console.log(rows)
+  }
 
   public parseParams(params: any) {
     let paramsArray: any = []
@@ -196,4 +407,14 @@ export default class TableView extends Vue {
 }
 </script>
 
-<style></style>
+<style lang="scss" scoped>
+//see to include this directly into assets and not like this
+@import '../assets/styles/vue-ads-table-tree.css';
+@import 'https://use.fontawesome.com/releases/v5.3.1/css/all.css';
+@import '../assets/styles/vue-ads-pagination.css';
+@import 'https://cdn.jsdelivr.net/npm/tailwindcss/dist/tailwind.min.css';
+
+.leftAlign {
+  text-align: left;
+}
+</style>
