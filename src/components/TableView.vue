@@ -1,47 +1,13 @@
 <template>
   <div class="mb-6">
-    <!--     <v-data-table
-      :headers="headers"
-      :items="parameters"
-      :items-per-page="8"
-      class="elevation-1"
-    >
-      <template v-slot:[`item.dft`]="{ item }">
-        <v-simple-checkbox v-model="item.dft"></v-simple-checkbox>
-      </template>
-      <template v-slot:[`item.trkd`]="{ item }">
-        <v-simple-checkbox v-model="item.trkd"></v-simple-checkbox>
-      </template>
-    </v-data-table> -->
-    <!--     <vue-ads-table
-      :columns="columns"
-      :rows="rows"
-      :page="page"
-      selectable
-      @selection-change="blabla"
-      @filter-change="filterChanged"
-      @page-change="pageChanged"
-    >
-      <template v-slot:trkd="cell">
-        <v-checkbox v-model="cell.row.trkd"></v-checkbox>
-      </template>
-      <template v-slot:dft="cell">
-        <v-checkbox v-model="cell.row.dft"></v-checkbox>
-      </template>
-    </vue-ads-table> -->
-    <!--     {{ this.getSelectedModule }}
- -->
-    <ul class="switch-list">
-      <li class="switch-item" v-for="item in propList" :key="item.name">
-        <span>{{ item.name }}: </span>
-        <zk-switch v-model="$props[item.name]"></zk-switch>
-      </li>
-    </ul>
     <ZkTable
+      @cell-dblclick="blabla()"
       ref="table"
       sum-text="sum"
       index-text="#"
-      :data="table_data"
+      empty-text="No data"
+      cell-class-name="param-style"
+      :data="rows"
       :columns="columns"
       :stripe="$props.stripe"
       :border="$props.border"
@@ -60,8 +26,11 @@
            this rowIndex is ${cell.rowIndex}.`
         }}
       </template>
-      <template v-slot:likes="cell">
-        {{ cell.row.likes.join(',') }}
+      <template v-slot:trkd="cell">
+        {{ cell.row.trkd }}
+      </template>
+      <template v-slot:dft="cell">
+        {{ cell.row.dft }}
       </template>
     </ZkTable>
   </div>
@@ -70,13 +39,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
 import { mapGetters } from 'vuex'
-import ZkSwitch from './Switch/Switch.vue'
-
 import ZkTable from 'vue-table-with-tree-grid'
-
-//import { VueAdsTable } from 'vue-ads-table-tree'
-//import { VueAdsPagination } from 'vue-ads-pagination'
-//import { VueAdsPageButton } from 'vue-ads-pagination/
 
 @Component({
   computed: {
@@ -87,9 +50,6 @@ import ZkTable from 'vue-table-with-tree-grid'
     // ...mapState('sequence', ['sequences']),
   },
   components: {
-    /*     VueAdsTable,
-    VueAdsPagination, */
-    ZkSwitch,
     ZkTable,
   },
 })
@@ -97,483 +57,48 @@ export default class TableView extends Vue {
   private getSelectedModule!: any[]
 
   @Prop({ default: false }) readonly stripe!: boolean
-  @Prop({ default: false }) readonly border!: boolean
-  @Prop({ default: false }) readonly showHeader!: boolean
+  @Prop({ default: true }) readonly border!: boolean
+  @Prop({ default: true }) readonly showHeader!: boolean
   @Prop({ default: false }) readonly showSummary!: boolean
-  @Prop({ default: false }) readonly showRowHover!: boolean
+  @Prop({ default: true }) readonly showRowHover!: boolean
   @Prop({ default: false }) readonly showIndex!: boolean
-  @Prop({ default: false }) readonly treeType!: boolean
-  @Prop({ default: false }) readonly isFold!: boolean
+  @Prop({ default: true }) readonly treeType!: boolean
+  @Prop({ default: true }) readonly isFold!: boolean
   @Prop({ default: false }) readonly expandType!: boolean
   @Prop({ default: false }) readonly selectionType!: boolean
 
-  private table_data: any = [
-    {
-      name: 'Jack',
-      sex: 'male',
-      likes: ['football', 'basketball'],
-      score: 10,
-      children: [
-        {
-          name: 'Ashley',
-          sex: 'female',
-          likes: ['football', 'basketball'],
-          score: 20,
-          children: [
-            {
-              name: 'Ashley',
-              sex: 'female',
-              likes: ['football', 'basketball'],
-              score: 20,
-            },
-            {
-              name: 'Taki',
-              sex: 'male',
-              likes: ['football', 'basketball'],
-              score: 10,
-              children: [
-                {
-                  name: 'Ashley',
-                  sex: 'female',
-                  likes: ['football', 'basketball'],
-                  score: 20,
-                },
-                {
-                  name: 'Taki',
-                  sex: 'male',
-                  likes: ['football', 'basketball'],
-                  score: 10,
-                  children: [
-                    {
-                      name: 'Ashley',
-                      sex: 'female',
-                      likes: ['football', 'basketball'],
-                      score: 20,
-                    },
-                    {
-                      name: 'Taki',
-                      sex: 'male',
-                      likes: ['football', 'basketball'],
-                      score: 10,
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-        {
-          name: 'Taki',
-          sex: 'male',
-          likes: ['football', 'basketball'],
-          score: 10,
-        },
-      ],
-    },
-    {
-      name: 'Tom',
-      sex: 'male',
-      likes: ['football', 'basketball'],
-      score: 20,
-      children: [
-        {
-          name: 'Ashley',
-          sex: 'female',
-          likes: ['football', 'basketball'],
-          score: 20,
-          children: [
-            {
-              name: 'Ashley',
-              sex: 'female',
-              likes: ['football', 'basketball'],
-              score: 20,
-            },
-            {
-              name: 'Taki',
-              sex: 'male',
-              likes: ['football', 'basketball'],
-              score: 10,
-            },
-          ],
-        },
-        {
-          name: 'Taki',
-          sex: 'male',
-          likes: ['football', 'basketball'],
-          score: 10,
-          children: [
-            {
-              name: 'Ashley',
-              sex: 'female',
-              likes: ['football', 'basketball'],
-              score: 20,
-            },
-            {
-              name: 'Taki',
-              sex: 'male',
-              likes: ['football', 'basketball'],
-              score: 10,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      name: 'Tom',
-      sex: 'male',
-      likes: ['football', 'basketball'],
-      score: 20,
-    },
-    {
-      name: 'Tom',
-      sex: 'male',
-      likes: ['football', 'basketball'],
-      score: 20,
-      children: [
-        {
-          name: 'Ashley',
-          sex: 'female',
-          likes: ['football', 'basketball'],
-          score: 20,
-        },
-        {
-          name: 'Taki',
-          sex: 'male',
-          likes: ['football', 'basketball'],
-          score: 10,
-        },
-      ],
-    },
-  ]
-
   private columns: any = [
     {
-      label: 'name',
+      label: 'Name',
       prop: 'name',
-      width: '400px',
+      width: '250px',
     },
     {
-      label: 'sex',
-      prop: 'sex',
-      minWidth: '50px',
+      label: 'Type',
+      prop: 'type',
+      width: '100px',
     },
     {
-      label: 'score',
-      prop: 'score',
+      label: 'Value',
+      prop: 'value',
+      width: '250px',
     },
     {
-      label: 'likes',
-      prop: 'likes',
-      minWidth: '200px',
+      label: 'Trkd',
+      prop: 'trkd',
       type: 'template',
-      template: 'likes',
+      template: 'trkd',
+    },
+    {
+      label: 'Dft',
+      prop: 'dft',
+      type: 'template',
+      template: 'dft',
     },
   ]
 
-  /*   private page: number = 0
-  private filter: string = '' */
-
-  /*   private headers: any = [
-    {
-      text: 'Name',
-      align: 'start',
-      sortable: true,
-      value: 'name',
-    },
-    { text: 'Type', value: 'type' },
-    { text: 'Value', value: 'value' },
-    { text: 'Dft', value: 'dft' },
-    { text: 'Trkd', value: 'trkd' },
-  ] */
-  /*   private parameters1: any = [
-    {
-      name: 'allHadPtCut',
-      type: 'double',
-      value: 380,
-      dft: true,
-      trkd: true,
-    },
-    {
-      name: 'semiE_dRMin',
-      type: 'double',
-      value: 0.5,
-      dft: true,
-      trkd: true,
-    },
-    {
-      name: 'allHadRapidityCut',
-      type: 'double',
-      value: 16.0,
-      dft: true,
-      trkd: true,
-    },
-    {
-      name: 'elecSelect',
-      type: 'string',
-      value:
-        'pt > 45.0 & abs(eta)<2.5 & abs(gsfTrack.d0)<1 & abs(gsfTrack.dz)<20',
-      dft: true,
-      trkd: true,
-    },
-    {
-      name: 'muonSrc',
-      type: 'InputTag',
-      value: 'muons',
-      dft: true,
-      trkd: true,
-    },
-    {
-      name: 'jetLabels',
-      type: 'VInputTag',
-      value:
-        'ak4PFJets, ak4PFJetsPuppi, ak8PFJetsPuppi, ak8PFJetsPuppiSoftDrop',
-      dft: true,
-      trkd: true,
-    },
-    {
-      name: 'semiE_LepJetPtCut',
-      type: 'double',
-      value: 30,
-      dft: true,
-      trkd: true,
-    },
-    {
-      name: 'Honeycomb',
-      type: 408,
-      value: 3.2,
-      dft: true,
-      trkd: true,
-    },
-    {
-      name: 'Donut',
-      type: 452,
-      value: 25.0,
-      dft: true,
-      trkd: true,
-    },
-    {
-      name: 'KitKat',
-      type: 518,
-      value: 26.0,
-      dft: true,
-      trkd: true,
-    },
-  ] */
-
-  /* private columns: any = [
-    {
-      property: 'name',
-      title: 'Name',
-      direction: null,
-      filterable: true,
-    },
-    {
-      property: 'type',
-      title: 'Type',
-      direction: null,
-      filterable: true,
-      collapseIcon: true,
-    },
-    {
-      property: 'value',
-      title: 'Value',
-      direction: null,
-      filterable: true,
-      collapseIcon: true,
-    },
-    {
-      property: 'trkd',
-      title: 'Trkd',
-      direction: null,
-      filterable: true,
-      collapseIcon: true,
-    },
-    {
-      property: 'dft',
-      title: 'Dft',
-      direction: null,
-      filterable: true,
-      collapseIcon: true,
-    },
-  ]
-  private rows2: any = [
-    {
-      dft: true,
-      trkd: true,
-      type: 'PSet',
-      _children: [
-        {
-          value: '"none"',
-          trkd: true,
-          dft: true,
-          type: 'string',
-          name: 'ComponentName',
-        },
-        {
-          value: 'none',
-          trkd: true,
-          dft: true,
-          type: 'string',
-          name: 'ComponentName',
-        },
-      ],
-      name: 'SeedComparitorPSet',
-      value: '',
-    },
-    {
-      dft: true,
-      trkd: true,
-      _children: [],
-      type: 'bool',
-      name: 'forceKinematicWithRegionDirection',
-      value: 'false',
-      _hasChildren: true,
-    },
-    {
-      dft: true,
-      trkd: true,
-      _children: [],
-      type: 'string',
-      name: 'magneticField',
-      value: '"ParabolicMf"',
-    },
-    {
-      dft: true,
-      trkd: true,
-      _children: [],
-      type: 'double',
-      name: 'SeedMomentumForBOFF',
-      value: '5',
-    },
-    {
-      dft: true,
-      trkd: true,
-      _children: [],
-      type: 'string',
-      name: 'propagator',
-      value: '"PropagatorWithMaterialParabolicMf"',
-    },
-    {
-      dft: true,
-      trkd: true,
-      _children: [],
-      type: 'string',
-      name: 'TTRHBuilder',
-      value: '"hltESPTTRHBWithTrackAngle"',
-    },
-    {
-      dft: true,
-      trkd: true,
-      _children: [],
-      type: 'double',
-      name: 'MinOneOverPtError',
-      value: '1',
-    },
-    {
-      dft: true,
-      trkd: true,
-      _children: [],
-      type: 'InputTag',
-      name: 'seedingHitSets',
-      value: '"hltElePixelHitDoublets"',
-    },
-    {
-      dft: true,
-      trkd: true,
-      _children: [],
-      type: 'double',
-      name: 'OriginTransverseErrorMultiplier',
-      value: '1',
-    },
-  ]
-  private rows1: any = [
-    {
-      name: 'Josephine',
-      type: 'Astrid',
-      value: 'Josephine',
-      trkd: true,
-      dft: true,
-    },
-    {
-      name: 'Josephine',
-      type: 'Astrid',
-      value: 'Josephine',
-      trkd: true,
-      dft: true,
-    },
-    {
-      name: 'Josephine',
-      type: 'Astrid',
-      value: 'Josephine',
-      trkd: true,
-      dft: true,
-      _children: [
-        {
-          name: 'Josephine',
-          type: 'Astrid',
-          value: 'Josephine',
-          trkd: true,
-          dft: true,
-          _children: [
-            {
-              name: 'Josephine',
-              type: 'Astrid',
-              value: 'Josephine',
-              trkd: true,
-              dft: true,
-            },
-            {
-              name: 'Josephine',
-              type: 'Astrid',
-              value: 'Josephine',
-              trkd: true,
-              dft: true,
-            },
-            {
-              name: 'Josephine',
-              type: 'Astrid',
-              value: 'Josephine',
-              trkd: true,
-              dft: true,
-            },
-            {
-              name: 'Josephine',
-              type: 'Astrid',
-              value: 'Josephine',
-              trkd: true,
-              dft: true,
-              _hasChildren: true,
-            },
-          ],
-        },
-        {
-          name: 'Josephine',
-          type: 'Astrid',
-          value: 'Josephine',
-          trkd: true,
-          dft: true,
-        },
-        {
-          name: 'Josephine',
-          type: 'Astrid',
-          value: 'Josephine',
-          trkd: true,
-          dft: true,
-        },
-      ],
-    },
-  ] */
-
-  /*   public filterChanged(filter) {
-    this.filter = filter
-  }
-
-  public pageChanged(page) {
-    this.page = page
-  } */
-
-  public blabla(rows: any) {
-    console.log(rows)
+  public blabla() {
+    console.log('BLABLA')
   }
 
   public buildRecursiveVPSetObject(vpSetObject: Object, body: any) {
@@ -591,7 +116,7 @@ export default class TableView extends Vue {
         nestedNoNamePSetObject['name'] = 'PSet' //no name
         nestedNoNamePSetObject['dft'] = false
         nestedNoNamePSetObject['trkd'] = true
-        nestedNoNamePSetObject['_children'] = []
+        nestedNoNamePSetObject['children'] = []
       }
       //console.log(JSON.stringify(key), JSON.stringify(value))
       // eslint-disable-next-line no-unused-vars
@@ -613,7 +138,7 @@ export default class TableView extends Vue {
             ) {
               console.log('PSET NAME: ' + key1)
               nestedVPSetObject['name'] = key1
-              nestedVPSetObject['_children'] = []
+              nestedVPSetObject['children'] = []
 
               this.buildRecursiveVPSetObject(nestedVPSetObject, value2)
             } else {
@@ -635,16 +160,16 @@ export default class TableView extends Vue {
         }
         //nestedModuleObject['name'] = nestedModuleObject['value']
         if (Object.entries(Object(body)).length == 1) {
-          vpSetObject['_children'].push(nestedVPSetObject)
+          vpSetObject['children'].push(nestedVPSetObject)
         } else {
-          nestedNoNamePSetObject['_children'].push(nestedVPSetObject)
+          nestedNoNamePSetObject['children'].push(nestedVPSetObject)
         }
       }
       if (Object.entries(Object(body)).length > 1) {
-        vpSetObject['_children'].push(nestedNoNamePSetObject)
+        vpSetObject['children'].push(nestedNoNamePSetObject)
       }
       /*     console.log(
-        'VPSET CHILDREN: ' + JSON.stringify(vpSetObject['_children'][0])
+        'VPSET CHILDREN: ' + JSON.stringify(vpSetObject['children'][0])
       ) */
     }
   }
@@ -671,15 +196,7 @@ export default class TableView extends Vue {
             //children: [],
             dft: true,
             trkd: true,
-            _children: [
-              {
-                value: 'none',
-                trkd: true,
-                dft: true,
-                type: 'string',
-                name: 'ComponentName',
-              },
-            ],
+            children: [],
           }
 
           for (const [key2, value2] of Object.entries(Object(value1))) {
@@ -689,15 +206,7 @@ export default class TableView extends Vue {
                 nestedParameterObject['type'] == 'cms.VPSet' ||
                 nestedParameterObject['type'] == 'cms.PSet'
               ) {
-                nestedParameterObject['_children'] = [
-                  {
-                    value: 'none',
-                    trkd: true,
-                    dft: true,
-                    type: 'string',
-                    name: 'ComponentName',
-                  },
-                ]
+                nestedParameterObject['children'] = []
                 // nestedParameterObject['_hasChildren'] = true
                 console.log(JSON.stringify(nestedParameterObject))
                 nestedParameterObject['name'] = key1
@@ -743,28 +252,10 @@ export default class TableView extends Vue {
     return paramsArray
   }
 
-  get propList() {
-    console.log(this.$props)
-    return Object.keys(this.$props).map((item) => ({
-      name: item,
-    }))
-  }
-  /* 
   get rows() {
-    //console.log(this.getSelectedModule)
     let rows = this.parseParams(this.getSelectedModule)
-    console.log(rows)
     return rows
-      return [
-      {
-        name: 'semiE_LepJetPtCut',
-        type: 'double',
-        value: 30,
-        dft: true,
-        trkd: true,
-      },
-    ] 
-  } */
+  }
 }
 </script>
 
@@ -782,5 +273,9 @@ export default class TableView extends Vue {
 .switch-item {
   margin: 20px;
   float: left;
+}
+.param-style {
+  color: darkgreen;
+  font-weight: bold;
 }
 </style>
