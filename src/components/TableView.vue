@@ -13,7 +13,7 @@
         <v-simple-checkbox v-model="item.trkd"></v-simple-checkbox>
       </template>
     </v-data-table> -->
-    <vue-ads-table
+    <!--     <vue-ads-table
       :columns="columns"
       :rows="rows"
       :page="page"
@@ -21,26 +21,61 @@
       @selection-change="blabla"
       @filter-change="filterChanged"
       @page-change="pageChanged"
-      :call-children="callChildren"
     >
-      <!-- Possible memory leak but I don't know why-->
       <template v-slot:trkd="cell">
         <v-checkbox v-model="cell.row.trkd"></v-checkbox>
       </template>
       <template v-slot:dft="cell">
         <v-checkbox v-model="cell.row.dft"></v-checkbox>
       </template>
-    </vue-ads-table>
+    </vue-ads-table> -->
     <!--     {{ this.getSelectedModule }}
  -->
+    <ul class="switch-list">
+      <li class="switch-item" v-for="item in propList" :key="item.name">
+        <span>{{ item.name }}: </span>
+        <zk-switch v-model="$props[item.name]"></zk-switch>
+      </li>
+    </ul>
+    <ZkTable
+      ref="table"
+      sum-text="sum"
+      index-text="#"
+      :data="table_data"
+      :columns="columns"
+      :stripe="$props.stripe"
+      :border="$props.border"
+      :show-header="$props.showHeader"
+      :show-summary="$props.showSummary"
+      :show-row-hover="$props.showRowHover"
+      :show-index="$props.showIndex"
+      :tree-type="$props.treeType"
+      :is-fold="$props.isFold"
+      :expand-type="$props.expandType"
+      :selection-type="$props.selectionType"
+    >
+      <template v-slot:$expand="cell">
+        {{
+          `My name is ${cell.row.name},
+           this rowIndex is ${cell.rowIndex}.`
+        }}
+      </template>
+      <template v-slot:likes="cell">
+        {{ cell.row.likes.join(',') }}
+      </template>
+    </ZkTable>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Prop } from 'vue-property-decorator'
 import { mapGetters } from 'vuex'
-import { VueAdsTable } from 'vue-ads-table-tree'
-import { VueAdsPagination } from 'vue-ads-pagination'
+import ZkSwitch from './Switch/Switch.vue'
+
+import ZkTable from 'vue-table-with-tree-grid'
+
+//import { VueAdsTable } from 'vue-ads-table-tree'
+//import { VueAdsPagination } from 'vue-ads-pagination'
 //import { VueAdsPageButton } from 'vue-ads-pagination/
 
 @Component({
@@ -52,15 +87,191 @@ import { VueAdsPagination } from 'vue-ads-pagination'
     // ...mapState('sequence', ['sequences']),
   },
   components: {
-    VueAdsTable,
-    VueAdsPagination,
+    /*     VueAdsTable,
+    VueAdsPagination, */
+    ZkSwitch,
+    ZkTable,
   },
 })
 export default class TableView extends Vue {
   private getSelectedModule!: any[]
 
-  private page: number = 0
-  private filter: string = ''
+  @Prop({ default: false }) readonly stripe!: boolean
+  @Prop({ default: false }) readonly border!: boolean
+  @Prop({ default: false }) readonly showHeader!: boolean
+  @Prop({ default: false }) readonly showSummary!: boolean
+  @Prop({ default: false }) readonly showRowHover!: boolean
+  @Prop({ default: false }) readonly showIndex!: boolean
+  @Prop({ default: false }) readonly treeType!: boolean
+  @Prop({ default: false }) readonly isFold!: boolean
+  @Prop({ default: false }) readonly expandType!: boolean
+  @Prop({ default: false }) readonly selectionType!: boolean
+
+  private table_data: any = [
+    {
+      name: 'Jack',
+      sex: 'male',
+      likes: ['football', 'basketball'],
+      score: 10,
+      children: [
+        {
+          name: 'Ashley',
+          sex: 'female',
+          likes: ['football', 'basketball'],
+          score: 20,
+          children: [
+            {
+              name: 'Ashley',
+              sex: 'female',
+              likes: ['football', 'basketball'],
+              score: 20,
+            },
+            {
+              name: 'Taki',
+              sex: 'male',
+              likes: ['football', 'basketball'],
+              score: 10,
+              children: [
+                {
+                  name: 'Ashley',
+                  sex: 'female',
+                  likes: ['football', 'basketball'],
+                  score: 20,
+                },
+                {
+                  name: 'Taki',
+                  sex: 'male',
+                  likes: ['football', 'basketball'],
+                  score: 10,
+                  children: [
+                    {
+                      name: 'Ashley',
+                      sex: 'female',
+                      likes: ['football', 'basketball'],
+                      score: 20,
+                    },
+                    {
+                      name: 'Taki',
+                      sex: 'male',
+                      likes: ['football', 'basketball'],
+                      score: 10,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          name: 'Taki',
+          sex: 'male',
+          likes: ['football', 'basketball'],
+          score: 10,
+        },
+      ],
+    },
+    {
+      name: 'Tom',
+      sex: 'male',
+      likes: ['football', 'basketball'],
+      score: 20,
+      children: [
+        {
+          name: 'Ashley',
+          sex: 'female',
+          likes: ['football', 'basketball'],
+          score: 20,
+          children: [
+            {
+              name: 'Ashley',
+              sex: 'female',
+              likes: ['football', 'basketball'],
+              score: 20,
+            },
+            {
+              name: 'Taki',
+              sex: 'male',
+              likes: ['football', 'basketball'],
+              score: 10,
+            },
+          ],
+        },
+        {
+          name: 'Taki',
+          sex: 'male',
+          likes: ['football', 'basketball'],
+          score: 10,
+          children: [
+            {
+              name: 'Ashley',
+              sex: 'female',
+              likes: ['football', 'basketball'],
+              score: 20,
+            },
+            {
+              name: 'Taki',
+              sex: 'male',
+              likes: ['football', 'basketball'],
+              score: 10,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'Tom',
+      sex: 'male',
+      likes: ['football', 'basketball'],
+      score: 20,
+    },
+    {
+      name: 'Tom',
+      sex: 'male',
+      likes: ['football', 'basketball'],
+      score: 20,
+      children: [
+        {
+          name: 'Ashley',
+          sex: 'female',
+          likes: ['football', 'basketball'],
+          score: 20,
+        },
+        {
+          name: 'Taki',
+          sex: 'male',
+          likes: ['football', 'basketball'],
+          score: 10,
+        },
+      ],
+    },
+  ]
+
+  private columns: any = [
+    {
+      label: 'name',
+      prop: 'name',
+      width: '400px',
+    },
+    {
+      label: 'sex',
+      prop: 'sex',
+      minWidth: '50px',
+    },
+    {
+      label: 'score',
+      prop: 'score',
+    },
+    {
+      label: 'likes',
+      prop: 'likes',
+      minWidth: '200px',
+      type: 'template',
+      template: 'likes',
+    },
+  ]
+
+  /*   private page: number = 0
+  private filter: string = '' */
 
   /*   private headers: any = [
     {
@@ -149,7 +360,7 @@ export default class TableView extends Vue {
     },
   ] */
 
-  private columns: any = [
+  /* private columns: any = [
     {
       property: 'name',
       title: 'Name',
@@ -198,6 +409,13 @@ export default class TableView extends Vue {
           type: 'string',
           name: 'ComponentName',
         },
+        {
+          value: 'none',
+          trkd: true,
+          dft: true,
+          type: 'string',
+          name: 'ComponentName',
+        },
       ],
       name: 'SeedComparitorPSet',
       value: '',
@@ -209,6 +427,7 @@ export default class TableView extends Vue {
       type: 'bool',
       name: 'forceKinematicWithRegionDirection',
       value: 'false',
+      _hasChildren: true,
     },
     {
       dft: true,
@@ -343,15 +562,15 @@ export default class TableView extends Vue {
         },
       ],
     },
-  ]
+  ] */
 
-  public filterChanged(filter) {
+  /*   public filterChanged(filter) {
     this.filter = filter
   }
 
   public pageChanged(page) {
     this.page = page
-  }
+  } */
 
   public blabla(rows: any) {
     console.log(rows)
@@ -424,9 +643,9 @@ export default class TableView extends Vue {
       if (Object.entries(Object(body)).length > 1) {
         vpSetObject['_children'].push(nestedNoNamePSetObject)
       }
-      console.log(
+      /*     console.log(
         'VPSET CHILDREN: ' + JSON.stringify(vpSetObject['_children'][0])
-      )
+      ) */
     }
   }
 
@@ -452,8 +671,15 @@ export default class TableView extends Vue {
             //children: [],
             dft: true,
             trkd: true,
-            /*             _children: [],
-             */
+            _children: [
+              {
+                value: 'none',
+                trkd: true,
+                dft: true,
+                type: 'string',
+                name: 'ComponentName',
+              },
+            ],
           }
 
           for (const [key2, value2] of Object.entries(Object(value1))) {
@@ -463,16 +689,25 @@ export default class TableView extends Vue {
                 nestedParameterObject['type'] == 'cms.VPSet' ||
                 nestedParameterObject['type'] == 'cms.PSet'
               ) {
-                nestedParameterObject['_children'] = []
-                nestedParameterObject['_hasChildren'] = true
+                nestedParameterObject['_children'] = [
+                  {
+                    value: 'none',
+                    trkd: true,
+                    dft: true,
+                    type: 'string',
+                    name: 'ComponentName',
+                  },
+                ]
+                // nestedParameterObject['_hasChildren'] = true
+                console.log(JSON.stringify(nestedParameterObject))
                 nestedParameterObject['name'] = key1
                 nestedParameterObject['value'] = ''
 
                 this.buildRecursiveVPSetObject(nestedParameterObject, value2)
 
-                console.log(
+                /*      console.log(
                   'VPSET BUILD: ' + JSON.stringify(nestedParameterObject)
-                )
+                ) */
               } else {
                 nestedParameterObject['name'] = key1
                 //simple type
@@ -508,12 +743,19 @@ export default class TableView extends Vue {
     return paramsArray
   }
 
+  get propList() {
+    console.log(this.$props)
+    return Object.keys(this.$props).map((item) => ({
+      name: item,
+    }))
+  }
+  /* 
   get rows() {
     //console.log(this.getSelectedModule)
     let rows = this.parseParams(this.getSelectedModule)
-    //console.log(rows)
+    console.log(rows)
     return rows
-    /*    return [
+      return [
       {
         name: 'semiE_LepJetPtCut',
         type: 'double',
@@ -521,33 +763,24 @@ export default class TableView extends Vue {
         dft: true,
         trkd: true,
       },
-    ] */
-  }
-
-  async callChildren() {
-    //await this.sleep(1000);
-    console.log('AAAA')
-    return [
-      {
-        value: '"none"',
-        trkd: true,
-        dft: true,
-        type: 'string',
-        name: 'ComponentName',
-      },
-    ]
-  }
+    ] 
+  } */
 }
 </script>
 
 <style lang="scss" scoped>
 //see to include this directly into assets and not like this
-@import '../assets/styles/vue-ads-table-tree.css';
-@import 'https://use.fontawesome.com/releases/v5.3.1/css/all.css';
-@import '../assets/styles/vue-ads-pagination.css';
-@import 'https://cdn.jsdelivr.net/npm/tailwindcss/dist/tailwind.min.css';
-
-.leftAlign {
-  text-align: left;
+* {
+  margin: 0;
+  padding: 0;
+}
+.switch-list {
+  margin: 20px 0;
+  list-style: none;
+  overflow: hidden;
+}
+.switch-item {
+  margin: 20px;
+  float: left;
 }
 </style>
