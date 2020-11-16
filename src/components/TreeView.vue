@@ -451,7 +451,7 @@ export default class TreeView extends Vue {
   public parsePaths(pathData: any) {
     let pathsObject: Object = {
       name: 'Paths',
-      type: 'paths',
+      type: 'pts', //TODO check this
       children: [],
     }
 
@@ -828,13 +828,14 @@ export default class TreeView extends Vue {
   async fetchNodeByName(itemType: string, itemName: string) {
     console.log(itemType)
     console.log(itemName)
-    if (itemType == 'sequence') {
+    console.log('fetchNodeByName called')
+    if (itemType === 'sequence') {
       await this.$store.dispatch('sequence/fetchSequenceByName', itemName) // note the "await"
-    } else if (itemType == 'paths') {
+    } else if (itemType === 'paths') {
       await this.$store.dispatch('path/fetchPathByName', itemName)
-    } else if (itemType == 'modules') {
+    } else if (itemType === 'modules') {
       await this.$store.dispatch('module/fetchModuleByName', itemName)
-    } else if (itemType == 'pset') {
+    } else if (itemType === 'pset') {
       await this.$store.dispatch('pset/fetchPSetByName', itemName)
     }
   }

@@ -5,7 +5,8 @@ export const namespaced = true
 export const state = {
   modules: [],
   modulesTotal: 0,
-  module: {},
+  moduleParams: {},
+  moduleName: '',
 }
 export const mutations = {
   ADD_MODULE(state, module) {
@@ -14,9 +15,9 @@ export const mutations = {
   SET_MODULES(state, modules) {
     state.modules = modules
   },
-  SET_MODULE(state, module) {
-    state.module = module
-    //console.log(state.module)
+  SET_MODULE(state, payload) {
+    state.moduleName = payload.name
+    state.moduleParams = payload.moduleParams
   },
 }
 export const actions = {
@@ -53,6 +54,7 @@ export const actions = {
       })
   },
   fetchModule({ commit, getters, dispatch }, id) {
+    //not working for now
     let module = getters.getModuleById(id)
     if (module) {
       commit('SET_MODULE', module)
@@ -71,13 +73,13 @@ export const actions = {
     }
   },
   fetchModuleByName({ commit, getters, dispatch }, name) {
-    let module = getters.getModuleByName(name)
+    let moduleParams = getters.getModuleByName(name)
     if (module) {
-      commit('SET_MODULE', module)
+      commit('SET_MODULE', { name: name, moduleParams: moduleParams })
     } else {
       return ModuleService.getModuleByName(name)
         .then((response) => {
-          commit('SET_MODULE', response.data)
+          commit('SET_MODULE', { name: name, moduleParams: response.data })
         })
         .catch((error) => {
           const notification = {
@@ -110,8 +112,15 @@ export const getters = {
     //console.log('MODULES' + state.modules)
     return state.modules
   },
-  getSelectedModule: (state) => {
-    //console.log('CALLED')
-    return state.module
+  getSelectedModuleParams: (state) => {
+    //console.log('CALLED:' + state.moduleParams)
+    return state.moduleParams
+  },
+  getSelectedModuleName: (state) => {
+    return state.moduleName
+  },
+  getSelectedModulePath: (state, getters, rootState, rootGetters) => {
+    return rootGetters['path/getPathsContainingModule'](state.moduleName)
+    //this.$store.getters['path/getPathsContainingModule'](state.module.name)
   },
 }

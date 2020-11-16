@@ -96,9 +96,34 @@ export const getters = {
     return state.paths.find((path) => path.id == id)
   },
   getPathByName: (state) => (name) => {
-    return state.paths.find((path) => path.name == name)
+    //return state.paths.find((path) => path.name == name)
+    for (const [key, value] of Object.entries(state.paths)) {
+      console.log('KEY ' + key)
+      console.log('VALUE ' + value)
+      if (key == name) {
+        //console.log('VALUE: ' + JSON.stringify(value))
+        return value
+      }
+    }
   },
   getPaths: (state) => {
     return state.paths
+  },
+  getPathsContainingModule: (state) => (moduleName) => {
+    //some logic here
+    let paths = []
+
+    for (const [key, value] of Object.entries(state.paths)) {
+      //console.log('KEY: ' + JSON.stringify(key))
+      //console.log('VALUE: ' + JSON.stringify(value))
+      for (const [key1, value1] of Object.entries(value)) {
+        console.log('KEY1: ' + key1)
+        console.log('value1: ' + value1[0])
+        if (value1[0] == 'modules') {
+          if (value1[1] == moduleName) paths.push(key)
+        }
+      }
+    }
+    return paths //if module is not direct part of the path (but part of the sequence etc)
   },
 }

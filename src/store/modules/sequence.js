@@ -102,4 +102,22 @@ export const getters = {
   getSequences: (state) => {
     return state.sequences
   },
+  //TODO get sequences containing module, and then paths from that sequence
+  /*   getSequencesContainingModule: (state) => (moduleName) => {
+    //some logic here
+    let sequences = []
+
+    for (const [key, value] of Object.entries(state.sequences)) {
+      //console.log('KEY: ' + JSON.stringify(key))
+      //console.log('VALUE: ' + JSON.stringify(value))
+      for (const [key1, value1] of Object.entries(value)) {
+        console.log('KEY1: ' + key1)
+        console.log('value1: ' + value1[0])
+        if (value1[0] == 'modules') {
+          if (value1[1] == moduleName) paths.push(key)
+        }
+      }
+    }
+    return paths //if module is not direct part of the path (but part of the sequence etc)
+  }, */
 }

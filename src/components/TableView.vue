@@ -1,5 +1,42 @@
 <template>
   <div class="mb-6">
+    <span class="flex">
+      <v-text-field
+        value="John Doe"
+        label="Package"
+        outlined
+        readonly
+        dense
+        class="package, mx-3"
+      ></v-text-field>
+      <v-text-field
+        value="John Doe"
+        label="CVS"
+        outlined
+        readonly
+        dense
+        class="cvs, mx-3"
+      ></v-text-field>
+      <v-text-field
+        :value="this.getSelectedModuleName"
+        label="EDProducer"
+        outlined
+        readonly
+        dense
+        class="producer, mx-3"
+      ></v-text-field>
+    </span>
+    <span class="flex">
+      <v-text-field
+        :value="this.getSelectedModuleName"
+        label="Label"
+        outlined
+        readonly
+        dense
+        class="label, mx-3"
+      ></v-text-field>
+      <v-select :items="paths" label="Paths" dense outlined></v-select>
+    </span>
     <ZkTable
       @cell-dblclick="blabla()"
       ref="table"
@@ -49,7 +86,9 @@ import ZkTable from 'vue-table-with-tree-grid'
   computed: {
     ...mapGetters({
       getModuleByName: 'module/getModuleByName',
-      getSelectedModule: 'module/getSelectedModule',
+      getSelectedModuleParams: 'module/getSelectedModuleParams',
+      getSelectedModuleName: 'module/getSelectedModuleName',
+      getSelectedModulePath: 'module/getSelectedModulePath',
     }),
     // ...mapState('sequence', ['sequences']),
   },
@@ -58,7 +97,9 @@ import ZkTable from 'vue-table-with-tree-grid'
   },
 })
 export default class TableView extends Vue {
-  private getSelectedModule!: any[]
+  private getSelectedModuleParams!: any[]
+  private getSelectedModuleName!: any[]
+  private getSelectedModulePath!: any[]
 
   @Prop({ default: false }) readonly stripe!: boolean
   @Prop({ default: true }) readonly border!: boolean
@@ -264,8 +305,16 @@ export default class TableView extends Vue {
   }
 
   get rows() {
-    let rows = this.parseParams(this.getSelectedModule)
+    let rows = this.parseParams(this.getSelectedModuleParams)
     return rows
+  }
+
+  get paths() {
+    let selectedModulePath = this.getSelectedModulePath
+    // eslint-disable-next-line no-unused-vars
+    console.log(selectedModulePath)
+    //console.log(pathContainngModule)
+    return selectedModulePath
   }
 }
 </script>
@@ -276,17 +325,24 @@ export default class TableView extends Vue {
   margin: 0;
   padding: 0;
 }
-.switch-list {
-  margin: 20px 0;
-  list-style: none;
-  overflow: hidden;
+.v-text-field {
+  width: 200px;
 }
-.switch-item {
-  margin: 20px;
-  float: left;
+
+.flex {
+  display: flex;
+  margin-top: 10px;
 }
-.param-style {
-  color: darkgreen;
-  font-weight: bold;
+.package {
+  width: 250px;
+}
+.cvs {
+  width: 60px;
+}
+.producer {
+  width: 200px;
+}
+.label {
+  width: 400px;
 }
 </style>
