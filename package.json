@@ -11,7 +11,6 @@
     "axios": "^0.20.0",
     "core-js": "^3.6.5",
     "material-design-icons": "^3.0.1",
-    "v-tree-data-table": "^1.0.17",
     "vue": "^2.6.10",
     "vue-class-component": "^8.0.0-beta.4",
     "vue-table-with-tree-grid": "^0.2.4",

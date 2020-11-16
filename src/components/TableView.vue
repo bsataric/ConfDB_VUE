@@ -6,7 +6,11 @@
       sum-text="sum"
       index-text="#"
       empty-text="No data"
-      cell-class-name="param-style"
+      :style="{
+        color: activeColor,
+        fontSize: fontSize + 'px',
+        fontFamily: font_family,
+      }"
       :data="rows"
       :columns="columns"
       :stripe="$props.stripe"
@@ -27,10 +31,10 @@
         }}
       </template>
       <template v-slot:trkd="cell">
-        {{ cell.row.trkd }}
+        <v-checkbox v-model="cell.row.trkd"></v-checkbox>
       </template>
       <template v-slot:dft="cell">
-        {{ cell.row.dft }}
+        <v-checkbox v-model="cell.row.dft"></v-checkbox>
       </template>
     </ZkTable>
   </div>
@@ -58,7 +62,7 @@ export default class TableView extends Vue {
 
   @Prop({ default: false }) readonly stripe!: boolean
   @Prop({ default: true }) readonly border!: boolean
-  @Prop({ default: true }) readonly showHeader!: boolean
+  @Prop({ default: true }) readonly showHeader!: boolean //there is no option for sticky header
   @Prop({ default: false }) readonly showSummary!: boolean
   @Prop({ default: true }) readonly showRowHover!: boolean
   @Prop({ default: false }) readonly showIndex!: boolean
@@ -66,6 +70,11 @@ export default class TableView extends Vue {
   @Prop({ default: true }) readonly isFold!: boolean
   @Prop({ default: false }) readonly expandType!: boolean
   @Prop({ default: false }) readonly selectionType!: boolean
+
+  //TODO: fix the styling later to look like Vuetify but for now this is OK
+  private activeColor: any = 'black'
+  private fontSize: any = 16
+  private font_family: any = 'Roboto, sans-serif'
 
   private columns: any = [
     {
@@ -88,12 +97,14 @@ export default class TableView extends Vue {
       prop: 'trkd',
       type: 'template',
       template: 'trkd',
+      width: '50px',
     },
     {
       label: 'Dft',
       prop: 'dft',
       type: 'template',
       template: 'dft',
+      width: '50px',
     },
   ]
 
@@ -102,7 +113,7 @@ export default class TableView extends Vue {
   }
 
   public buildRecursiveVPSetObject(vpSetObject: Object, body: any) {
-    console.log('BUILDING RECURSIVE VPSET')
+    //console.log('BUILDING RECURSIVE VPSET')
     //if the body has more then 0 keys it is an unnamed nested PSet
     if (Object.entries(Object(body)).length > 1) {
       //console.log('NESTED UNNAMED PSET')
@@ -127,7 +138,7 @@ export default class TableView extends Vue {
           trkd: true,
           dft: true,
         }
-        console.log('KEY1: ' + key1 + ' VALUE1: ' + value1)
+        //console.log('KEY1: ' + key1 + ' VALUE1: ' + value1)
         //this is parameter loop
         for (const [key2, value2] of Object.entries(Object(value1))) {
           if (key2 === 'type') nestedVPSetObject['type'] = value2
@@ -136,7 +147,7 @@ export default class TableView extends Vue {
               nestedVPSetObject['type'] == 'cms.VPSet' ||
               nestedVPSetObject['type'] == 'cms.PSet'
             ) {
-              console.log('PSET NAME: ' + key1)
+              //console.log('PSET NAME: ' + key1)
               nestedVPSetObject['name'] = key1
               nestedVPSetObject['children'] = []
 
@@ -208,7 +219,7 @@ export default class TableView extends Vue {
               ) {
                 nestedParameterObject['children'] = []
                 // nestedParameterObject['_hasChildren'] = true
-                console.log(JSON.stringify(nestedParameterObject))
+                //console.log(JSON.stringify(nestedParameterObject))
                 nestedParameterObject['name'] = key1
                 nestedParameterObject['value'] = ''
 
@@ -248,7 +259,7 @@ export default class TableView extends Vue {
         }
       }
     }
-    console.log('paramsArray:' + JSON.stringify(paramsArray))
+    //console.log('paramsArray:' + JSON.stringify(paramsArray))
     return paramsArray
   }
 
