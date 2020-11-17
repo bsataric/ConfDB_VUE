@@ -1,4 +1,5 @@
 import PathService from '@/services/PathService.js'
+import snippetCreator from '@/store/helpers/snippetCreator.js'
 
 export const namespaced = true
 
@@ -145,5 +146,9 @@ export const getters = {
       }
     }
     return paths
+  },
+  //create snippet text here
+  getSelectedPathSnippet: (state) => {
+    return snippetCreator.getPathSnippet(state.path)
   },
 }

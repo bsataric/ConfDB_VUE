@@ -1,4 +1,5 @@
 import ModuleService from '@/services/ModuleService.js'
+import snippetCreator from '@/store/helpers/snippetCreator.js'
 
 export const namespaced = true
 
@@ -134,5 +135,9 @@ export const getters = {
     }
     return modulePaths
     //this.$store.getters['path/getPathsContainingModule'](state.module.name)
+  },
+  //create snippet text here
+  getSelectedModuleSnippet: (state) => {
+    return snippetCreator.getModuleSnippet(state.moduleName, state.moduleParams)
   },
 }

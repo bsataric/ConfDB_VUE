@@ -1,4 +1,5 @@
 import SequenceService from '@/services/SequenceService.js'
+import snippetCreator from '@/store/helpers/snippetCreator.js'
 
 export const namespaced = true
 
@@ -97,7 +98,15 @@ export const getters = {
     return state.sequences.find((sequence) => sequence.id == id)
   },
   getSequenceByName: (state) => (name) => {
-    return state.sequences.find((sequences) => sequences.name == name)
+    //return state.sequences.find((sequences) => sequences.name == name)
+    for (const [key, value] of Object.entries(state.sequences)) {
+      console.log('KEY ' + key)
+      console.log('VALUE ' + value)
+      if (key == name) {
+        //console.log('VALUE: ' + JSON.stringify(value))
+        return value
+      }
+    }
   },
   getSequences: (state) => {
     return state.sequences
@@ -122,5 +131,9 @@ export const getters = {
     }
     //console.log('getSequencesContainingModule SEQUENCES: ' + sequences)
     return sequences //if module is not direct part of the path (but part of the sequence etc)
+  },
+  //create snippet text here
+  getSelectedSequenceSnippet: (state) => {
+    return snippetCreator.getSequenceSnippet(state.sequence)
   },
 }
