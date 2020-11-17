@@ -312,7 +312,7 @@ export default class TableView extends Vue {
   get paths() {
     let selectedModulePath = this.getSelectedModulePath
     // eslint-disable-next-line no-unused-vars
-    console.log(selectedModulePath)
+    //console.log(selectedModulePath)
     //console.log(pathContainngModule)
     return selectedModulePath
   }

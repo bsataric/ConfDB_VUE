@@ -116,14 +116,34 @@ export const getters = {
     for (const [key, value] of Object.entries(state.paths)) {
       //console.log('KEY: ' + JSON.stringify(key))
       //console.log('VALUE: ' + JSON.stringify(value))
+      // eslint-disable-next-line no-unused-vars
       for (const [key1, value1] of Object.entries(value)) {
-        console.log('KEY1: ' + key1)
-        console.log('value1: ' + value1[0])
+        //console.log('KEY1: ' + key1)
+        //console.log('value1: ' + value1[0])
         if (value1[0] == 'modules') {
           if (value1[1] == moduleName) paths.push(key)
         }
       }
     }
     return paths //if module is not direct part of the path (but part of the sequence etc)
+  },
+
+  getPathsContainingSequence: (state) => (sequenceName) => {
+    //some logic here
+    let paths = []
+
+    for (const [key, value] of Object.entries(state.paths)) {
+      //console.log('KEY: ' + JSON.stringify(key))
+      //console.log('VALUE: ' + JSON.stringify(value))
+      // eslint-disable-next-line no-unused-vars
+      for (const [key1, value1] of Object.entries(value)) {
+        //console.log('KEY1: ' + key1)
+        //console.log('value1: ' + value1[0])
+        if (value1[0] == 'sequences') {
+          if (value1[1] == sequenceName) paths.push(key)
+        }
+      }
+    }
+    return paths
   },
 }

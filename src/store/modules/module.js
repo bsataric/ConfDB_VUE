@@ -3,10 +3,10 @@ import ModuleService from '@/services/ModuleService.js'
 export const namespaced = true
 
 export const state = {
-  modules: [],
+  modules: [], //all modules
   modulesTotal: 0,
-  moduleParams: {},
-  moduleName: '',
+  moduleParams: {}, //currently selected module params
+  moduleName: '', //current selected module name
 }
 export const mutations = {
   ADD_MODULE(state, module) {
@@ -120,7 +120,19 @@ export const getters = {
     return state.moduleName
   },
   getSelectedModulePath: (state, getters, rootState, rootGetters) => {
-    return rootGetters['path/getPathsContainingModule'](state.moduleName)
+    let modulePaths = []
+    let sequencesContainingModule = []
+    modulePaths = rootGetters['path/getPathsContainingModule'](state.moduleName)
+    sequencesContainingModule = rootGetters[
+      'sequence/getSequencesContainingModule'
+    ](state.moduleName)
+    for (let i = 0; i < sequencesContainingModule.length; i++) {
+      let sequencePath = rootGetters['path/getPathsContainingSequence'](
+        sequencesContainingModule[i]
+      )
+      modulePaths.push(sequencePath)
+    }
+    return modulePaths
     //this.$store.getters['path/getPathsContainingModule'](state.module.name)
   },
 }
