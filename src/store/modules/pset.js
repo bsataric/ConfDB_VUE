@@ -1,4 +1,5 @@
 import PSetService from '@/services/PSetService.js'
+import SnippetCreator from '@/store/helpers/SnippetCreator.js'
 
 export const namespaced = true
 
@@ -72,10 +73,12 @@ export const actions = {
   fetchPSetByName({ commit, getters, dispatch }, name) {
     let pset = getters.getPSetByName(name)
     if (pset) {
+      commit('SET_SELECTED_NODE_TYPE', 'pset', { root: true })
       commit('SET_PSET', pset)
     } else {
       return PSetService.getPSetByName(name)
         .then((response) => {
+          commit('SET_SELECTED_NODE_TYPE', 'pset', { root: true })
           commit('SET_PSET', response.data)
         })
         .catch((error) => {
@@ -96,9 +99,21 @@ export const getters = {
     return state.psets.find((pset) => pset.id == id)
   },
   getPSetByName: (state) => (name) => {
-    return state.psets.find((pset) => pset.name == name)
+    //return state.psets.find((pset) => pset.name == name)
+    for (const [key, value] of Object.entries(state.psets)) {
+      //console.log('KEY ' + key)
+      //console.log('VALUE ' + value)
+      if (key == name) {
+        //console.log('VALUE: ' + JSON.stringify(value))
+        return value
+      }
+    }
   },
   getPSets: (state) => {
     return state.psets
+  },
+  //create snippet text here
+  getSelectedPSetSnippet: (state) => {
+    return SnippetCreator.getPSetSnippet(state.pset)
   },
 }

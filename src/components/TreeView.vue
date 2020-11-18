@@ -826,9 +826,9 @@ export default class TreeView extends Vue {
   }
 
   async fetchNodeByName(itemType: string, itemName: string) {
-    console.log(itemType)
-    console.log(itemName)
-    console.log('fetchNodeByName called')
+    //console.log(itemType)
+    //console.log(itemName)
+    //console.log('fetchNodeByName called')
     if (itemType === 'sequence') {
       await this.$store.dispatch('sequence/fetchSequenceByName', itemName) // note the "await"
     } else if (itemType === 'paths') {

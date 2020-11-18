@@ -2,7 +2,7 @@
   <div class="mb-6">
     <span class="flex">
       <v-text-field
-        value="John Doe"
+        value="Dummy package"
         label="Package"
         outlined
         readonly
@@ -10,7 +10,7 @@
         class="package, mx-3"
       ></v-text-field>
       <v-text-field
-        value="John Doe"
+        value="Dummy CVS"
         label="CVS"
         outlined
         readonly

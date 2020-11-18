@@ -17,15 +17,16 @@ export default new Vuex.Store({
     notification,
   },
   state: {
-    //global state TODO
-    categories: [
-      'sustainability',
-      'nature',
-      'animal welfare',
-      'housing',
-      'education',
-      'food',
-      'community',
-    ],
+    selectedNodeType: '', //TODO: maybe create action or something to change this through it
+  },
+  mutations: {
+    SET_SELECTED_NODE_TYPE(state, nodeType) {
+      state.selectedNodeType = nodeType
+    },
+  },
+  getters: {
+    getSelectedNodeType(state) {
+      return state.selectedNodeType
+    },
   },
 })

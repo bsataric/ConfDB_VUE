@@ -1,12 +1,13 @@
 import PathService from '@/services/PathService.js'
-import snippetCreator from '@/store/helpers/snippetCreator.js'
+import SnippetCreator from '@/store/helpers/SnippetCreator.js'
 
 export const namespaced = true
 
 export const state = {
   paths: [],
   pathsTotal: 0,
-  path: {},
+  pathParams: {},
+  pathName: '', //current selected module name
 }
 export const mutations = {
   ADD_PATH(state, path) {
@@ -15,8 +16,9 @@ export const mutations = {
   SET_PATHS(state, paths) {
     state.paths = paths
   },
-  SET_PATH(state, path) {
-    state.path = path
+  SET_PATH(state, payload) {
+    state.pathName = payload.name
+    state.pathParams = payload.pathParams
   },
 }
 export const actions = {
@@ -71,13 +73,15 @@ export const actions = {
     }
   },
   fetchPathByName({ commit, getters, dispatch }, name) {
-    let path = getters.getPathByName(name)
-    if (path) {
-      commit('SET_PATH', path)
+    let pathParams = getters.getPathByName(name)
+    if (pathParams) {
+      commit('SET_SELECTED_NODE_TYPE', 'path', { root: true })
+      commit('SET_PATH', { name: name, pathParams: pathParams })
     } else {
       return PathService.getPathByName(name)
         .then((response) => {
-          commit('SET_PATH', response.data)
+          commit('SET_SELECTED_NODE_TYPE', 'path', { root: true })
+          commit('SET_PATH', { name: name, pathParams: response.data })
         })
         .catch((error) => {
           const notification = {
@@ -99,8 +103,8 @@ export const getters = {
   getPathByName: (state) => (name) => {
     //return state.paths.find((path) => path.name == name)
     for (const [key, value] of Object.entries(state.paths)) {
-      console.log('KEY ' + key)
-      console.log('VALUE ' + value)
+      //console.log('KEY ' + key)
+      //console.log('VALUE ' + value)
       if (key == name) {
         //console.log('VALUE: ' + JSON.stringify(value))
         return value
@@ -149,6 +153,6 @@ export const getters = {
   },
   //create snippet text here
   getSelectedPathSnippet: (state) => {
-    return snippetCreator.getPathSnippet(state.path)
+    return SnippetCreator.getPathSnippet(state.pathName, state.pathParams)
   },
 }

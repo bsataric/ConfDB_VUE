@@ -13,7 +13,8 @@
       rows="17"
       name="input-7-4"
       label="Outlined textarea"
-      :value="this.getSeqSnippet"
+      readonly
+      :value="this.selectedNodeSnippet(this.getSelectedNodeType)"
     ></v-textarea>
   </div>
 </template>
@@ -25,30 +26,39 @@ import { mapGetters } from 'vuex'
 @Component({
   computed: {
     ...mapGetters({
+      getSelectedNodeType: 'getSelectedNodeType',
       getModuleSnippet: 'module/getSelectedModuleSnippet',
       getSequenceSnippet: 'sequence/getSelectedSequenceSnippet',
       getPathSnippet: 'path/getSelectedPathSnippet',
+      getPSetSnippet: 'pset/getSelectedPSetSnippet',
     }),
     // ...mapState('sequence', ['sequences']),
   },
 })
 export default class SnippetView extends Vue {
   private activeTab: any = 3
+  private getSelectedNodeType!: any
   private getModuleSnippet!: any
   private getSequenceSnippet!: any
   private getPathSnippet!: any
+  private getPSetSnippet!: any
 
   public createAndShowSnippet() {
     console.log('AAA')
   }
 
-  //TODO: see how to combine this
-  get getSeqSnippet() {
-    return this.getSequenceSnippet
-  }
-
-  get getSnippet1() {
-    return this.getSequenceSnippet
+  public selectedNodeSnippet(nodeType: any) {
+    //console.log('SELECTED NODE TYPE: ' + nodeType)
+    if (nodeType == 'module') {
+      return this.getModuleSnippet
+    } else if (nodeType == 'sequence') {
+      return this.getSequenceSnippet
+    } else if (nodeType == 'path') {
+      return this.getPathSnippet
+    } else if (nodeType == 'pset') {
+      return this.getPSetSnippet
+    }
+    return ''
   }
 }
 </script>

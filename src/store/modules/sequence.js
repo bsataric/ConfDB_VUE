@@ -1,12 +1,13 @@
 import SequenceService from '@/services/SequenceService.js'
-import snippetCreator from '@/store/helpers/snippetCreator.js'
+import SnippetCreator from '@/store/helpers/SnippetCreator.js'
 
 export const namespaced = true
 
 export const state = {
   sequences: [],
   sequencesTotal: 0,
-  sequence: {},
+  sequenceParams: {},
+  sequenceName: '',
 }
 export const mutations = {
   ADD_SEQUENCE(state, sequence) {
@@ -15,8 +16,9 @@ export const mutations = {
   SET_SEQUENCES(state, sequences) {
     state.sequences = sequences
   },
-  SET_SEQUENCE(state, sequence) {
-    state.sequence = sequence
+  SET_SEQUENCE(state, payload) {
+    state.sequenceName = payload.name
+    state.sequenceParams = payload.sequenceParams
   },
 }
 export const actions = {
@@ -72,13 +74,15 @@ export const actions = {
     }
   },
   fetchSequenceByName({ commit, getters, dispatch }, name) {
-    let sequence = getters.getSequenceByName(name)
-    if (sequence) {
-      commit('SET_SEQUENCE', sequence)
+    let sequenceParams = getters.getSequenceByName(name)
+    if (sequenceParams) {
+      commit('SET_SELECTED_NODE_TYPE', 'sequence', { root: true })
+      commit('SET_SEQUENCE', { name: name, sequenceParams: sequenceParams })
     } else {
       return SequenceService.getSequenceByName(name)
         .then((response) => {
-          commit('SET_SEQUENCE', response.data)
+          commit('SET_SELECTED_NODE_TYPE', 'sequence', { root: true })
+          commit('SET_SEQUENCE', { name: name, sequenceParams: response.data })
         })
         .catch((error) => {
           const notification = {
@@ -100,8 +104,8 @@ export const getters = {
   getSequenceByName: (state) => (name) => {
     //return state.sequences.find((sequences) => sequences.name == name)
     for (const [key, value] of Object.entries(state.sequences)) {
-      console.log('KEY ' + key)
-      console.log('VALUE ' + value)
+      //console.log('KEY ' + key)
+      //console.log('VALUE ' + value)
       if (key == name) {
         //console.log('VALUE: ' + JSON.stringify(value))
         return value
@@ -133,7 +137,11 @@ export const getters = {
     return sequences //if module is not direct part of the path (but part of the sequence etc)
   },
   //create snippet text here
+  // eslint-disable-next-line no-unused-vars
   getSelectedSequenceSnippet: (state) => {
-    return snippetCreator.getSequenceSnippet(state.sequence)
+    return SnippetCreator.getSequenceSnippet(
+      state.sequenceName,
+      state.sequenceParams
+    )
   },
 }

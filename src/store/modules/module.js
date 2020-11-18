@@ -1,5 +1,5 @@
 import ModuleService from '@/services/ModuleService.js'
-import snippetCreator from '@/store/helpers/snippetCreator.js'
+import SnippetCreator from '@/store/helpers/SnippetCreator.js'
 
 export const namespaced = true
 
@@ -75,11 +75,13 @@ export const actions = {
   },
   fetchModuleByName({ commit, getters, dispatch }, name) {
     let moduleParams = getters.getModuleByName(name)
-    if (module) {
+    if (moduleParams) {
+      commit('SET_SELECTED_NODE_TYPE', 'module', { root: true })
       commit('SET_MODULE', { name: name, moduleParams: moduleParams })
     } else {
       return ModuleService.getModuleByName(name)
         .then((response) => {
+          commit('SET_SELECTED_NODE_TYPE', 'module', { root: true })
           commit('SET_MODULE', { name: name, moduleParams: response.data })
         })
         .catch((error) => {
@@ -138,6 +140,6 @@ export const getters = {
   },
   //create snippet text here
   getSelectedModuleSnippet: (state) => {
-    return snippetCreator.getModuleSnippet(state.moduleName, state.moduleParams)
+    return SnippetCreator.getModuleSnippet(state.moduleName, state.moduleParams)
   },
 }
