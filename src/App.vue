@@ -4,6 +4,17 @@
       <section workspace ref="workspace">
         <!--  <NotificationContainer /> -->
         <v-container class="grey lighten-5">
+          <v-toolbar>
+            <v-app-bar-nav-icon></v-app-bar-nav-icon>
+
+            <v-toolbar-title>ConfDB</v-toolbar-title>
+
+            <v-spacer></v-spacer>
+
+            <v-btn icon>
+              <v-icon>mdi-export</v-icon>
+            </v-btn>
+          </v-toolbar>
           <v-row>
             <v-col>
               <v-card class="v-card-treeview" outlined tile>

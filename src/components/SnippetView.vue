@@ -12,7 +12,8 @@
     <v-textarea
       rows="17"
       name="input-7-4"
-      label="Outlined textarea"
+      label=""
+      placeholder=""
       readonly
       :value="this.selectedNodeSnippet(this.getSelectedNodeType)"
     ></v-textarea>
