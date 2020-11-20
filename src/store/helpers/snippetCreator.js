@@ -1,32 +1,61 @@
 /* eslint-disable no-unused-vars */
 export default {
-  buildRecursiveVPSetParameter(parameters, innerParameterText, level) {
+  buildRecursiveVPSetParameter(parameters, level) {
     let vPSetParameterText = ''
     let cmsType = ''
     let tab = '\t'
 
+    /*     if (JSON.stringify(parameters) == '[{}]') {
+      console.log('[{}]')
+      console.log('vPSetParameterText:' + JSON.stringify(vPSetParameterText))
+    } */
     //innerParameterText += '\n' + tab.repeat(level)
-    vPSetParameterText += '\n' + tab.repeat(level)
+    if (JSON.stringify(parameters) != '[{}]') {
+      //put tabs only if the PSet is not empty
+      vPSetParameterText += '\n' + tab.repeat(level)
+    }
     //console.log('VPSET parameters:' + JSON.stringify(parameters))
+    let paramCounter = 0
+    if (Object.entries(parameters).length > 1) {
+      console.log('NESTED NONAMED PSET')
+    }
     for (const [key, value] of Object.entries(parameters)) {
-      //console.log('KEY: ' + key)
-      //console.log('VALUE: ' + value)
+      /*       console.log('KEY: ' + key)
+      console.log('VALUE: ' + JSON.stringify(value)) */
+      /*    if (JSON.stringify(parameters) == '[{}]') {
+        console.log('[{}]')
+        console.log('value:' + JSON.stringify(value))
+      } */
       let entriesCounter = 0
+      /*     console.log(
+        'FIRST CHAR: ' +
+          JSON.stringify(Object.entries(parameters)[paramCounter])
+      ) */
+      paramCounter++
+      if (Object.entries(parameters).length > 1) {
+        level++
+        vPSetParameterText += 'cms.PSet(\n' + tab.repeat(level)
+      }
 
       for (const [key1, value1] of Object.entries(value)) {
         //console.log('KEY1: ' + key1)
         //console.log('VALUE1: ' + value1)
+        /*      if (JSON.stringify(parameters) == '[{}]') {
+          console.log('[{}]')
+          console.log('value:' + JSON.stringify(value))
+        } */
         //innerParameterText += key1 + ' = ' //name
         entriesCounter++
         vPSetParameterText += key1 + ' = '
+
         //console.log(innerParameterText)
         //console.log(vPSetParameterText)
         for (const [key2, value2] of Object.entries(value1)) {
-          console.log(
+          /*      console.log(
             'Object.entries(value1).length: ' + Object.entries(value).length
           )
           console.log('KEY2: ' + key2)
-          console.log('VALUE2: ' + value2)
+          console.log('VALUE2: ' + value2) */
           if (key2 == 'type') {
             cmsType = value2 //remember cms type for sets
             //innerParameterText += value2 + '( '
@@ -42,28 +71,53 @@ export default {
               //console.log(innerParameterText)
             } else {
               //complicated set type needs deconstructing
-              console.log('innerParameterText BEFORE: ' + innerParameterText)
+              //console.log('innerParameterText BEFORE: ' + innerParameterText)
+              ///if (value2 != '') {
               vPSetParameterText += this.buildRecursiveVPSetParameter(
                 value2,
-                vPSetParameterText,
                 level + 1
               )
-              console.log('innerParameterText AFTER: ' + innerParameterText)
+              /* } else {
+                console.log('EMPTY')
+              } */
+              //console.log('innerParameterText AFTER: ' + innerParameterText)
             }
           }
         }
       }
+      if (Object.entries(parameters).length > 1) {
+        //console.log('USAOAAAA')
+        if (paramCounter == Object.entries(parameters).length) level -= 2
+        else level--
+        vPSetParameterText += ')\n' + tab.repeat(level)
+      }
+    }
+
+    if (Object.entries(parameters).length > 1) {
+      //level--
+      // console.log('USAOAAAA')
+      //level--
+      //vPSetParameterText += '\n)AA'
     }
     /*  if (cmsType != 'cms.PSet' && cmsType != 'cms.VPSet') {
       return innerParameterText + vPSetParameterText + ' )\n'
     } */
+    /*     if (JSON.stringify(parameters) == '[{}]') {
+      console.log('[{}]')
+      console.log('vPSetParameterText:' + JSON.stringify(vPSetParameterText))
+    } */
     //console.log(vPSetParameterText)
-    console.log('LEVEL: ' + level)
+    //console.log('LEVEL: ' + level)
+    if (Object.entries(parameters).length > 1) {
+      level++ //TODO: FIX LAST BRACE ON MULTIPLE VPSETS
+    }
+    if (Object.entries(parameters).length > 1) {
+      console.log('LEVEL AT THE END: ' + level)
+    }
     if (level > 2) vPSetParameterText += ')\n' + tab.repeat(level - 1)
-    //TODO: zakucao sam :)
     else {
-      vPSetParameterText += ' )\n'
-      console.log('USAO OVDE GOVNAR ' + vPSetParameterText)
+      vPSetParameterText += ')\n'
+      //console.log('LEVEL <= 2 ' + vPSetParameterText)
     }
     return vPSetParameterText
   },
@@ -92,6 +146,11 @@ export default {
           //console.log('KEY1: ' + key1)
           //console.log('VALUE1: ' + value1)
           innerParameterText += '\t' + key1 + ' = ' //parameter name
+
+          //if (key1 == 'l1InputRegions') {
+          //console.log('KEY1:' + key1)
+          //console.log(JSON.stringify(value1))
+          //}
           //parse inner parameter values
           entriesCounter++
           for (const [key2, value2] of Object.entries(value1)) {
@@ -107,11 +166,24 @@ export default {
                 else innerParameterText += value2 + ' )\n'
               } else {
                 //complicated set type needs deconstructing
+                /*     if (key1 == 'MTOB') {
+                  console.log(key1)
+                  console.log('VALUE2: ' + JSON.stringify(value2))
+                } */
+                //if (V)PSet is not empty
+                //console.log('VALUE2: ' + JSON.stringify(value2)[0])
+                /*         if (JSON.stringify(value2)[0] == '[') {
+                  //no named PSet
+                  innerParameterText += '\ncms.PSet('
+                } */
                 innerParameterText += this.buildRecursiveVPSetParameter(
                   value2,
-                  '',
                   2
                 )
+                /*      if (JSON.stringify(value2)[0] == '[') {
+                  //no named PSet
+                  innerParameterText += ')\n'
+                } */
               }
             }
           }
