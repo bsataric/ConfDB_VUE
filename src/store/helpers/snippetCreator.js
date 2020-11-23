@@ -2,6 +2,7 @@
 export default {
   buildRecursiveVPSetParameter(parameters, level) {
     let vPSetParameterText = ''
+    let firstRow = true
     let cmsType = ''
     let tab = '\t'
 
@@ -10,15 +11,16 @@ export default {
       console.log('vPSetParameterText:' + JSON.stringify(vPSetParameterText))
     } */
     //innerParameterText += '\n' + tab.repeat(level)
-    if (JSON.stringify(parameters) != '[{}]') {
+    if (JSON.stringify(parameters) != '[{}]' && firstRow) {
       //put tabs only if the PSet is not empty
+      //console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
       vPSetParameterText += '\n' + tab.repeat(level)
     }
     //console.log('VPSET parameters:' + JSON.stringify(parameters))
     let paramCounter = 0
-    if (Object.entries(parameters).length > 1) {
+    /*    if (Object.entries(parameters).length > 1) {
       console.log('NESTED NONAMED PSET')
-    }
+    } */
     for (const [key, value] of Object.entries(parameters)) {
       /*       console.log('KEY: ' + key)
       console.log('VALUE: ' + JSON.stringify(value)) */
@@ -27,15 +29,25 @@ export default {
         console.log('value:' + JSON.stringify(value))
       } */
       let entriesCounter = 0
+      //console.log('ENTERED LOOP parameters' + parameters)
       /*     console.log(
         'FIRST CHAR: ' +
           JSON.stringify(Object.entries(parameters)[paramCounter])
       ) */
-      paramCounter++
       if (Object.entries(parameters).length > 1) {
-        level++
-        vPSetParameterText += 'cms.PSet(\n' + tab.repeat(level)
+        console.log('PRAVIM PSET')
+        if (paramCounter == 0) {
+          vPSetParameterText += 'cms.PSet(\n' //nested no named PSet
+          level++
+          vPSetParameterText += tab.repeat(level)
+        } else {
+          console.log('LEVEL: ' + level)
+          vPSetParameterText += tab.repeat(level) + 'cms.PSet(\n' //nested no named PSet
+          level++
+          //vPSetParameterText += tab.repeat(level)
+        }
       }
+      paramCounter++
 
       for (const [key1, value1] of Object.entries(value)) {
         //console.log('KEY1: ' + key1)
@@ -46,7 +58,22 @@ export default {
         } */
         //innerParameterText += key1 + ' = ' //name
         entriesCounter++
+        //console.log('ENTERED LOOP entriesCounter' + entriesCounter)
+        //console.log('INNER LEVEL: ' + level)
+        //console.log('CREATING NAME')
+        //if (actualLevel == -1) {
+        if (!firstRow) vPSetParameterText += tab.repeat(level)
+        else firstRow = false
+        //console.log('TAB REPEAT LEVEL: ' + level)
+        //actualLevel = level + 1
+        /*    } else {
+          vPSetParameterText += tab.repeat(actualLevel)
+          console.log('TAB REPEAT LEVEL: ' + actualLevel)
+        } */
         vPSetParameterText += key1 + ' = '
+
+        //console.log(vPSetParameterText)
+        //console.log('NAME CREATED')
 
         //console.log(innerParameterText)
         //console.log(vPSetParameterText)
@@ -66,8 +93,10 @@ export default {
             if (cmsType != 'cms.PSet' && cmsType != 'cms.VPSet') {
               //innerParameterText += value2 + ' ),\n' + tab.repeat(level)
               if (entriesCounter < Object.entries(value).length)
-                vPSetParameterText += value2 + ' ),\n' + tab.repeat(level)
-              else vPSetParameterText += value2 + ' )\n' + tab.repeat(level - 1)
+                vPSetParameterText += value2 + ' ),\n'
+              /* + tab.repeat(level) */ else
+                vPSetParameterText +=
+                  value2 + ' )\n' /* + tab.repeat(level - 1) */
               //console.log(innerParameterText)
             } else {
               //complicated set type needs deconstructing
@@ -86,10 +115,11 @@ export default {
         }
       }
       if (Object.entries(parameters).length > 1) {
-        //console.log('USAOAAAA')
-        if (paramCounter == Object.entries(parameters).length) level -= 2
-        else level--
-        vPSetParameterText += ')\n' + tab.repeat(level)
+        console.log('ZAVRSIO PSET')
+        //if (paramCounter == Object.entries(parameters).length) level -= 1
+        //else level--
+        level--
+        vPSetParameterText += tab.repeat(level) + ')\n'
       }
     }
 
@@ -108,18 +138,20 @@ export default {
     } */
     //console.log(vPSetParameterText)
     //console.log('LEVEL: ' + level)
+    /*     console.log(
+      'Object.entries(parameters).length',
+      Object.entries(parameters).length
+    )
+    console.log('LEVEL AT THE END: ' + level) */
     if (Object.entries(parameters).length > 1) {
-      level++ //TODO: FIX LAST BRACE ON MULTIPLE VPSETS
+      //level++ //TODO: FIX LAST BRACE ON MULTIPLE VPSETS
     }
     if (Object.entries(parameters).length > 1) {
-      console.log('LEVEL AT THE END: ' + level)
+      //console.log('LEVEL AT THE END: ' + level)
     }
-    if (level > 2) vPSetParameterText += ')\n' + tab.repeat(level - 1)
-    else {
-      vPSetParameterText += ')\n'
-      //console.log('LEVEL <= 2 ' + vPSetParameterText)
-    }
-    return vPSetParameterText
+    vPSetParameterText += tab.repeat(level - 1) + ')' + '\n' //else { //vPSetParameterText += ')\n' //console.log('LEVEL <= 2 ' + vPSetParameterText) //}
+    //if (level > 2) //vPSetParameterText += ')\n'
+    /* + tab.repeat(level - 1) */ return vPSetParameterText
   },
   getModuleSnippet(moduleName, moduleParams) {
     //console.log(moduleName)
@@ -161,9 +193,10 @@ export default {
               innerParameterText += value2 + '( '
             } else if (key2 == 'value') {
               if (cmsType != 'cms.PSet' && cmsType != 'cms.VPSet') {
-                if (entriesCounter < Object.entries(value).length)
-                  innerParameterText += value2 + ' ),\n'
-                else innerParameterText += value2 + ' )\n'
+                //if (entriesCounter < Object.entries(value).length)
+                /* innerParameterText += value2 + ' ),\n'
+                else */ innerParameterText +=
+                  value2 + ' )\n'
               } else {
                 //complicated set type needs deconstructing
                 /*     if (key1 == 'MTOB') {
