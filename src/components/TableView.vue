@@ -18,8 +18,8 @@
         class="cvs, mx-3"
       ></v-text-field>
       <v-text-field
-        :value="this.getSelectedModuleName"
-        label="EDProducer"
+        :value="this.getSelectedNodeEDProducerValue(this.getSelectedNodeType)"
+        :label="this.getSelectedNodeEDProducer(this.getSelectedNodeType)"
         outlined
         readonly
         dense
@@ -28,14 +28,20 @@
     </span>
     <span class="flex">
       <v-text-field
-        :value="this.getSelectedModuleName"
+        :value="this.getSelectedNodeLabel(this.getSelectedNodeType)"
         label="Label"
         outlined
         readonly
         dense
         class="label, mx-3"
       ></v-text-field>
-      <v-select :items="paths" label="Paths" dense outlined></v-select>
+      <v-select
+        :items="this.getPaths(this.getSelectedNodeType)"
+        label="Paths"
+        dense
+        outlined
+        :disabled="this.getPathsDisabled(this.getSelectedNodeType)"
+      ></v-select>
     </span>
     <ZkTable
       @cell-dblclick="blabla()"
@@ -48,7 +54,7 @@
         fontSize: fontSize + 'px',
         fontFamily: font_family,
       }"
-      :data="rows"
+      :data="this.getSelectedNodeParams(this.getSelectedNodeType)"
       :columns="columns"
       :stripe="$props.stripe"
       :border="$props.border"
@@ -85,10 +91,13 @@ import ZkTable from 'vue-table-with-tree-grid'
 @Component({
   computed: {
     ...mapGetters({
+      getSelectedNodeType: 'getSelectedNodeType',
       getModuleByName: 'module/getModuleByName',
       getSelectedModuleParams: 'module/getSelectedModuleParams',
       getSelectedModuleName: 'module/getSelectedModuleName',
       getSelectedModulePath: 'module/getSelectedModulePath',
+      getSelectedPSetParams: 'pset/getSelectedPSetParams',
+      getSelectedPSetName: 'pset/getSelectedPSetName',
     }),
     // ...mapState('sequence', ['sequences']),
   },
@@ -97,9 +106,12 @@ import ZkTable from 'vue-table-with-tree-grid'
   },
 })
 export default class TableView extends Vue {
+  private getSelectedNodeType!: any
   private getSelectedModuleParams!: any[]
   private getSelectedModuleName!: any[]
   private getSelectedModulePath!: any[]
+  private getSelectedPSetParams!: any[]
+  private getSelectedPSetName!: any[]
 
   @Prop({ default: false }) readonly stripe!: boolean
   @Prop({ default: true }) readonly border!: boolean
@@ -226,87 +238,178 @@ export default class TableView extends Vue {
     }
   }
 
-  public parseParams(params: any) {
+  public parseParams(params: any, nodeType: any) {
+    //console.log('MODULE/PSET PARAMS: ' + JSON.stringify(params))
+    //console.log('NODETYPE: ' + nodeType)
     let paramsArray: any = []
     //paramsArray.length = 0
 
     //console.log(moduleData)
     //console.log(modulesObject)
-    for (const [key, value] of Object.entries(params)) {
-      //loop over sequnces - create new Sequence object and add it to children of the seqs
-      //console.log('KEY: ' + key)
-      //console.log('VALUE: ' + value)
+    if (nodeType == 'module') {
+      for (const [key, value] of Object.entries(params)) {
+        //loop over sequnces - create new Sequence object and add it to children of the seqs
+        /*   console.log('KEY: ' + key)
+      console.log('VALUE: ' + value) */
 
-      if (key === 'params') {
-        // eslint-disable-next-line no-unused-vars
-        for (const [key1, value1] of Object.entries(Object(value))) {
-          //console.log('KEY1: ' + key1)
-          //console.log('VALUE1: ' + value1)
-
-          let nestedParameterObject: Object = {
-            //id: this.idCounter++,
-            //children: [],
-            dft: true,
-            trkd: true,
-            children: [],
-          }
-
-          for (const [key2, value2] of Object.entries(Object(value1))) {
-            if (key2 === 'type') nestedParameterObject['type'] = value2
-            else if (key2 === 'value') {
-              if (
-                nestedParameterObject['type'] == 'cms.VPSet' ||
-                nestedParameterObject['type'] == 'cms.PSet'
-              ) {
-                nestedParameterObject['children'] = []
-                // nestedParameterObject['_hasChildren'] = true
-                //console.log(JSON.stringify(nestedParameterObject))
-                nestedParameterObject['name'] = key1
-                nestedParameterObject['value'] = ''
-
-                this.buildRecursiveVPSetObject(nestedParameterObject, value2)
-
-                /*      console.log(
-                  'VPSET BUILD: ' + JSON.stringify(nestedParameterObject)
-                ) */
-              } else {
-                nestedParameterObject['name'] = key1
-                //simple type
-                nestedParameterObject['value'] = JSON.stringify(value2) //simple value
-                if (nestedParameterObject['value'].length > 70) {
-                  //shorten the string and put three dots in the end
-                  nestedParameterObject['value'] =
-                    nestedParameterObject['value'].substring(1, 70) + '...'
-                }
-              }
-            }
-            //console.log(key3)
-          }
-
-          if (nestedParameterObject['type'] != undefined) {
-            //console.log('AAAA')
-            let cmsTypeLenght = nestedParameterObject['type'].length
-            let cmsType = nestedParameterObject['type'].substring(
-              //cmsType is necessary for printing out in tree
-              nestedParameterObject['type'].indexOf('.') + 1,
-              cmsTypeLenght
-            )
-            nestedParameterObject['type'] = cmsType
-            //nestedModuleObject['name'] = nestedModuleObject['value']
-            //console.log(nestedParameterObject)
-          }
-          //push parameter into module children
-          paramsArray.push(nestedParameterObject)
+        if (key === 'params') {
+          // eslint-disable-next-line no-unused-vars
+          this.parseInnerParams(value, paramsArray)
         }
       }
+    } else if (nodeType == 'pset') {
+      this.parseInnerParams(params, paramsArray)
     }
     //console.log('paramsArray:' + JSON.stringify(paramsArray))
     return paramsArray
   }
 
-  get rows() {
+  public parseInnerParams(params: any, paramsArray: any) {
+    for (const [key1, value1] of Object.entries(Object(params))) {
+      //console.log('KEY1: ' + key1)
+      //console.log('VALUE1: ' + value1)
+
+      let nestedParameterObject: Object = {
+        //id: this.idCounter++,
+        //children: [],
+        dft: true,
+        trkd: true,
+        children: [],
+      }
+
+      for (const [key2, value2] of Object.entries(Object(value1))) {
+        if (key2 === 'type') nestedParameterObject['type'] = value2
+        else if (key2 === 'value') {
+          if (
+            nestedParameterObject['type'] == 'cms.VPSet' ||
+            nestedParameterObject['type'] == 'cms.PSet'
+          ) {
+            nestedParameterObject['children'] = []
+            // nestedParameterObject['_hasChildren'] = true
+            //console.log(JSON.stringify(nestedParameterObject))
+            nestedParameterObject['name'] = key1
+            nestedParameterObject['value'] = ''
+
+            this.buildRecursiveVPSetObject(nestedParameterObject, value2)
+
+            /*      console.log(
+                  'VPSET BUILD: ' + JSON.stringify(nestedParameterObject)
+                ) */
+          } else {
+            nestedParameterObject['name'] = key1
+            //simple type
+            nestedParameterObject['value'] = JSON.stringify(value2) //simple value
+            if (nestedParameterObject['value'].length > 70) {
+              //shorten the string and put three dots in the end
+              nestedParameterObject['value'] =
+                nestedParameterObject['value'].substring(1, 70) + '...'
+            }
+          }
+        }
+        //console.log(key3)
+      }
+
+      if (nestedParameterObject['type'] != undefined) {
+        //console.log('AAAA')
+        let cmsTypeLenght = nestedParameterObject['type'].length
+        let cmsType = nestedParameterObject['type'].substring(
+          //cmsType is necessary for printing out in tree
+          nestedParameterObject['type'].indexOf('.') + 1,
+          cmsTypeLenght
+        )
+        nestedParameterObject['type'] = cmsType
+        //nestedModuleObject['name'] = nestedModuleObject['value']
+        //console.log(nestedParameterObject)
+      }
+      //push parameter into module children
+      paramsArray.push(nestedParameterObject)
+    }
+
+    return paramsArray
+  }
+
+  /*   get rows() {
     let rows = this.parseParams(this.getSelectedModuleParams)
     return rows
+  } */
+
+  public getSelectedNodeParams(nodeType: any) {
+    //console.log('SELECTED NODE TYPE: ' + nodeType)
+    if (nodeType == 'module') {
+      return this.parseParams(this.getSelectedModuleParams, nodeType)
+    } else if (nodeType == 'sequence') {
+      return []
+    } else if (nodeType == 'path') {
+      return []
+    } else if (nodeType == 'pset') {
+      return this.parseParams(this.getSelectedPSetParams, nodeType)
+    }
+    return []
+  }
+
+  public getSelectedNodeEDProducer(nodeType: any) {
+    if (nodeType == 'module') {
+      return 'EDProducer'
+    } else if (nodeType == 'sequence') {
+      return ''
+    } else if (nodeType == 'path') {
+      return ''
+    } else if (nodeType == 'pset') {
+      return ''
+    }
+    return ''
+  }
+
+  public getSelectedNodeEDProducerValue(nodeType: any) {
+    if (nodeType == 'module') {
+      return this.getSelectedModuleName
+    } else if (nodeType == 'sequence') {
+      return ''
+    } else if (nodeType == 'path') {
+      return ''
+    } else if (nodeType == 'pset') {
+      return ''
+    }
+    return ''
+  }
+
+  public getSelectedNodeLabel(nodeType: any) {
+    if (nodeType == 'module') {
+      return this.getSelectedModuleName
+    } else if (nodeType == 'sequence') {
+      return ''
+    } else if (nodeType == 'path') {
+      return ''
+    } else if (nodeType == 'pset') {
+      return this.getSelectedPSetName
+    }
+    return ''
+  }
+
+  public getPathsDisabled(nodeType: any) {
+    if (nodeType == 'module') {
+      return false
+    } else if (nodeType == 'sequence') {
+      return true
+    } else if (nodeType == 'path') {
+      return true
+    } else if (nodeType == 'pset') {
+      return true
+    }
+    return true
+  }
+
+  public getPaths(nodeType: any) {
+    if (nodeType == 'module') {
+      return this.getSelectedModulePath
+    } else if (nodeType == 'sequence') {
+      return []
+    } else if (nodeType == 'path') {
+      return []
+    } else if (nodeType == 'pset') {
+      return []
+    }
+    return []
   }
 
   get paths() {

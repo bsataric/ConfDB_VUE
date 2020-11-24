@@ -12,8 +12,6 @@ export default {
     let paramCounter = 0
 
     for (const [key, value] of Object.entries(parameters)) {
-      let entriesCounter = 0
-
       if (Object.entries(parameters).length > 1) {
         if (paramCounter == 0) {
           vPSetParameterText += 'cms.PSet(\n' //nested no named PSet
@@ -27,8 +25,6 @@ export default {
       paramCounter++
 
       for (const [key1, value1] of Object.entries(value)) {
-        entriesCounter++
-
         if (!firstRow) vPSetParameterText += tab.repeat(level)
         else firstRow = false
 
@@ -67,15 +63,12 @@ export default {
     let cType = ''
 
     for (const [key, value] of Object.entries(moduleParams)) {
-      let entriesCounter = 0
-
       if (key == 'pytype') {
         moduleSnippet += 'cms.' + value + '( '
       } else if (key == 'params') {
         for (const [key1, value1] of Object.entries(value)) {
           innerParameterText += '\t' + key1 + ' = ' //parameter name
 
-          entriesCounter++
           for (const [key2, value2] of Object.entries(value1)) {
             if (key2 == 'type') {
               cmsType = value2 //remember cms type for sets
@@ -131,10 +124,41 @@ export default {
     return sequenceSnippet
     //return JSON.stringify(sequenceParams)
   },
-  getPSetSnippet(pset) {
-    //console.log(sequence)
-    //console.log(sequenceParams)
+  getPSetSnippet(psetName, psetParams) {
+    console.log(psetName)
+    console.log(JSON.stringify(psetParams))
     console.log('getPSetSnippet CALLED!')
-    return JSON.stringify(pset)
+    let psetSnippet = psetName + ' = '
+    let innerParameterText = ''
+    let cmsType = ''
+    let cType = 'cms.PSet(\n'
+
+    /*     for (const [key, value] of Object.entries(psetParams)) {
+      if (key == 'pytype') {
+        psetSnippet += 'cms.' + value + '( '
+      } else if (key == 'params') { */
+    for (const [key1, value1] of Object.entries(psetParams)) {
+      innerParameterText += '\t' + key1 + ' = ' //parameter name
+
+      for (const [key2, value2] of Object.entries(value1)) {
+        if (key2 == 'type') {
+          cmsType = value2 //remember cms type for sets
+          innerParameterText += value2 + '( '
+        } else if (key2 == 'value') {
+          if (cmsType != 'cms.PSet' && cmsType != 'cms.VPSet') {
+            innerParameterText += value2 + ' )\n'
+          } else {
+            //complicated set type needs deconstructing
+            innerParameterText += this.buildRecursiveVPSetParameter(value2, 2)
+          }
+        }
+      }
+      /*         }
+      } else if (key == 'ctype') cType = '"' + value + '",\n' */
+    }
+    psetSnippet = psetSnippet + cType + innerParameterText
+    psetSnippet += ' )'
+
+    return psetSnippet
   },
 }

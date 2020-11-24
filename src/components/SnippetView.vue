@@ -15,7 +15,7 @@
       label=""
       placeholder=""
       readonly
-      :value="this.selectedNodeSnippet(this.getSelectedNodeType)"
+      :value="this.getSelectedNodeSnippet(this.getSelectedNodeType)"
     ></v-textarea>
   </div>
 </template>
@@ -48,7 +48,7 @@ export default class SnippetView extends Vue {
     console.log('AAA')
   }
 
-  public selectedNodeSnippet(nodeType: any) {
+  public getSelectedNodeSnippet(nodeType: any) {
     //console.log('SELECTED NODE TYPE: ' + nodeType)
     if (nodeType == 'module') {
       return this.getModuleSnippet

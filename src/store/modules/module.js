@@ -54,6 +54,7 @@ export const actions = {
         dispatch('notification/add', notification, { root: true })
       })
   },
+  //NOT USED FOR NOW
   fetchModule({ commit, getters, dispatch }, id) {
     //not working for now
     let module = getters.getModuleById(id)

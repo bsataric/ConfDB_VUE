@@ -6,7 +6,8 @@ export const namespaced = true
 export const state = {
   psets: [],
   psetsTotal: 0,
-  pset: {},
+  psetParams: {}, //currently selected pset params
+  psetName: '', //current selected pset name
 }
 export const mutations = {
   ADD_PSET(state, pset) {
@@ -15,8 +16,9 @@ export const mutations = {
   SET_PSETS(state, psets) {
     state.psets = psets
   },
-  SET_PSET(state, pset) {
-    state.pset = pset
+  SET_PSET(state, payload) {
+    state.psetName = payload.name
+    state.psetParams = payload.psetParams
   },
 }
 export const actions = {
@@ -52,6 +54,7 @@ export const actions = {
         dispatch('notification/add', notification, { root: true })
       })
   },
+  //NOT USED FOR NOW
   fetchPSet({ commit, getters, dispatch }, id) {
     let pset = getters.getPSetById(id)
     if (pset) {
@@ -71,15 +74,16 @@ export const actions = {
     }
   },
   fetchPSetByName({ commit, getters, dispatch }, name) {
-    let pset = getters.getPSetByName(name)
-    if (pset) {
+    let psetParams = getters.getPSetByName(name)
+    //console.log('GET PSET PARAMS: ' + JSON.stringify(psetParams))
+    if (psetParams) {
       commit('SET_SELECTED_NODE_TYPE', 'pset', { root: true })
-      commit('SET_PSET', pset)
+      commit('SET_PSET', { name: name, psetParams: psetParams })
     } else {
       return PSetService.getPSetByName(name)
         .then((response) => {
           commit('SET_SELECTED_NODE_TYPE', 'pset', { root: true })
-          commit('SET_PSET', response.data)
+          commit('SET_PSET', { name: name, psetParams: response })
         })
         .catch((error) => {
           const notification = {
@@ -112,8 +116,17 @@ export const getters = {
   getPSets: (state) => {
     return state.psets
   },
+  getSelectedPSetParams: (state) => {
+    //console.log('CALLED:' + state.psetParams)
+    return state.psetParams
+  },
+  getSelectedPSetName: (state) => {
+    return state.psetName
+  },
   //create snippet text here
   getSelectedPSetSnippet: (state) => {
-    return SnippetCreator.getPSetSnippet(state.pset)
+    //console.log('POZVAN SAM')
+    //console.log('SNIPPET CREATOR PARAMS: ' + JSON.stringify(state.psetParams))
+    return SnippetCreator.getPSetSnippet(state.psetName, state.psetParams)
   },
 }
