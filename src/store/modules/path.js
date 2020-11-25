@@ -76,11 +76,13 @@ export const actions = {
     let pathParams = getters.getPathByName(name)
     if (pathParams) {
       commit('SET_SELECTED_NODE_TYPE', 'path', { root: true })
+      commit('SET_SELECTED_NODE_NAME', name, { root: true })
       commit('SET_PATH', { name: name, pathParams: pathParams })
     } else {
       return PathService.getPathByName(name)
         .then((response) => {
           commit('SET_SELECTED_NODE_TYPE', 'path', { root: true })
+          commit('SET_SELECTED_NODE_NAME', name, { root: true })
           commit('SET_PATH', { name: name, pathParams: response.data })
         })
         .catch((error) => {

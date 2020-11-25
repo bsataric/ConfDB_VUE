@@ -78,11 +78,13 @@ export const actions = {
     let moduleParams = getters.getModuleByName(name)
     if (moduleParams) {
       commit('SET_SELECTED_NODE_TYPE', 'module', { root: true })
+      commit('SET_SELECTED_NODE_NAME', name, { root: true })
       commit('SET_MODULE', { name: name, moduleParams: moduleParams })
     } else {
       return ModuleService.getModuleByName(name)
         .then((response) => {
           commit('SET_SELECTED_NODE_TYPE', 'module', { root: true })
+          commit('SET_SELECTED_NODE_NAME', name, { root: true })
           commit('SET_MODULE', { name: name, moduleParams: response.data })
         })
         .catch((error) => {

@@ -77,11 +77,13 @@ export const actions = {
     let sequenceParams = getters.getSequenceByName(name)
     if (sequenceParams) {
       commit('SET_SELECTED_NODE_TYPE', 'sequence', { root: true })
+      commit('SET_SELECTED_NODE_NAME', name, { root: true })
       commit('SET_SEQUENCE', { name: name, sequenceParams: sequenceParams })
     } else {
       return SequenceService.getSequenceByName(name)
         .then((response) => {
           commit('SET_SELECTED_NODE_TYPE', 'sequence', { root: true })
+          commit('SET_SELECTED_NODE_NAME', name, { root: true })
           commit('SET_SEQUENCE', { name: name, sequenceParams: response.data })
         })
         .catch((error) => {

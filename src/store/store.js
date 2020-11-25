@@ -18,15 +18,22 @@ export default new Vuex.Store({
   },
   state: {
     selectedNodeType: '', //TODO: maybe create action or something to change this through it
+    selectedNodeName: '',
   },
   mutations: {
     SET_SELECTED_NODE_TYPE(state, nodeType) {
       state.selectedNodeType = nodeType
     },
+    SET_SELECTED_NODE_NAME(state, nodeName) {
+      state.selectedNodeName = nodeName
+    },
   },
   getters: {
     getSelectedNodeType(state) {
       return state.selectedNodeType
+    },
+    getSelectedNodeName(state) {
+      return state.selectedNodeName
     },
   },
 })

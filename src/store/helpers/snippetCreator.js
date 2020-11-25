@@ -125,9 +125,9 @@ export default {
     //return JSON.stringify(sequenceParams)
   },
   getPSetSnippet(psetName, psetParams) {
-    console.log(psetName)
-    console.log(JSON.stringify(psetParams))
-    console.log('getPSetSnippet CALLED!')
+    //console.log(psetName)
+    //console.log(JSON.stringify(psetParams))
+    //console.log('getPSetSnippet CALLED!')
     let psetSnippet = psetName + ' = '
     let innerParameterText = ''
     let cmsType = ''

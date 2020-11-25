@@ -78,11 +78,13 @@ export const actions = {
     //console.log('GET PSET PARAMS: ' + JSON.stringify(psetParams))
     if (psetParams) {
       commit('SET_SELECTED_NODE_TYPE', 'pset', { root: true })
+      commit('SET_SELECTED_NODE_NAME', name, { root: true })
       commit('SET_PSET', { name: name, psetParams: psetParams })
     } else {
       return PSetService.getPSetByName(name)
         .then((response) => {
           commit('SET_SELECTED_NODE_TYPE', 'pset', { root: true })
+          commit('SET_SELECTED_NODE_NAME', name, { root: true })
           commit('SET_PSET', { name: name, psetParams: response })
         })
         .catch((error) => {
