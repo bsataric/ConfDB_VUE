@@ -4,21 +4,21 @@ export default {
     let vPSetParameterText = ''
     let firstRow = true
     let cmsType = ''
-    let tab = '\t'
+    let tab = '&emsp;'
 
     if (JSON.stringify(parameters) != '[{}]' && firstRow) {
-      vPSetParameterText += '\n' + tab.repeat(level)
+      vPSetParameterText += '</br>' + tab.repeat(level)
     }
     let paramCounter = 0
 
     for (const [key, value] of Object.entries(parameters)) {
       if (Object.entries(parameters).length > 1) {
         if (paramCounter == 0) {
-          vPSetParameterText += 'cms.PSet(\n' //nested no named PSet
+          vPSetParameterText += 'cms.PSet(</br>' //nested no named PSet
           level++
           vPSetParameterText += tab.repeat(level)
         } else {
-          vPSetParameterText += tab.repeat(level) + 'cms.PSet(\n' //nested no named PSet
+          vPSetParameterText += tab.repeat(level) + 'cms.PSet(</br>' //nested no named PSet
           level++
         }
       }
@@ -36,7 +36,7 @@ export default {
             vPSetParameterText += value2 + '( '
           } else {
             if (cmsType != 'cms.PSet' && cmsType != 'cms.VPSet') {
-              vPSetParameterText += value2 + ' ),\n'
+              vPSetParameterText += value2 + ' ),</br>'
             } else {
               //complicated set type needs deconstructing
               vPSetParameterText += this.buildRecursiveVPSetParameter(
@@ -49,11 +49,11 @@ export default {
       }
       if (Object.entries(parameters).length > 1) {
         level--
-        vPSetParameterText += tab.repeat(level) + ')\n'
+        vPSetParameterText += tab.repeat(level) + ')</br>'
       }
     }
 
-    vPSetParameterText += tab.repeat(level - 1) + ')' + '\n'
+    vPSetParameterText += tab.repeat(level - 1) + ')' + '</br>'
     return vPSetParameterText
   },
   getModuleSnippet(moduleName, moduleParams) {
@@ -67,7 +67,7 @@ export default {
         moduleSnippet += 'cms.' + value + '( '
       } else if (key == 'params') {
         for (const [key1, value1] of Object.entries(value)) {
-          innerParameterText += '\t' + key1 + ' = ' //parameter name
+          innerParameterText += '&emsp;' + key1 + ' = ' //parameter name
 
           for (const [key2, value2] of Object.entries(value1)) {
             if (key2 == 'type') {
@@ -75,7 +75,7 @@ export default {
               innerParameterText += value2 + '( '
             } else if (key2 == 'value') {
               if (cmsType != 'cms.PSet' && cmsType != 'cms.VPSet') {
-                innerParameterText += value2 + ' )\n'
+                innerParameterText += value2 + ' )</br>'
               } else {
                 //complicated set type needs deconstructing
                 innerParameterText += this.buildRecursiveVPSetParameter(
@@ -86,7 +86,7 @@ export default {
             }
           }
         }
-      } else if (key == 'ctype') cType = '"' + value + '",\n'
+      } else if (key == 'ctype') cType = '"' + value + '",</br>'
     }
     moduleSnippet = moduleSnippet + cType + innerParameterText
     moduleSnippet += ' )'
@@ -131,14 +131,14 @@ export default {
     let psetSnippet = psetName + ' = '
     let innerParameterText = ''
     let cmsType = ''
-    let cType = 'cms.PSet(\n'
+    let cType = 'cms.PSet(</br>'
 
     /*     for (const [key, value] of Object.entries(psetParams)) {
       if (key == 'pytype') {
         psetSnippet += 'cms.' + value + '( '
       } else if (key == 'params') { */
     for (const [key1, value1] of Object.entries(psetParams)) {
-      innerParameterText += '\t' + key1 + ' = ' //parameter name
+      innerParameterText += '&emsp;' + key1 + ' = ' //parameter name
 
       for (const [key2, value2] of Object.entries(value1)) {
         if (key2 == 'type') {
@@ -146,7 +146,7 @@ export default {
           innerParameterText += value2 + '( '
         } else if (key2 == 'value') {
           if (cmsType != 'cms.PSet' && cmsType != 'cms.VPSet') {
-            innerParameterText += value2 + ' )\n'
+            innerParameterText += value2 + ' )</br>'
           } else {
             //complicated set type needs deconstructing
             innerParameterText += this.buildRecursiveVPSetParameter(value2, 2)
@@ -154,7 +154,7 @@ export default {
         }
       }
       /*         }
-      } else if (key == 'ctype') cType = '"' + value + '",\n' */
+      } else if (key == 'ctype') cType = '"' + value + '",</br>' */
     }
     psetSnippet = psetSnippet + cType + innerParameterText
     psetSnippet += ' )'

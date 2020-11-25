@@ -125,7 +125,15 @@ export const getters = {
   getSelectedModuleName: (state) => {
     return state.moduleName
   },
-  getSelectedModulePath: (state, getters, rootState, rootGetters) => {
+  getSelectedModuleSequences: (state, getters, rootState, rootGetters) => {
+    let sequencesContainingModule = []
+    sequencesContainingModule = rootGetters[
+      'sequence/getSequencesContainingModule'
+    ](state.moduleName)
+    return sequencesContainingModule
+    //this.$store.getters['path/getPathsContainingModule'](state.module.name)
+  },
+  getSelectedModulePaths: (state, getters, rootState, rootGetters) => {
     let modulePaths = []
     let sequencesContainingModule = []
     modulePaths = rootGetters['path/getPathsContainingModule'](state.moduleName)

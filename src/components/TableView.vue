@@ -95,7 +95,7 @@ import ZkTable from 'vue-table-with-tree-grid'
       getModuleByName: 'module/getModuleByName',
       getSelectedModuleParams: 'module/getSelectedModuleParams',
       getSelectedModuleName: 'module/getSelectedModuleName',
-      getSelectedModulePath: 'module/getSelectedModulePath',
+      getSelectedModulePaths: 'module/getSelectedModulePaths',
       getSelectedPSetParams: 'pset/getSelectedPSetParams',
       getSelectedPSetName: 'pset/getSelectedPSetName',
     }),
@@ -109,7 +109,7 @@ export default class TableView extends Vue {
   private getSelectedNodeType!: any
   private getSelectedModuleParams!: any[]
   private getSelectedModuleName!: any[]
-  private getSelectedModulePath!: any[]
+  private getSelectedModulePaths!: any[]
   private getSelectedPSetParams!: any[]
   private getSelectedPSetName!: any[]
 
@@ -401,7 +401,7 @@ export default class TableView extends Vue {
 
   public getPaths(nodeType: any) {
     if (nodeType == 'module') {
-      return this.getSelectedModulePath
+      return this.getSelectedModulePaths
     } else if (nodeType == 'sequence') {
       return []
     } else if (nodeType == 'path') {
@@ -413,7 +413,7 @@ export default class TableView extends Vue {
   }
 
   get paths() {
-    let selectedModulePath = this.getSelectedModulePath
+    let selectedModulePath = this.getSelectedModulePaths
     // eslint-disable-next-line no-unused-vars
     //console.log(selectedModulePath)
     //console.log(pathContainngModule)

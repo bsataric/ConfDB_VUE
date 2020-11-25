@@ -2,13 +2,13 @@
   <!-- change key into some computed key or something and not name since they can be same-->
   <div>
     <v-treeview
-      v-model="tree"
       :items="items"
       activatable
       dense
-      item-key="id"
+      item-key="name"
       item-text=""
       open-on-click
+      :open="getOpen(this.getSelectedNodeType, this.getSelectedNodeName)"
     >
       <template v-slot:prepend="{ item, open }">
         <span @click="fetchNodeByName(item.type, item.name)">
@@ -50,18 +50,23 @@ import { mapGetters } from 'vuex'
       getPaths: 'path/getPaths',
       getModules: 'module/getModules',
       getModuleByName: 'module/getModuleByName',
+      getSelectedNodeType: 'getSelectedNodeType',
+      getSelectedNodeName: 'getSelectedNodeName',
       getPSets: 'pset/getPSets',
     }),
     // ...mapState('sequence', ['sequences']),
   },
 })
 export default class TreeView extends Vue {
-  //private open: any = []
+  private open: any = []
   private active: any = []
   private getSequences!: any[] // are assigned via mapState
   private getPaths!: any[]
   private getModules!: any[]
   private getPSets!: any[]
+
+  private getSelectedNodeName!: any[]
+  private getSelectedNodeType!: any[]
 
   private globalSequencesObject: Object = {}
   private globalPathsObject: Object = {}
@@ -840,12 +845,24 @@ export default class TreeView extends Vue {
     }
   }
 
+  public getOpen(openNodeType: string, openNodeName: string) {
+    const array: string[] = []
+    if (openNodeType == 'sequence')
+      //TODO FIX
+      array.push('Sequences')
+    array.push(openNodeName)
+    //console.log(array)
+    return array
+  }
+
   created() {
     // Make a request for config parts
     this.fetchGroup('seqs')
     this.fetchGroup('paths')
     this.fetchGroup('mods')
     this.fetchGroup('psets')
+
+    this.open = ['Modules']
 
     //this.open = [1]
   }
