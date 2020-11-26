@@ -33,6 +33,7 @@ export default new Vuex.Store({
       return state.selectedNodeType
     },
     getSelectedNodeName(state) {
+      console.log('TRIGGERED')
       return state.selectedNodeName
     },
   },

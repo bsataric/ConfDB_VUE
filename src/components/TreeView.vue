@@ -1,5 +1,9 @@
 <template>
   <!-- change key into some computed key or something and not name since they can be same-->
+  <!-- 
+          :open="openNodes"
+      :key="openNodes.length"
+  -->
   <div>
     <v-treeview
       :items="items"
@@ -8,7 +12,7 @@
       item-key="name"
       item-text=""
       open-on-click
-      :open="getOpen(this.getSelectedNodeType, this.getSelectedNodeName)"
+      multiple-active
     >
       <template v-slot:prepend="{ item, open }">
         <span @click="fetchNodeByName(item.type, item.name)">
@@ -58,7 +62,9 @@ import { mapGetters } from 'vuex'
   },
 })
 export default class TreeView extends Vue {
-  private open: any = []
+  private openNodes: any = []
+  private openSequencesList: any = []
+  private openModulesList: any = []
   private active: any = []
   private getSequences!: any[] // are assigned via mapState
   private getPaths!: any[]
@@ -834,6 +840,7 @@ export default class TreeView extends Vue {
     //console.log(itemType)
     //console.log(itemName)
     //console.log('fetchNodeByName called')
+    //let index = this.checkOpen(itemName) //close node if it's already open
     if (itemType === 'sequence') {
       await this.$store.dispatch('sequence/fetchSequenceByName', itemName) // note the "await"
     } else if (itemType === 'paths') {
@@ -843,17 +850,74 @@ export default class TreeView extends Vue {
     } else if (itemType === 'pset') {
       await this.$store.dispatch('pset/fetchPSetByName', itemName)
     }
+    //if (index == -1)
+    //open only if it is not already open
+    this.getOpen(itemType, itemName)
+    //this.openNodes = ['Modules', 'hltFEDSelector']
   }
 
+  /*   public checkOpen(openNodeName: string) {
+    let index = this.openNodes.indexOf(openNodeName)
+    if (index != -1) {
+      //element already open
+      this.openNodes.splice(index, 1)
+      console.log('ELEMENT ALREADY OPEN this.open: ' + this.openNodes)
+    }
+    return index
+  } */
+
   public getOpen(openNodeType: string, openNodeName: string) {
-    const array: string[] = []
-    if (openNodeType == 'sequence')
-      //TODO FIX
-      array.push('Sequences')
-    array.push(openNodeName)
-    //console.log(array)
-    return array
+    //const array: string[] = []
+    //this.open = []
+    console.log('openNodeType: ' + openNodeType)
+    console.log('openNodeName: ' + openNodeName)
+
+    /*     let index = this.openNodes.indexOf(openNodeName)
+    if (index != -1) {
+      //element already openNodes
+      this.openNodes.splice(index, 1)
+      //console.log('ELEMENT ALREADY OPEN this.open: ' + this.openNodes)
+      return
+    } */
+    //console.log('openNodeName: ' + openNodeName)
+    let indexOfSequences = this.openSequencesList.indexOf('Sequences')
+    let indexOfModules = this.openModulesList.indexOf('Modules')
+    //let indexOfNode = this.openNodes.indexOf(openNodeName)
+
+    if (openNodeType == 'seqs') {
+      if (indexOfSequences == -1) this.openSequencesList.push('Sequences')
+      else this.openSequencesList.splice(0)
+    } else if (openNodeType == 'mods') {
+      if (indexOfModules == -1) this.openModulesList.push('Modules')
+      else this.openModulesList.splice(0)
+    } else if (openNodeType == 'sequence') {
+      let indexOfSequenceNode = this.openSequencesList.indexOf(openNodeName)
+      if (indexOfSequenceNode == -1) this.openSequencesList.push(openNodeName)
+      else this.openSequencesList.splice(indexOfSequenceNode, 1)
+      //this.open.push(openNodeName)
+      //array.push('Sequences')
+    } else if (openNodeType == 'modules') {
+      let indexOfModuleNode = this.openModulesList.indexOf(openNodeName)
+      if (indexOfModuleNode == -1) this.openModulesList.push(openNodeName)
+      else this.openModulesList.splice(indexOfModuleNode, 1)
+      //this.open.push('openNodeName')
+    }
+    console.log('this.openSequencesList ' + this.openSequencesList)
+    console.log('this.openModulesList ' + this.openModulesList)
+
+    //return array
+    let result = []
+    result = result.concat(this.openSequencesList, this.openModulesList)
+    this.openNodes = result
+
+    console.log('this.openNodes ' + this.openNodes)
   }
+
+  /*   get returnOpen() {
+    //console.log('this.open 2: ' + this.open)
+    this.openNodes = ['hltFEDSelector']
+    return this.openNodes
+  } */
 
   created() {
     // Make a request for config parts
@@ -862,7 +926,7 @@ export default class TreeView extends Vue {
     this.fetchGroup('mods')
     this.fetchGroup('psets')
 
-    this.open = ['Modules']
+    //this.open = ['Modules']
 
     //this.open = [1]
   }

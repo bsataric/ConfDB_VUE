@@ -137,7 +137,7 @@ export default class SnippetView extends Vue {
     //console.log('this.previousNodeName: ' + this.previousNodeName)
     if (this.previousNodeName != nodeName) {
       this.activeTab = 3 //force snippet
-      console.log('FORCING SNIPPET')
+      //console.log('FORCING SNIPPET')
     }
 
     this.previousNodeName = nodeName
