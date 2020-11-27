@@ -36,7 +36,9 @@ export default {
             vPSetParameterText += value2 + '( '
           } else {
             if (cmsType != 'cms.PSet' && cmsType != 'cms.VPSet') {
-              vPSetParameterText += value2 + ' ),</br>'
+              if (cmsType == 'cms.string' || cmsType == 'cms.InputTag')
+                vPSetParameterText += '"' + value2 + '" )</br>'
+              else vPSetParameterText += value2 + ' )</br>'
             } else {
               //complicated set type needs deconstructing
               vPSetParameterText += this.buildRecursiveVPSetParameter(
@@ -75,7 +77,9 @@ export default {
               innerParameterText += value2 + '( '
             } else if (key2 == 'value') {
               if (cmsType != 'cms.PSet' && cmsType != 'cms.VPSet') {
-                innerParameterText += value2 + ' )</br>'
+                if (cmsType == 'cms.string' || cmsType == 'cms.InputTag')
+                  innerParameterText += '"' + value2 + '" )</br>'
+                else innerParameterText += value2 + ' )</br>'
               } else {
                 //complicated set type needs deconstructing
                 innerParameterText += this.buildRecursiveVPSetParameter(
@@ -146,7 +150,9 @@ export default {
           innerParameterText += value2 + '( '
         } else if (key2 == 'value') {
           if (cmsType != 'cms.PSet' && cmsType != 'cms.VPSet') {
-            innerParameterText += value2 + ' )</br>'
+            if (cmsType == 'cms.string' || cmsType == 'cms.InputTag')
+              innerParameterText += '"' + value2 + '" )</br>'
+            else innerParameterText += value2 + ' )</br>'
           } else {
             //complicated set type needs deconstructing
             innerParameterText += this.buildRecursiveVPSetParameter(value2, 2)
