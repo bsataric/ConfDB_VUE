@@ -182,13 +182,13 @@ export default class SnippetView extends Vue {
 
   async openNode(nodeType: string, nodeName: string) {
     if (nodeType == 'Sequences') {
-      await this.$store.dispatch('sequence/fetchSequenceByName', nodeName) // note the "await"
+      await this.$store.dispatch('sequence/fetchSequenceById', nodeName) // note the "await"
     } else if (nodeType === 'paths') {
-      await this.$store.dispatch('path/fetchPathByName', nodeName)
+      await this.$store.dispatch('path/fetchPathById', nodeName)
     } else if (nodeType === 'modules') {
-      await this.$store.dispatch('module/fetchModuleByName', nodeName)
+      await this.$store.dispatch('module/fetchModuleById', nodeName)
     } else if (nodeType === 'pset') {
-      await this.$store.dispatch('pset/fetchPSetByName', nodeName)
+      await this.$store.dispatch('pset/fetchPSetById', nodeName)
     }
   }
 }

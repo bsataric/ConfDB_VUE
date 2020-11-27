@@ -54,7 +54,7 @@ export const actions = {
         dispatch('notification/add', notification, { root: true })
       })
   },
-  fetchPath({ commit, getters, dispatch }, id) {
+  fetchPathById({ commit, getters, dispatch }, id) {
     let path = getters.getPathById(id)
     if (path) {
       commit('SET_PATH', path)

@@ -55,12 +55,12 @@ export const actions = {
         dispatch('notification/add', notification, { root: true })
       })
   },
-  fetchSequence({ commit, getters, dispatch }, id) {
-    let sequence = getters.getSequenceById(id)
+  fetchSequenceById({ commit, getters, dispatch }, name) {
+    let sequence = getters.getSequenceById(name)
     if (sequence) {
       commit('SET_SEQUENCE', sequence)
     } else {
-      return SequenceService.getSequence(id)
+      return SequenceService.getSequence(name)
         .then((response) => {
           commit('SET_SEQUENCE', response.data)
         })
@@ -101,6 +101,7 @@ export const getters = {
     return state.sequences.length
   },
   getSequenceById: (state) => (id) => {
+    //TODO GET SEQUENCE FROM NODE ID MAP AND LOAD IT SOMEHOW
     return state.sequences.find((sequence) => sequence.id == id)
   },
   getSequenceByName: (state) => (name) => {

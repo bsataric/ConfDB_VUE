@@ -55,7 +55,7 @@ export const actions = {
       })
   },
   //NOT USED FOR NOW
-  fetchPSet({ commit, getters, dispatch }, id) {
+  fetchPSetById({ commit, getters, dispatch }, id) {
     let pset = getters.getPSetById(id)
     if (pset) {
       commit('SET_PSET', pset)

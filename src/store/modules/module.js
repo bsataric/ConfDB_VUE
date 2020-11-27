@@ -8,6 +8,7 @@ export const state = {
   modulesTotal: 0,
   moduleParams: {}, //currently selected module params
   moduleName: '', //current selected module name
+  moduleId: -1, //current selected module ID
 }
 export const mutations = {
   ADD_MODULE(state, module) {
@@ -22,7 +23,7 @@ export const mutations = {
   },
 }
 export const actions = {
-  createPath({ commit, dispatch }, module) {
+  createModule({ commit, dispatch }, module) {
     return ModuleService.postModule(module)
       .then(() => {
         commit('ADD_MODULE', module)
@@ -55,7 +56,7 @@ export const actions = {
       })
   },
   //NOT USED FOR NOW
-  fetchModule({ commit, getters, dispatch }, id) {
+  fetchModuleById({ commit, getters, dispatch }, id) {
     //not working for now
     let module = getters.getModuleById(id)
     if (module) {
@@ -81,6 +82,7 @@ export const actions = {
       commit('SET_SELECTED_NODE_NAME', name, { root: true })
       commit('SET_MODULE', { name: name, moduleParams: moduleParams })
     } else {
+      //this is hardly executed ever... it's like a backup
       return ModuleService.getModuleByName(name)
         .then((response) => {
           commit('SET_SELECTED_NODE_TYPE', 'module', { root: true })
@@ -110,9 +112,11 @@ export const getters = {
     for (const [key, value] of Object.entries(state.modules)) {
       if (key == name) {
         //console.log('VALUE: ' + JSON.stringify(value))
+        //console.log('MODULE FOUND')
         return value
       }
     }
+    console.log('MODULE NOT FOUND')
   },
   getModules: (state) => {
     //console.log('MODULES' + state.modules)
