@@ -92,7 +92,6 @@ import ZkTable from 'vue-table-with-tree-grid'
   computed: {
     ...mapGetters({
       getSelectedNodeType: 'getSelectedNodeType',
-      getModuleByName: 'module/getModuleByName',
       getSelectedModuleParams: 'module/getSelectedModuleParams',
       getSelectedModuleName: 'module/getSelectedModuleName',
       getSelectedModulePaths: 'module/getSelectedModulePaths',

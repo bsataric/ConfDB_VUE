@@ -148,11 +148,11 @@ export default class SnippetView extends Vue {
       let sequences = this.getSelectedModuleSequences
       this.arrayOfSelectedObjects = sequences
       let sequencesText = ''
-      console.log(sequences)
+      //console.log(sequences)
       // eslint-disable-next-line no-unused-vars
       for (const [key, value] of Object.entries(sequences)) {
         //console.log('KEY: ' + key)
-        console.log('VALUE: ' + value)
+        //console.log('VALUE: ' + value)
         sequencesText +=
           '<a id=Sequences.' + value + '>' + value + '</a>' + '\n'
       }
@@ -162,11 +162,11 @@ export default class SnippetView extends Vue {
       let paths = this.getSelectedModulePaths
       this.arrayOfSelectedObjects = paths
       let pathsText = ''
-      console.log(paths)
+      //console.log(paths)
       // eslint-disable-next-line no-unused-vars
       for (const [key, value] of Object.entries(paths)) {
         //console.log('KEY: ' + key)
-        console.log('VALUE: ' + value)
+        //console.log('VALUE: ' + value)
         pathsText += value + '\n'
       }
       return pathsText
@@ -175,20 +175,23 @@ export default class SnippetView extends Vue {
   }
   public handleClick(e) {
     let array = e.target.id.split('.')
-    console.log(array[0])
-    console.log(array[1])
+    //console.log(array[0])
+    //console.log(array[1])
     this.openNode(array[0], array[1])
   }
 
   async openNode(nodeType: string, nodeName: string) {
     if (nodeType == 'Sequences') {
-      await this.$store.dispatch('sequence/fetchSequenceById', nodeName) // note the "await"
+      await this.$store.dispatch(
+        'sequence/fetchSequenceAndSequenceId',
+        nodeName
+      ) // note the "await"
     } else if (nodeType === 'paths') {
-      await this.$store.dispatch('path/fetchPathById', nodeName)
+      await this.$store.dispatch('path/fetchPathAndPathId', nodeName)
     } else if (nodeType === 'modules') {
-      await this.$store.dispatch('module/fetchModuleById', nodeName)
+      await this.$store.dispatch('module/fetchModuleAndModuleId', nodeName)
     } else if (nodeType === 'pset') {
-      await this.$store.dispatch('pset/fetchPSetById', nodeName)
+      await this.$store.dispatch('pset/fetchPSetAndPSetId', nodeName)
     }
   }
 }

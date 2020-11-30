@@ -8,6 +8,8 @@ export const state = {
   sequencesTotal: 0,
   sequenceParams: {},
   sequenceName: '',
+  sequenceId: -1, //current selected module ID
+  sequenceParamLength: 0,
 }
 export const mutations = {
   ADD_SEQUENCE(state, sequence) {
@@ -18,7 +20,9 @@ export const mutations = {
   },
   SET_SEQUENCE(state, payload) {
     state.sequenceName = payload.name
+    state.sequenceId = payload.sequenceId
     state.sequenceParams = payload.sequenceParams
+    state.sequenceParamLength = payload.sequenceParamLength
   },
 }
 export const actions = {
@@ -55,14 +59,57 @@ export const actions = {
         dispatch('notification/add', notification, { root: true })
       })
   },
-  fetchSequenceById({ commit, getters, dispatch }, name) {
-    let sequence = getters.getSequenceById(name)
-    if (sequence) {
-      commit('SET_SEQUENCE', sequence)
+  fetchSequenceAndSequenceId({ commit, getters, dispatch }, name) {
+    let sequenceObj = getters.getSequenceAndSequenceId(name)
+    let sequenceParams = sequenceObj.value
+    let sequenceId = sequenceObj.sequenceId
+    let sequenceParamLength = sequenceParams.length
+    //console.log('sequenceObj: ' + JSON.stringify(sequenceObj))
+    //console.log('sequenceId: ' + sequenceId)
+    console.log('sequenceParams.length' + sequenceParams.length)
+    if (sequenceParams) {
+      commit(
+        'SET_SELECTED_NODE',
+        {
+          selectedNodeType: 'sequence',
+          selectedNodeName: name,
+          selectedNodeId: sequenceId,
+          selectedNodeParamLength: sequenceParamLength,
+        },
+        { root: true }
+      )
+      //commit('SET_SELECTED_NODE_TYPE', 'sequence', { root: true })
+      //commit('SET_SELECTED_NODE_NAME', name, { root: true })
+      commit('SET_SEQUENCE', {
+        name: name,
+        sequenceId: sequenceId,
+        sequenceParams: sequenceParams,
+        sequenceParamLength: sequenceParamLength,
+      })
     } else {
-      return SequenceService.getSequence(name)
+      return SequenceService.getSequenceByName(name)
         .then((response) => {
-          commit('SET_SEQUENCE', response.data)
+          //TODO: generate sequenceId
+          // let sequenceId = sequenceObj.sequenceId
+          commit(
+            'SET_SELECTED_NODE',
+            {
+              selectedNodeType: 'sequence',
+              selectedNodeName: name,
+              selectedNodeId: sequenceId,
+              selectedNodeParamLength: response.data.length,
+            },
+            { root: true }
+          )
+          //commit('SET_SELECTED_NODE_TYPE', 'sequence', { root: true })
+          //commit('SET_SELECTED_NODE_NAME', name, { root: true })
+          //DUMMY
+          commit('SET_SEQUENCE', {
+            name: name,
+            sequenceId: -1,
+            sequenceParams: response.data,
+            sequenceParamLength: response.data.length,
+          })
         })
         .catch((error) => {
           const notification = {
@@ -73,7 +120,7 @@ export const actions = {
         })
     }
   },
-  fetchSequenceByName({ commit, getters, dispatch }, name) {
+  /*   fetchSequenceByName({ commit, getters, dispatch }, name) {
     let sequenceParams = getters.getSequenceByName(name)
     if (sequenceParams) {
       commit('SET_SELECTED_NODE_TYPE', 'sequence', { root: true })
@@ -94,15 +141,26 @@ export const actions = {
           dispatch('notification/add', notification, { root: true })
         })
     }
-  },
+  }, */
 }
 export const getters = {
   seqLength: (state) => {
     return state.sequences.length
   },
-  getSequenceById: (state) => (id) => {
-    //TODO GET SEQUENCE FROM NODE ID MAP AND LOAD IT SOMEHOW
-    return state.sequences.find((sequence) => sequence.id == id)
+  getSequenceAndSequenceId: (state, getters, rootState, rootGetters) => (
+    name
+  ) => {
+    let nodeNameIdMap = rootGetters['getNodeNameIdMap']
+    let sequenceId = nodeNameIdMap['sequence.' + name]
+
+    for (const [key, value] of Object.entries(state.sequences)) {
+      //console.log('KEY ' + key)
+      //console.log('VALUE ' + value)
+      if (key == name) {
+        //console.log('VALUE: ' + JSON.stringify(value))
+        return { value, sequenceId }
+      }
+    }
   },
   getSequenceByName: (state) => (name) => {
     //return state.sequences.find((sequences) => sequences.name == name)

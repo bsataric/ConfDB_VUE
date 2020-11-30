@@ -9,6 +9,7 @@ export const state = {
   moduleParams: {}, //currently selected module params
   moduleName: '', //current selected module name
   moduleId: -1, //current selected module ID
+  moduleParamLength: 0,
 }
 export const mutations = {
   ADD_MODULE(state, module) {
@@ -19,7 +20,9 @@ export const mutations = {
   },
   SET_MODULE(state, payload) {
     state.moduleName = payload.name
+    state.moduleId = payload.moduleId
     state.moduleParams = payload.moduleParams
+    state.moduleParamLength = payload.moduleParamLength
   },
 }
 export const actions = {
@@ -55,16 +58,52 @@ export const actions = {
         dispatch('notification/add', notification, { root: true })
       })
   },
-  //NOT USED FOR NOW
-  fetchModuleById({ commit, getters, dispatch }, id) {
-    //not working for now
-    let module = getters.getModuleById(id)
-    if (module) {
-      commit('SET_MODULE', module)
+  fetchModuleAndModuleId({ commit, getters, dispatch }, name) {
+    let moduleObj = getters.getModuleAndModuleId(name)
+    let moduleParams = moduleObj.value
+    let moduleId = moduleObj.moduleId
+    let moduleParamLength = moduleParams.length
+    //console.log('moduleObj: ' + JSON.stringify(moduleObj))
+    //console.log('moduleId: ' + moduleId)
+    console.log('moduleParamLength: ' + Object.entries(moduleParams).length) //TODO FIX THIS
+    if (moduleParams) {
+      commit(
+        'SET_SELECTED_NODE',
+        {
+          selectedNodeType: 'module',
+          selectedNodeName: name,
+          selectedNodeId: moduleId,
+          selectedNodeParamLength: moduleParamLength,
+        },
+        { root: true }
+      )
+      commit('SET_MODULE', {
+        name: name,
+        moduleId: moduleId,
+        moduleParams: moduleParams,
+        moduleParamLength: moduleParamLength,
+      })
     } else {
-      return ModuleService.getModule(id)
+      return ModuleService.getModuleByName(name)
         .then((response) => {
-          commit('SET_MODULE', response.data)
+          //TODO: generate moduleId
+          // let moduleId = moduleObj.moduleId
+          commit(
+            'SET_SELECTED_NODE',
+            {
+              selectedNodeType: 'module',
+              selectedNodeName: name,
+              selectedNodeId: moduleId,
+              selectedNodeParamLength: response.data.length,
+            },
+            { root: true }
+          )
+          commit('SET_MODULE', {
+            name: name,
+            moduleId: -1,
+            moduleParams: response.data,
+            selectedNodeParamLength: response.data.length,
+          })
         })
         .catch((error) => {
           const notification = {
@@ -75,7 +114,7 @@ export const actions = {
         })
     }
   },
-  fetchModuleByName({ commit, getters, dispatch }, name) {
+  /*   fetchModuleByName({ commit, getters, dispatch }, name) {
     let moduleParams = getters.getModuleByName(name)
     if (moduleParams) {
       commit('SET_SELECTED_NODE_TYPE', 'module', { root: true })
@@ -97,26 +136,24 @@ export const actions = {
           dispatch('notification/add', notification, { root: true })
         })
     }
-  },
+  }, */
 }
 export const getters = {
   moduleLength: (state) => {
     return state.modules.length
   },
-  getModuleById: (state) => (id) => {
-    return state.modules.find((module) => module.id == id)
-  },
-  getModuleByName: (state) => (name) => {
-    //console.log('getModuleByName ' + name)
-    //return state.modules.find((module) => module.name == name)
+  getModuleAndModuleId: (state, getters, rootState, rootGetters) => (name) => {
+    let nodeNameIdMap = rootGetters['getNodeNameIdMap']
+    let moduleId = nodeNameIdMap['module.' + name]
+
     for (const [key, value] of Object.entries(state.modules)) {
+      //console.log('KEY ' + key)
+      //console.log('VALUE ' + value)
       if (key == name) {
         //console.log('VALUE: ' + JSON.stringify(value))
-        //console.log('MODULE FOUND')
-        return value
+        return { value, moduleId }
       }
     }
-    console.log('MODULE NOT FOUND')
   },
   getModules: (state) => {
     //console.log('MODULES' + state.modules)

@@ -19,23 +19,28 @@ export default new Vuex.Store({
   state: {
     selectedNodeType: '', //TODO: maybe create action or something to change this through it
     selectedNodeName: '',
+    selectedNodeId: -1,
+    selectedNodeParamLength: 0,
     nodeNameIdMap: {},
   },
   mutations: {
-    SET_SELECTED_NODE_TYPE(state, nodeType) {
-      state.selectedNodeType = nodeType
+    SET_SELECTED_NODE(state, payload) {
+      /*      console.log(payload.selectedNodeType)
+      console.log(payload.selectedNodeName)
+      console.log(payload.selectedNodeId) */
+      state.selectedNodeType = payload.selectedNodeType
+      state.selectedNodeName = payload.selectedNodeName
+      state.selectedNodeId = payload.selectedNodeId
+      state.selectedNodeParamLength = payload.selectedNodeParamLength
     },
-    SET_SELECTED_NODE_NAME(state, nodeName) {
-      state.selectedNodeName = nodeName
-    },
-    SET_SEQUENCE_NAME_ID_MAP(state, payload) {
-      state.sequenceNameIdMap = payload
-      //console.log('MAP: ' + JSON.stringify(state.sequenceNameIdMap))
+    SET_NODE_NAME_ID_MAP(state, payload) {
+      state.nodeNameIdMap = payload
+      //console.log('MAP: ' + JSON.stringify(state.nodeNameIdMap))
     },
   },
   actions: {
-    createSequenceNameIdMap({ commit }, sequenceNameIdMap) {
-      commit('SET_SEQUENCE_NAME_ID_MAP', sequenceNameIdMap)
+    createNodeNameIdMap({ commit }, nodeNameIdMap) {
+      commit('SET_NODE_NAME_ID_MAP', nodeNameIdMap)
     },
   },
   getters: {
@@ -43,8 +48,16 @@ export default new Vuex.Store({
       return state.selectedNodeType
     },
     getSelectedNodeName(state) {
-      //console.log('TRIGGERED')
       return state.selectedNodeName
+    },
+    getSelectedNodeId(state) {
+      return state.selectedNodeId
+    },
+    getSelectedNodeParamLength(state) {
+      return state.selectedNodeParamLength
+    },
+    getNodeNameIdMap(state) {
+      return state.nodeNameIdMap
     },
   },
 })

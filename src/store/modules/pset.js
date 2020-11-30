@@ -8,6 +8,8 @@ export const state = {
   psetsTotal: 0,
   psetParams: {}, //currently selected pset params
   psetName: '', //current selected pset name
+  psetId: -1, //current selected pset ID
+  psetParamLength: 0,
 }
 export const mutations = {
   ADD_PSET(state, pset) {
@@ -18,7 +20,9 @@ export const mutations = {
   },
   SET_PSET(state, payload) {
     state.psetName = payload.name
+    state.psetId = payload.psetId
     state.psetParams = payload.psetParams
+    state.psetParamLength = payload.psetParamLength
   },
 }
 export const actions = {
@@ -54,15 +58,53 @@ export const actions = {
         dispatch('notification/add', notification, { root: true })
       })
   },
-  //NOT USED FOR NOW
-  fetchPSetById({ commit, getters, dispatch }, id) {
-    let pset = getters.getPSetById(id)
-    if (pset) {
-      commit('SET_PSET', pset)
+  fetchPSetAndPSetId({ commit, getters, dispatch }, name) {
+    let psetObj = getters.getPSetAndPSetId(name)
+    let psetParams = psetObj.value
+    let psetId = psetObj.pathId
+    let psetParamLength = psetParams.length
+    //console.log('psetObj: ' + JSON.stringify(psetObj))
+    //console.log('psetId: ' + psetId)
+    //console.log('psetParams' + psetParams)
+
+    if (psetParams) {
+      commit(
+        'SET_SELECTED_NODE',
+        {
+          selectedNodeType: 'pset',
+          selectedNodeName: name,
+          selectedNodeId: psetId,
+          selectedNodeParamLength: psetParamLength,
+        },
+        { root: true }
+      )
+      commit('SET_PSET', {
+        name: name,
+        psetId: psetId,
+        psetParams: psetParams,
+        psetParamLength: psetParamLength,
+      })
     } else {
-      return PSetService.getPSet(id)
+      return PSetService.getPSetByName(name)
         .then((response) => {
-          commit('SET_PSET', response.data)
+          //TODO: generate psetId
+          // let psetId = psetObj.psetId
+          commit(
+            'SET_SELECTED_NODE',
+            {
+              selectedNodeType: 'pset',
+              selectedNodeName: name,
+              selectedNodeId: psetId,
+              selectedNodeParamLength: response.data.length,
+            },
+            { root: true }
+          )
+          commit('SET_PSET', {
+            name: name,
+            psetId: -1,
+            pathParams: response.data,
+            selectedNodeParamLength: response.data.length,
+          })
         })
         .catch((error) => {
           const notification = {
@@ -73,7 +115,7 @@ export const actions = {
         })
     }
   },
-  fetchPSetByName({ commit, getters, dispatch }, name) {
+  /*  fetchPSetByName({ commit, getters, dispatch }, name) {
     let psetParams = getters.getPSetByName(name)
     //console.log('GET PSET PARAMS: ' + JSON.stringify(psetParams))
     if (psetParams) {
@@ -95,14 +137,24 @@ export const actions = {
           dispatch('notification/add', notification, { root: true })
         })
     }
-  },
+  }, */
 }
 export const getters = {
   psetLength: (state) => {
     return state.psets.length
   },
-  getPSetById: (state) => (id) => {
-    return state.psets.find((pset) => pset.id == id)
+  getPSetAndPSetId: (state, getters, rootState, rootGetters) => (name) => {
+    let nodeNameIdMap = rootGetters['getNodeNameIdMap']
+    let psetId = nodeNameIdMap['pset.' + name]
+
+    for (const [key, value] of Object.entries(state.psets)) {
+      //console.log('KEY ' + key)
+      //console.log('VALUE ' + value)
+      if (key == name) {
+        //console.log('VALUE: ' + JSON.stringify(value))
+        return { value, psetId }
+      }
+    }
   },
   getPSetByName: (state) => (name) => {
     //return state.psets.find((pset) => pset.name == name)

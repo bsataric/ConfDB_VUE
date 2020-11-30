@@ -6,8 +6,10 @@ export const namespaced = true
 export const state = {
   paths: [],
   pathsTotal: 0,
-  pathParams: {},
-  pathName: '', //current selected module name
+  pathParams: {}, //currently selected path params
+  pathName: '', //current selected path name
+  pathId: -1, //current selected path ID
+  pathParamLength: 0,
 }
 export const mutations = {
   ADD_PATH(state, path) {
@@ -18,7 +20,9 @@ export const mutations = {
   },
   SET_PATH(state, payload) {
     state.pathName = payload.name
+    state.pathId = payload.pathId
     state.pathParams = payload.pathParams
+    state.pathParamLength = payload.pathParamLength
   },
 }
 export const actions = {
@@ -54,14 +58,51 @@ export const actions = {
         dispatch('notification/add', notification, { root: true })
       })
   },
-  fetchPathById({ commit, getters, dispatch }, id) {
-    let path = getters.getPathById(id)
-    if (path) {
-      commit('SET_PATH', path)
+  fetchPathAndPathId({ commit, getters, dispatch }, name) {
+    let pathObj = getters.getPathAndPathId(name)
+    let pathParams = pathObj.value
+    let pathId = pathObj.pathId
+    let pathParamLength = pathParams.length
+    //console.log('pathObj: ' + JSON.stringify(pathObj))
+    //console.log('pathId: ' + pathId)
+    if (pathParams) {
+      commit(
+        'SET_SELECTED_NODE',
+        {
+          selectedNodeType: 'path',
+          selectedNodeName: name,
+          selectedNodeId: pathId,
+          selectedNodeParamLength: pathParamLength,
+        },
+        { root: true }
+      )
+      commit('SET_PATH', {
+        name: name,
+        pathId: pathId,
+        pathParams: pathParams,
+        pathParamLength: pathParamLength,
+      })
     } else {
-      return PathService.getPath(id)
+      return PathService.getPathByName(name)
         .then((response) => {
-          commit('SET_PATH', response.data)
+          //TODO: generate pathId
+          // let pathId = pathObj.pathId
+          commit(
+            'SET_SELECTED_NODE',
+            {
+              selectedNodeType: 'path',
+              selectedNodeName: name,
+              selectedNodeId: pathId,
+              selectedNodeParamLength: response.data.length,
+            },
+            { root: true }
+          )
+          commit('SET_PATH', {
+            name: name,
+            pathId: -1,
+            pathParams: response.data,
+            sequenceParamLength: response.data.length,
+          })
         })
         .catch((error) => {
           const notification = {
@@ -72,7 +113,7 @@ export const actions = {
         })
     }
   },
-  fetchPathByName({ commit, getters, dispatch }, name) {
+  /*   fetchPathByName({ commit, getters, dispatch }, name) {
     let pathParams = getters.getPathByName(name)
     if (pathParams) {
       commit('SET_SELECTED_NODE_TYPE', 'path', { root: true })
@@ -93,14 +134,24 @@ export const actions = {
           dispatch('notification/add', notification, { root: true })
         })
     }
-  },
+  }, */
 }
 export const getters = {
   pathLength: (state) => {
     return state.paths.length
   },
-  getPathById: (state) => (id) => {
-    return state.paths.find((path) => path.id == id)
+  getPathAndPathId: (state, getters, rootState, rootGetters) => (name) => {
+    let nodeNameIdMap = rootGetters['getNodeNameIdMap']
+    let pathId = nodeNameIdMap['path.' + name]
+
+    for (const [key, value] of Object.entries(state.paths)) {
+      //console.log('KEY ' + key)
+      //console.log('VALUE ' + value)
+      if (key == name) {
+        //console.log('VALUE: ' + JSON.stringify(value))
+        return { value, pathId }
+      }
+    }
   },
   getPathByName: (state) => (name) => {
     //return state.paths.find((path) => path.name == name)
