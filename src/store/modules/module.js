@@ -58,14 +58,15 @@ export const actions = {
         dispatch('notification/add', notification, { root: true })
       })
   },
-  fetchModuleAndModuleId({ commit, getters, dispatch }, name) {
-    let moduleObj = getters.getModuleAndModuleId(name)
+  fetchModuleAndModuleId({ commit, getters, dispatch }, payload) {
+    let moduleObj = getters.getModuleAndModuleId(payload.itemName)
+    let name = payload.itemName
     let moduleParams = moduleObj.value
     let moduleId = moduleObj.moduleId
-    let moduleParamLength = moduleParams.length
+    let moduleParamLength = payload.itemChildrenLength
     //console.log('moduleObj: ' + JSON.stringify(moduleObj))
-    //console.log('moduleId: ' + moduleId)
-    console.log('moduleParamLength: ' + Object.entries(moduleParams).length) //TODO FIX THIS
+    //console.log('moduleParams: ' + moduleParams)
+    console.log('moduleParamLength: ' + moduleParamLength)
     if (moduleParams) {
       commit(
         'SET_SELECTED_NODE',
@@ -114,29 +115,6 @@ export const actions = {
         })
     }
   },
-  /*   fetchModuleByName({ commit, getters, dispatch }, name) {
-    let moduleParams = getters.getModuleByName(name)
-    if (moduleParams) {
-      commit('SET_SELECTED_NODE_TYPE', 'module', { root: true })
-      commit('SET_SELECTED_NODE_NAME', name, { root: true })
-      commit('SET_MODULE', { name: name, moduleParams: moduleParams })
-    } else {
-      //this is hardly executed ever... it's like a backup
-      return ModuleService.getModuleByName(name)
-        .then((response) => {
-          commit('SET_SELECTED_NODE_TYPE', 'module', { root: true })
-          commit('SET_SELECTED_NODE_NAME', name, { root: true })
-          commit('SET_MODULE', { name: name, moduleParams: response.data })
-        })
-        .catch((error) => {
-          const notification = {
-            type: 'error',
-            message: 'There was a problem fetching module ' + error.message,
-          }
-          dispatch('notification/add', notification, { root: true })
-        })
-    }
-  }, */
 }
 export const getters = {
   moduleLength: (state) => {

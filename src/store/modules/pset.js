@@ -58,14 +58,16 @@ export const actions = {
         dispatch('notification/add', notification, { root: true })
       })
   },
-  fetchPSetAndPSetId({ commit, getters, dispatch }, name) {
-    let psetObj = getters.getPSetAndPSetId(name)
+  fetchPSetAndPSetId({ commit, getters, dispatch }, payload) {
+    let psetObj = getters.getPSetAndPSetId(payload.itemName)
+    let name = payload.itemName
     let psetParams = psetObj.value
-    let psetId = psetObj.pathId
-    let psetParamLength = psetParams.length
+    let psetId = psetObj.psetId
+    let psetParamLength = payload.itemChildrenLength
     //console.log('psetObj: ' + JSON.stringify(psetObj))
     //console.log('psetId: ' + psetId)
     //console.log('psetParams' + psetParams)
+    console.log('psetParamLength: ' + psetParamLength)
 
     if (psetParams) {
       commit(
@@ -115,29 +117,6 @@ export const actions = {
         })
     }
   },
-  /*  fetchPSetByName({ commit, getters, dispatch }, name) {
-    let psetParams = getters.getPSetByName(name)
-    //console.log('GET PSET PARAMS: ' + JSON.stringify(psetParams))
-    if (psetParams) {
-      commit('SET_SELECTED_NODE_TYPE', 'pset', { root: true })
-      commit('SET_SELECTED_NODE_NAME', name, { root: true })
-      commit('SET_PSET', { name: name, psetParams: psetParams })
-    } else {
-      return PSetService.getPSetByName(name)
-        .then((response) => {
-          commit('SET_SELECTED_NODE_TYPE', 'pset', { root: true })
-          commit('SET_SELECTED_NODE_NAME', name, { root: true })
-          commit('SET_PSET', { name: name, psetParams: response })
-        })
-        .catch((error) => {
-          const notification = {
-            type: 'error',
-            message: 'There was a problem fetching pset ' + error.message,
-          }
-          dispatch('notification/add', notification, { root: true })
-        })
-    }
-  }, */
 }
 export const getters = {
   psetLength: (state) => {
@@ -146,6 +125,9 @@ export const getters = {
   getPSetAndPSetId: (state, getters, rootState, rootGetters) => (name) => {
     let nodeNameIdMap = rootGetters['getNodeNameIdMap']
     let psetId = nodeNameIdMap['pset.' + name]
+
+    //console.log(nodeNameIdMap)
+    //console.log('psetId: ' + psetId)
 
     for (const [key, value] of Object.entries(state.psets)) {
       //console.log('KEY ' + key)

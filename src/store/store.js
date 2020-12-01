@@ -22,16 +22,33 @@ export default new Vuex.Store({
     selectedNodeId: -1,
     selectedNodeParamLength: 0,
     nodeNameIdMap: {},
+    openNodeIds: [],
   },
   mutations: {
     SET_SELECTED_NODE(state, payload) {
-      /*      console.log(payload.selectedNodeType)
+      console.log(payload.selectedNodeType)
       console.log(payload.selectedNodeName)
-      console.log(payload.selectedNodeId) */
+      console.log(payload.selectedNodeId)
+      console.log(payload.selectedNodeParamLength)
+
       state.selectedNodeType = payload.selectedNodeType
       state.selectedNodeName = payload.selectedNodeName
       state.selectedNodeId = payload.selectedNodeId
       state.selectedNodeParamLength = payload.selectedNodeParamLength
+
+      if (state.selectedNodeParamLength == 0) {
+        console.log('ITEM CHILDREN ZERO!')
+        return
+      }
+
+      let idIndex = state.openNodeIds.indexOf(state.selectedNodeId)
+
+      console.log('OPEN NODES BEFORE: ' + state.openNodeIds)
+
+      if (idIndex == -1) state.openNodeIds.push(state.selectedNodeId)
+      else state.openNodeIds.splice(idIndex, 1)
+
+      console.log('OPEN NODES AFTER: ' + state.openNodeIds)
     },
     SET_NODE_NAME_ID_MAP(state, payload) {
       state.nodeNameIdMap = payload
@@ -41,6 +58,9 @@ export default new Vuex.Store({
   actions: {
     createNodeNameIdMap({ commit }, nodeNameIdMap) {
       commit('SET_NODE_NAME_ID_MAP', nodeNameIdMap)
+    },
+    setSelectedNode({ commit }, payload) {
+      commit('SET_SELECTED_NODE', payload)
     },
   },
   getters: {
@@ -58,6 +78,16 @@ export default new Vuex.Store({
     },
     getNodeNameIdMap(state) {
       return state.nodeNameIdMap
+    },
+    getOpenNodeIds(state) {
+      console.log('openNodeIds FIRED')
+      console.log('openNodeIds:' + state.openNodeIds)
+      return state.openNodeIds
+    },
+    getOpenNodeIdsLength(state) {
+      console.log('openNodeIds.length FIRED')
+      console.log('openNodeIds:' + state.openNodeIds)
+      return state.openNodeIds.length
     },
   },
 })

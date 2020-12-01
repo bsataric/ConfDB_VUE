@@ -59,14 +59,15 @@ export const actions = {
         dispatch('notification/add', notification, { root: true })
       })
   },
-  fetchSequenceAndSequenceId({ commit, getters, dispatch }, name) {
-    let sequenceObj = getters.getSequenceAndSequenceId(name)
+  fetchSequenceAndSequenceId({ commit, getters, dispatch }, payload) {
+    let sequenceObj = getters.getSequenceAndSequenceId(payload.itemName)
+    let name = payload.itemName
     let sequenceParams = sequenceObj.value
     let sequenceId = sequenceObj.sequenceId
-    let sequenceParamLength = sequenceParams.length
+    let sequenceParamLength = payload.itemChildrenLength
     //console.log('sequenceObj: ' + JSON.stringify(sequenceObj))
     //console.log('sequenceId: ' + sequenceId)
-    console.log('sequenceParams.length' + sequenceParams.length)
+    console.log('sequenceParamLength' + sequenceParamLength)
     if (sequenceParams) {
       commit(
         'SET_SELECTED_NODE',
@@ -120,28 +121,6 @@ export const actions = {
         })
     }
   },
-  /*   fetchSequenceByName({ commit, getters, dispatch }, name) {
-    let sequenceParams = getters.getSequenceByName(name)
-    if (sequenceParams) {
-      commit('SET_SELECTED_NODE_TYPE', 'sequence', { root: true })
-      commit('SET_SELECTED_NODE_NAME', name, { root: true })
-      commit('SET_SEQUENCE', { name: name, sequenceParams: sequenceParams })
-    } else {
-      return SequenceService.getSequenceByName(name)
-        .then((response) => {
-          commit('SET_SELECTED_NODE_TYPE', 'sequence', { root: true })
-          commit('SET_SELECTED_NODE_NAME', name, { root: true })
-          commit('SET_SEQUENCE', { name: name, sequenceParams: response.data })
-        })
-        .catch((error) => {
-          const notification = {
-            type: 'error',
-            message: 'There was a problem fetching sequence ' + error.message,
-          }
-          dispatch('notification/add', notification, { root: true })
-        })
-    }
-  }, */
 }
 export const getters = {
   seqLength: (state) => {

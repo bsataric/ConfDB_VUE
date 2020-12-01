@@ -58,13 +58,16 @@ export const actions = {
         dispatch('notification/add', notification, { root: true })
       })
   },
-  fetchPathAndPathId({ commit, getters, dispatch }, name) {
-    let pathObj = getters.getPathAndPathId(name)
+  fetchPathAndPathId({ commit, getters, dispatch }, payload) {
+    let pathObj = getters.getPathAndPathId(payload.itemName)
+    let name = payload.itemName
     let pathParams = pathObj.value
     let pathId = pathObj.pathId
-    let pathParamLength = pathParams.length
+    let pathParamLength = payload.itemChildrenLength
     //console.log('pathObj: ' + JSON.stringify(pathObj))
     //console.log('pathId: ' + pathId)
+    console.log('pathParamLength' + pathParamLength)
+
     if (pathParams) {
       commit(
         'SET_SELECTED_NODE',
@@ -113,28 +116,6 @@ export const actions = {
         })
     }
   },
-  /*   fetchPathByName({ commit, getters, dispatch }, name) {
-    let pathParams = getters.getPathByName(name)
-    if (pathParams) {
-      commit('SET_SELECTED_NODE_TYPE', 'path', { root: true })
-      commit('SET_SELECTED_NODE_NAME', name, { root: true })
-      commit('SET_PATH', { name: name, pathParams: pathParams })
-    } else {
-      return PathService.getPathByName(name)
-        .then((response) => {
-          commit('SET_SELECTED_NODE_TYPE', 'path', { root: true })
-          commit('SET_SELECTED_NODE_NAME', name, { root: true })
-          commit('SET_PATH', { name: name, pathParams: response.data })
-        })
-        .catch((error) => {
-          const notification = {
-            type: 'error',
-            message: 'There was a problem fetching path ' + error.message,
-          }
-          dispatch('notification/add', notification, { root: true })
-        })
-    }
-  }, */
 }
 export const getters = {
   pathLength: (state) => {
