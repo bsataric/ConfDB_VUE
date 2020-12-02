@@ -59,7 +59,7 @@ export const actions = {
         dispatch('notification/add', notification, { root: true })
       })
   },
-  fetchSequenceAndSequenceId({ commit, getters, dispatch }, payload) {
+  fetchSequenceAndSequenceId({ commit, getters }, payload) {
     let sequenceObj = getters.getSequenceAndSequenceId(payload.itemName)
     let name = payload.itemName
     let sequenceParams = sequenceObj.value
@@ -87,7 +87,7 @@ export const actions = {
         sequenceParams: sequenceParams,
         sequenceParamLength: sequenceParamLength,
       })
-    } else {
+    } /* else {
       return SequenceService.getSequenceByName(name)
         .then((response) => {
           //TODO: generate sequenceId
@@ -119,7 +119,7 @@ export const actions = {
           }
           dispatch('notification/add', notification, { root: true })
         })
-    }
+    } */
   },
 }
 export const getters = {

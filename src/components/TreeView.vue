@@ -14,7 +14,6 @@
       item-text=""
       open-on-click
       :open="this.getOpenNodeIds"
-      :key="this.getOpenNodeIdsLength"
     >
       <template v-slot:prepend="{ item, open }">
         <span
@@ -638,7 +637,7 @@ export default class TreeView extends Vue {
       console.log(itemName)
       console.log(itemId)
       console.log(itemChildren.length) */
-      await this.$store.dispatch('setSelectedNode', {
+      this.$store.dispatch('setSelectedNode', {
         selectedNodeType: itemType,
         selectedNodeName: itemName,
         selectedNodeId: itemId,
@@ -707,14 +706,18 @@ export default class TreeView extends Vue {
     return this.getOpenNodeIdsLength
   }
 
-  public sleep(ms) {
+  async sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms))
   }
 
-  /*  async getIds() {
-    this.sleep(5000)
-    console.log('NODE IDS: ' + this.nodeIds)
-  }  */
+  // eslint-disable-next-line no-unused-vars
+  public getOpenNodeIdsWithDelay(nodeName: any) {
+    this.sleep(50).then(() => {
+      //let central store update cycle finish properly
+      console.log('DELAYED CALL')
+      return this.getOpenNodeIds
+    })
+  }
 
   created() {
     // Make a request for config parts
@@ -725,7 +728,7 @@ export default class TreeView extends Vue {
     this.fetchGroup('psets')
 
     //this.setNodeIds()
-    //this.getIds()
+    //this.getOpenNodeIdsWithDelay()
     //this.open = ['Modules']
 
     //this.open = [1]

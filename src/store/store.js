@@ -8,6 +8,10 @@ import * as notification from '@/store/modules/notification.js'
 
 Vue.use(Vuex)
 
+async function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
 export default new Vuex.Store({
   modules: {
     sequence,
@@ -82,7 +86,10 @@ export default new Vuex.Store({
     getOpenNodeIds(state) {
       console.log('openNodeIds FIRED')
       console.log('openNodeIds:' + state.openNodeIds)
-      return state.openNodeIds
+      sleep(50).then(() => {
+        //have a little delay to avoid race condition
+        return state.openNodeIds
+      })
     },
     getOpenNodeIdsLength(state) {
       console.log('openNodeIds.length FIRED')
