@@ -45,18 +45,23 @@ export const actions = {
         throw error
       })
   },
-  fetchModules({ commit, dispatch }) {
-    return ModuleService.getModules()
-      .then((response) => {
-        commit('SET_MODULES', response.data)
-      })
-      .catch((error) => {
-        const notification = {
-          type: 'error',
-          message: 'There was a problem fetching modules ' + error.message,
-        }
-        dispatch('notification/add', notification, { root: true })
-      })
+  fetchModules({ commit, dispatch }, payload) {
+    if (!payload.fromFile) {
+      return ModuleService.getModules()
+        .then((response) => {
+          commit('SET_MODULES', response.data)
+        })
+        .catch((error) => {
+          const notification = {
+            type: 'error',
+            message: 'There was a problem fetching modules ' + error.message,
+          }
+          dispatch('notification/add', notification, { root: true })
+        })
+    } else {
+      let modulesData = ModuleService.getModulesFromFile(payload.fileData)
+      commit('SET_MODULES', modulesData)
+    }
   },
   fetchModuleAndModuleId({ commit, getters, dispatch }, payload) {
     let moduleObj = getters.getModuleAndModuleId(payload.itemName)

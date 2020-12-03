@@ -13,7 +13,7 @@
       item-key="id"
       item-text=""
       open-on-click
-      :open="this.getOpenNodeIds"
+      open.sync="open"
     >
       <template v-slot:prepend="{ item, open }">
         <span
@@ -41,11 +41,13 @@
     </v-treeview>
     <!--     {{ getSequenceById(2) }}
  -->
+    <!--     <v-btn small @click="blabla()">Normal</v-btn>
+ -->
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Watch } from 'vue-property-decorator'
 import { mapGetters } from 'vuex'
 
 //const axios = require('axios').default
@@ -63,15 +65,23 @@ import { mapGetters } from 'vuex'
       getOpenNodeIds: 'getOpenNodeIds',
       getOpenNodeIdsLength: 'getOpenNodeIdsLength',
       getPSets: 'pset/getPSets',
+      getOpenFileContent: 'getOpenFileContent',
     }),
     // ...mapState('sequence', ['sequences']),
   },
 })
 export default class TreeView extends Vue {
+  @Watch('getOpenFileContent')
+  handler(val: any, oldVal: any) {
+    console.log('VAL:' + val)
+    console.log('OLDVAL: ' + oldVal)
+    this.fetchAllGroupsFromFile(val)
+  }
   //private openNodes: any = []
   //private openNodeIds: any = []
   //private nodeIds: any = []
   private nodeIdNameMap: any = {}
+  private open: any = []
 
   private openSequencesList: any = []
   private openModulesList: any = []
@@ -80,6 +90,7 @@ export default class TreeView extends Vue {
   private getPaths!: any[]
   private getModules!: any[]
   private getPSets!: any[]
+  private getOpenFileContent!: any[]
 
   private getSelectedNodeName!: string
   private getSelectedNodeType!: string
@@ -111,6 +122,11 @@ export default class TreeView extends Vue {
       this.globalPSetsObject,
     ]
   }
+
+  /*  get open() {
+    console.log('GET OPEN CALLED')
+    return this.getOpenNodeIds
+  } */
 
   public parseSequences(sequenceData: any) {
     let sequencesObject: Object = {
@@ -576,19 +592,31 @@ export default class TreeView extends Vue {
     this.globalPSetsObject = psetsObject
   }
 
-  async fetchGroup(name: string) {
+  async fetchGroup(name: string, fromFile: boolean, fileData: any) {
     if (name == 'seqs') {
-      await this.$store.dispatch('sequence/fetchSequences') // note the "await"
+      await this.$store.dispatch('sequence/fetchSequences', {
+        fromFile: fromFile,
+        fileData: fileData,
+      }) // note the "await"
       this.parseSequences(this.getSequences)
       //console.log(this.nodeIdNameMap)
     } else if (name == 'paths') {
-      await this.$store.dispatch('path/fetchPaths')
+      await this.$store.dispatch('path/fetchPaths', {
+        fromFile: fromFile,
+        fileData: fileData,
+      })
       this.parsePaths(this.getPaths)
     } else if (name == 'mods') {
-      await this.$store.dispatch('module/fetchModules')
+      await this.$store.dispatch('module/fetchModules', {
+        fromFile: fromFile,
+        fileData: fileData,
+      })
       this.parseModules(this.getModules)
     } else if (name == 'psets') {
-      await this.$store.dispatch('pset/fetchPSets')
+      await this.$store.dispatch('pset/fetchPSets', {
+        fromFile: fromFile,
+        fileData: fileData,
+      })
       this.parsePSets(this.getPSets)
       //console.log('AFTER PSETS: ' + this.nodeIds)
       await this.$store.dispatch('createNodeNameIdMap', this.nodeIdNameMap) // note the "await"
@@ -612,32 +640,29 @@ export default class TreeView extends Vue {
     //this.getOpen(itemType, itemName, itemId, itemChildren.length)
     //let index = this.checkOpen(itemName) //close node if it's already open
     //console.log('FETCH')
+    console.log('OPENNNNN: ' + this.open)
     if (itemType === 'sequence') {
       await this.$store.dispatch('sequence/fetchSequenceAndSequenceId', {
         itemName: itemName,
-        itemChildrenLength: itemChildren.length,
       }) // note the "await"
     } else if (itemType === 'paths') {
       await this.$store.dispatch('path/fetchPathAndPathId', {
         itemName: itemName,
-        itemChildrenLength: itemChildren.length,
       })
     } else if (itemType === 'modules') {
       await this.$store.dispatch('module/fetchModuleAndModuleId', {
         itemName: itemName,
-        itemChildrenLength: itemChildren.length,
       })
     } else if (itemType === 'pset') {
       await this.$store.dispatch('pset/fetchPSetAndPSetId', {
         itemName: itemName,
-        itemChildrenLength: itemChildren.length,
       })
     } else {
       /*   console.log(itemType)
       console.log(itemName)
       console.log(itemId)
       console.log(itemChildren.length) */
-      this.$store.dispatch('setSelectedNode', {
+      await this.$store.dispatch('setSelectedNode', {
         selectedNodeType: itemType,
         selectedNodeName: itemName,
         selectedNodeId: itemId,
@@ -688,7 +713,7 @@ export default class TreeView extends Vue {
   } */
 
   // eslint-disable-next-line no-unused-vars
-  public returnOpenNodes(nodeName: any) {
+  /*   public returnOpenNodes(nodeName: any) {
     console.log('RETURN OPEN NODES')
     console.log('getSelectedNodeType: ' + this.getSelectedNodeType)
     console.log('getSelectedNodeName: ' + this.getSelectedNodeName)
@@ -699,12 +724,13 @@ export default class TreeView extends Vue {
     console.log('getOpenNodeIds' + this.getOpenNodeIds)
 
     return this.getOpenNodeIds
-  }
+  } */
 
   // eslint-disable-next-line no-unused-vars
-  public returnOpenNodesLength(nodeName: any) {
-    return this.getOpenNodeIdsLength
-  }
+  /*   public returnOpenNodes(nodeName: any) {
+    console.log('returnOpenNodes TRIGGERED')
+    return this.getOpenNodeIds
+  } */
 
   async sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms))
@@ -719,13 +745,30 @@ export default class TreeView extends Vue {
     })
   }
 
+  public blabla() {
+    this.open = [5] //TODO open array not working properly, either find a way to fix it or drop it after tomorrow
+    console.log('OPENNNNN: ' + this.open)
+  }
+
+  public fetchAllGroups() {
+    this.fetchGroup('seqs', false, null)
+    this.fetchGroup('paths', false, null)
+    this.fetchGroup('mods', false, null)
+    this.fetchGroup('psets', false, null)
+  }
+
+  public fetchAllGroupsFromFile(fileContent: any) {
+    console.log('FETCH ALL GROUPS')
+    this.fetchGroup('seqs', true, fileContent)
+    this.fetchGroup('paths', true, fileContent)
+    this.fetchGroup('mods', true, fileContent)
+    this.fetchGroup('psets', true, fileContent)
+  }
+
   created() {
     // Make a request for config parts
     //this.nodeIds = []
-    this.fetchGroup('seqs')
-    this.fetchGroup('paths')
-    this.fetchGroup('mods')
-    this.fetchGroup('psets')
+    this.fetchAllGroups()
 
     //this.setNodeIds()
     //this.getOpenNodeIdsWithDelay()

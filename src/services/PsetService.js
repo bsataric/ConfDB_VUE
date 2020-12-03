@@ -13,6 +13,11 @@ export default {
   getPSets() {
     return apiClient.get('/psets')
   },
+  getPSetsFromFile(fileData) {
+    let jsonObject = JSON.parse(fileData)
+    //console.log(jsonObject['mods'])
+    return jsonObject['psets']
+  },
   getPSet(id) {
     return apiClient.get('/psets/' + id)
   },

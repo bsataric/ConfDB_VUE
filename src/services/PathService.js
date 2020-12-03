@@ -13,6 +13,11 @@ export default {
   getPaths() {
     return apiClient.get('/paths')
   },
+  getPathsFromFile(fileData) {
+    let jsonObject = JSON.parse(fileData)
+    //console.log(jsonObject['mods'])
+    return jsonObject['paths']
+  },
   getPath(id) {
     return apiClient.get('/paths/' + id)
   },

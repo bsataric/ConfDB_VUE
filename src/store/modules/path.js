@@ -45,28 +45,33 @@ export const actions = {
         throw error
       })
   },
-  fetchPaths({ commit, dispatch }) {
-    return PathService.getPaths()
-      .then((response) => {
-        commit('SET_PATHS', response.data)
-      })
-      .catch((error) => {
-        const notification = {
-          type: 'error',
-          message: 'There was a problem fetching paths ' + error.message,
-        }
-        dispatch('notification/add', notification, { root: true })
-      })
+  fetchPaths({ commit, dispatch }, payload) {
+    if (!payload.fromFile) {
+      return PathService.getPaths()
+        .then((response) => {
+          commit('SET_PATHS', response.data)
+        })
+        .catch((error) => {
+          const notification = {
+            type: 'error',
+            message: 'There was a problem fetching paths ' + error.message,
+          }
+          dispatch('notification/add', notification, { root: true })
+        })
+    } else {
+      let pathsData = PathService.getPathsFromFile(payload.fileData)
+      commit('SET_PATHS', pathsData)
+    }
   },
   fetchPathAndPathId({ commit, getters, dispatch }, payload) {
     let pathObj = getters.getPathAndPathId(payload.itemName)
     let name = payload.itemName
     let pathParams = pathObj.value
     let pathId = pathObj.pathId
-    let pathParamLength = payload.itemChildrenLength
+    let pathParamLength = pathObj.paramLength
     //console.log('pathObj: ' + JSON.stringify(pathObj))
     //console.log('pathId: ' + pathId)
-    console.log('pathParamLength' + pathParamLength)
+    //console.log('pathParamLength ' + pathParamLength)
 
     if (pathParams) {
       commit(
@@ -124,27 +129,39 @@ export const getters = {
   getPathAndPathId: (state, getters, rootState, rootGetters) => (name) => {
     let nodeNameIdMap = rootGetters['getNodeNameIdMap']
     let pathId = nodeNameIdMap['path.' + name]
+    let paramLength = 0
 
     for (const [key, value] of Object.entries(state.paths)) {
       //console.log('KEY ' + key)
       //console.log('VALUE ' + value)
       if (key == name) {
+        /*     for (const [key1, value1] of Object.entries(value)) {
+          console.log('KEY1 ' + key1)
+          console.log('VALUE1 ' + value1)
+        } */
+        //console.log('PARAMLENGTH: ' + Object.entries(value).length)
+        paramLength = Object.entries(value).length
+
         //console.log('VALUE: ' + JSON.stringify(value))
-        return { value, pathId }
+        return { value, pathId, paramLength }
       }
     }
   },
-  getPathByName: (state) => (name) => {
+  /*   getPathByName: (state) => (name) => {
     //return state.paths.find((path) => path.name == name)
     for (const [key, value] of Object.entries(state.paths)) {
       //console.log('KEY ' + key)
       //console.log('VALUE ' + value)
       if (key == name) {
+        for (const [key1, value1] of Object.entries(value)) {
+          console.log('KEY1 ' + key1)
+          console.log('VALUE1 ' + value1)
+        }
         //console.log('VALUE: ' + JSON.stringify(value))
         return value
       }
     }
-  },
+  }, */
   getPaths: (state) => {
     return state.paths
   },

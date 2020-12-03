@@ -34,7 +34,8 @@
     "src/**/*.vue",
     "tests/**/*.ts",
     "tests/**/*.tsx",
-    "src/store/helpers/SnippetCreator.js"
+    "src/store/helpers/SnippetCreator.js",
+    "src/store/helper_functions.js"
   ],
   "exclude": ["node_modules", "**/*.spec.ts"]
 }

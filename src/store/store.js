@@ -27,19 +27,20 @@ export default new Vuex.Store({
     selectedNodeParamLength: 0,
     nodeNameIdMap: {},
     openNodeIds: [],
+    openFileContent: '',
   },
   mutations: {
     SET_SELECTED_NODE(state, payload) {
-      console.log(payload.selectedNodeType)
+      /*      console.log(payload.selectedNodeType)
       console.log(payload.selectedNodeName)
       console.log(payload.selectedNodeId)
-      console.log(payload.selectedNodeParamLength)
+      console.log(payload.selectedNodeParamLength) */
 
       state.selectedNodeType = payload.selectedNodeType
       state.selectedNodeName = payload.selectedNodeName
       state.selectedNodeId = payload.selectedNodeId
       state.selectedNodeParamLength = payload.selectedNodeParamLength
-
+      /* 
       if (state.selectedNodeParamLength == 0) {
         console.log('ITEM CHILDREN ZERO!')
         return
@@ -52,11 +53,18 @@ export default new Vuex.Store({
       if (idIndex == -1) state.openNodeIds.push(state.selectedNodeId)
       else state.openNodeIds.splice(idIndex, 1)
 
-      console.log('OPEN NODES AFTER: ' + state.openNodeIds)
+      console.log('OPEN NODES AFTER: ' + state.openNodeIds) */
+
+      state.openNodeIds = [1]
     },
     SET_NODE_NAME_ID_MAP(state, payload) {
       state.nodeNameIdMap = payload
       //console.log('MAP: ' + JSON.stringify(state.nodeNameIdMap))
+    },
+    SET_OPEN_FILE_CONTENT(state, payload) {
+      console.log('SETTING OPEN FILE CONTENT:')
+      state.openFileContent = payload
+      console.log('OPEN FILE CONTENT SET:' + payload)
     },
   },
   actions: {
@@ -65,6 +73,9 @@ export default new Vuex.Store({
     },
     setSelectedNode({ commit }, payload) {
       commit('SET_SELECTED_NODE', payload)
+    },
+    setOpenFileContent({ commit }, payload) {
+      commit('SET_OPEN_FILE_CONTENT', payload)
     },
   },
   getters: {
@@ -86,15 +97,20 @@ export default new Vuex.Store({
     getOpenNodeIds(state) {
       console.log('openNodeIds FIRED')
       console.log('openNodeIds:' + state.openNodeIds)
-      sleep(50).then(() => {
+      sleep(2000).then(() => {
         //have a little delay to avoid race condition
+        console.log('DELAY CALLED')
         return state.openNodeIds
       })
     },
     getOpenNodeIdsLength(state) {
-      console.log('openNodeIds.length FIRED')
-      console.log('openNodeIds:' + state.openNodeIds)
+      //console.log('openNodeIds.length FIRED')
+      //console.log('openNodeIds:' + state.openNodeIds)
       return state.openNodeIds.length
+    },
+    getOpenFileContent(state) {
+      console.log('GET OPEN FILE CONTENT: ' + state.getOpenFileContent)
+      return state.openFileContent
     },
   },
 })

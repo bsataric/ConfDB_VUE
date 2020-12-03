@@ -13,6 +13,11 @@ export default {
   getSequences() {
     return apiClient.get('/seqs')
   },
+  getSequencesFromFile(fileData) {
+    let jsonObject = JSON.parse(fileData)
+    //console.log(jsonObject['mods'])
+    return jsonObject['seqs']
+  },
   getSequence(id) {
     return apiClient.get('/seqs/' + id)
   },

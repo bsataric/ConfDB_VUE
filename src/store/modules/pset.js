@@ -45,18 +45,23 @@ export const actions = {
         throw error
       })
   },
-  fetchPSets({ commit, dispatch }) {
-    return PSetService.getPSets()
-      .then((response) => {
-        commit('SET_PSETS', response.data)
-      })
-      .catch((error) => {
-        const notification = {
-          type: 'error',
-          message: 'There was a problem fetching psets ' + error.message,
-        }
-        dispatch('notification/add', notification, { root: true })
-      })
+  fetchPSets({ commit, dispatch }, payload) {
+    if (!payload.fromFile) {
+      return PSetService.getPSets()
+        .then((response) => {
+          commit('SET_PSETS', response.data)
+        })
+        .catch((error) => {
+          const notification = {
+            type: 'error',
+            message: 'There was a problem fetching psets ' + error.message,
+          }
+          dispatch('notification/add', notification, { root: true })
+        })
+    } else {
+      let psetsData = PSetService.getPSetsFromFile(payload.fileData)
+      commit('SET_PSETS', psetsData)
+    }
   },
   fetchPSetAndPSetId({ commit, getters, dispatch }, payload) {
     let psetObj = getters.getPSetAndPSetId(payload.itemName)

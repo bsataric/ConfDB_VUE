@@ -5,11 +5,15 @@
         <!--  <NotificationContainer /> -->
         <v-container class="grey lighten-5">
           <v-toolbar>
-            <v-app-bar-nav-icon></v-app-bar-nav-icon>
-
-            <v-toolbar-title>ConfDB</v-toolbar-title>
+            <v-app-bar-nav-icon> </v-app-bar-nav-icon>
+            <v-file-input
+              v-model="file"
+              label="Select config file..."
+            ></v-file-input>
+            <v-btn color="primary" @click="onUpload">Open</v-btn>
 
             <v-spacer></v-spacer>
+            <v-toolbar-title>ConfDB</v-toolbar-title>
 
             <v-btn icon>
               <v-icon>mdi-export</v-icon>
@@ -57,12 +61,26 @@ import { Component, Vue } from 'vue-property-decorator'
 })
 export default class App extends Vue {
   private name: any = 'App'
-  private counter: number = 0
-  private myLayout: any = null
-  private showPassword: any = false
-  private vueElInstance: any = null
+  private file: any = null
+  private fileContent: any = null
 
   public mounted() {}
+
+  public onUpload() {
+    //console.log(this.file)
+
+    var reader = new FileReader()
+
+    // Use the javascript reader object to load the contents
+    // of the file in the v-model prop
+    reader.readAsText(this.file)
+    reader.onload = () => {
+      this.fileContent = reader.result
+      //console.log(this.fileContent)
+
+      this.$store.dispatch('setOpenFileContent', this.fileContent)
+    }
+  }
 }
 </script>
 

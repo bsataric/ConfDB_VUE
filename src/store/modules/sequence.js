@@ -46,25 +46,30 @@ export const actions = {
         throw error
       })
   },
-  fetchSequences({ commit, dispatch }) {
-    return SequenceService.getSequences()
-      .then((response) => {
-        commit('SET_SEQUENCES', response.data)
-      })
-      .catch((error) => {
-        const notification = {
-          type: 'error',
-          message: 'There was a problem fetching sequences ' + error.message,
-        }
-        dispatch('notification/add', notification, { root: true })
-      })
+  fetchSequences({ commit, dispatch }, payload) {
+    if (!payload.fromFile) {
+      return SequenceService.getSequences()
+        .then((response) => {
+          commit('SET_SEQUENCES', response.data)
+        })
+        .catch((error) => {
+          const notification = {
+            type: 'error',
+            message: 'There was a problem fetching sequences ' + error.message,
+          }
+          dispatch('notification/add', notification, { root: true })
+        })
+    } else {
+      let sequenesData = SequenceService.getSequencesFromFile(payload.fileData)
+      commit('SET_SEQUENCES', sequenesData)
+    }
   },
-  fetchSequenceAndSequenceId({ commit, getters }, payload) {
+  fetchSequenceAndSequenceId({ commit, dispatch, getters }, payload) {
     let sequenceObj = getters.getSequenceAndSequenceId(payload.itemName)
     let name = payload.itemName
     let sequenceParams = sequenceObj.value
     let sequenceId = sequenceObj.sequenceId
-    let sequenceParamLength = payload.itemChildrenLength
+    let sequenceParamLength = sequenceObj.paramLength
     //console.log('sequenceObj: ' + JSON.stringify(sequenceObj))
     //console.log('sequenceId: ' + sequenceId)
     console.log('sequenceParamLength' + sequenceParamLength)
@@ -87,7 +92,7 @@ export const actions = {
         sequenceParams: sequenceParams,
         sequenceParamLength: sequenceParamLength,
       })
-    } /* else {
+    } else {
       return SequenceService.getSequenceByName(name)
         .then((response) => {
           //TODO: generate sequenceId
@@ -119,7 +124,7 @@ export const actions = {
           }
           dispatch('notification/add', notification, { root: true })
         })
-    } */
+    }
   },
 }
 export const getters = {
@@ -131,17 +136,24 @@ export const getters = {
   ) => {
     let nodeNameIdMap = rootGetters['getNodeNameIdMap']
     let sequenceId = nodeNameIdMap['sequence.' + name]
+    let paramLength = 0
 
     for (const [key, value] of Object.entries(state.sequences)) {
-      //console.log('KEY ' + key)
-      //console.log('VALUE ' + value)
+      /*    console.log('KEY ' + key)
+      console.log('VALUE ' + value) */
+
       if (key == name) {
-        //console.log('VALUE: ' + JSON.stringify(value))
-        return { value, sequenceId }
+        /*    for (const [key1, value1] of Object.entries(value)) {
+          console.log('key1 ' + key1)
+          console.log('value1 ' + value1)
+        } */
+        //console.log('PARAMLENGTH: ' + Object.entries(value).length)
+        paramLength = Object.entries(value).length
+        return { value, sequenceId, paramLength }
       }
     }
   },
-  getSequenceByName: (state) => (name) => {
+  /*   getSequenceByName: (state) => (name) => {
     //return state.sequences.find((sequences) => sequences.name == name)
     for (const [key, value] of Object.entries(state.sequences)) {
       //console.log('KEY ' + key)
@@ -151,7 +163,7 @@ export const getters = {
         return value
       }
     }
-  },
+  }, */
   getSequences: (state) => {
     return state.sequences
   },
