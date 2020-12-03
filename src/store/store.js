@@ -8,9 +8,9 @@ import * as notification from '@/store/modules/notification.js'
 
 Vue.use(Vuex)
 
-async function sleep(ms) {
+/* async function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
-}
+} */
 
 export default new Vuex.Store({
   modules: {
@@ -40,7 +40,7 @@ export default new Vuex.Store({
       state.selectedNodeName = payload.selectedNodeName
       state.selectedNodeId = payload.selectedNodeId
       state.selectedNodeParamLength = payload.selectedNodeParamLength
-      /* 
+
       if (state.selectedNodeParamLength == 0) {
         console.log('ITEM CHILDREN ZERO!')
         return
@@ -48,14 +48,14 @@ export default new Vuex.Store({
 
       let idIndex = state.openNodeIds.indexOf(state.selectedNodeId)
 
-      console.log('OPEN NODES BEFORE: ' + state.openNodeIds)
+      //console.log('OPEN NODES BEFORE: ' + state.openNodeIds)
 
       if (idIndex == -1) state.openNodeIds.push(state.selectedNodeId)
       else state.openNodeIds.splice(idIndex, 1)
 
-      console.log('OPEN NODES AFTER: ' + state.openNodeIds) */
+      //console.log('OPEN NODES AFTER: ' + state.openNodeIds)
 
-      state.openNodeIds = [1]
+      //state.openNodeIds = [1]
     },
     SET_NODE_NAME_ID_MAP(state, payload) {
       state.nodeNameIdMap = payload
@@ -95,13 +95,13 @@ export default new Vuex.Store({
       return state.nodeNameIdMap
     },
     getOpenNodeIds(state) {
-      console.log('openNodeIds FIRED')
-      console.log('openNodeIds:' + state.openNodeIds)
-      sleep(2000).then(() => {
-        //have a little delay to avoid race condition
-        console.log('DELAY CALLED')
-        return state.openNodeIds
-      })
+      //console.log('openNodeIds FIRED')
+      //console.log('openNodeIds:' + state.openNodeIds)
+      //sleep(2000).then(() => {
+      //have a little delay to avoid race condition
+      //console.log('DELAY CALLED')
+      return state.openNodeIds
+      //})
     },
     getOpenNodeIdsLength(state) {
       //console.log('openNodeIds.length FIRED')

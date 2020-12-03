@@ -72,7 +72,7 @@ export const actions = {
     let sequenceParamLength = sequenceObj.paramLength
     //console.log('sequenceObj: ' + JSON.stringify(sequenceObj))
     //console.log('sequenceId: ' + sequenceId)
-    console.log('sequenceParamLength' + sequenceParamLength)
+    //console.log('sequenceParamLength' + sequenceParamLength)
     if (sequenceParams) {
       commit(
         'SET_SELECTED_NODE',

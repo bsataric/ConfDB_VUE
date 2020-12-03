@@ -10,10 +10,12 @@
       :items="items"
       activatable
       dense
-      item-key="id"
       item-text=""
       open-on-click
-      open.sync="open"
+      :open="open"
+      :active="active"
+      @update:open="updateOpenNodes"
+      transition
     >
       <template v-slot:prepend="{ item, open }">
         <span
@@ -72,20 +74,46 @@ import { mapGetters } from 'vuex'
 })
 export default class TreeView extends Vue {
   @Watch('getOpenFileContent')
-  handler(val: any, oldVal: any) {
-    console.log('VAL:' + val)
-    console.log('OLDVAL: ' + oldVal)
+  // eslint-disable-next-line no-unused-vars
+  onOpenFileContentChanged(val: any, oldVal: any) {
+    //console.log('VAL:' + val)
+    //console.log('OLDVAL: ' + oldVal)
     this.fetchAllGroupsFromFile(val)
   }
+
+  @Watch('open')
+  onOpenChanged(val: any, oldVal: any) {
+    console.log('open VAL:' + val)
+    console.log('open OLDVAL: ' + oldVal)
+  }
+
+  @Watch('active')
+  onActiveChanged(val: any, oldVal: any) {
+    console.log('active VAL:' + val)
+    console.log('active OLDVAL: ' + oldVal)
+  }
+
+  @Watch('selected')
+  onSelectedChanged(val: any, oldVal: any) {
+    console.log('selected VAL:' + val)
+    console.log('selected OLDVAL: ' + oldVal)
+  }
+
+  @Watch('getOpenNodeIds')
+  onOpenNodeChanged(val: any, oldVal: any) {
+    console.log('getOpenNodeIds VAL:' + val)
+    console.log('getOpenNodeIds OLDVAL: ' + oldVal)
+  }
+
   //private openNodes: any = []
   //private openNodeIds: any = []
   //private nodeIds: any = []
   private nodeIdNameMap: any = {}
-  private open: any = []
+  private open: any = [1]
+  private active: any = []
 
   private openSequencesList: any = []
   private openModulesList: any = []
-  private active: any = []
   private getSequences!: any[] // are assigned via mapState
   private getPaths!: any[]
   private getModules!: any[]
@@ -113,6 +141,326 @@ export default class TreeView extends Vue {
     pset: 'mdi-format-list-bulleted',
   }
   private tree: any = []
+
+  private items1: any = [
+    {
+      id: 1,
+      name: 'Sequences',
+      type: 'seqs',
+      children: [
+        {
+          id: 2,
+          type: 'sequence',
+          name: 'HLTPFClusteringForEgammaUnseeded',
+          iconType: 'sequence',
+          iconColor: 'red',
+          children: [
+            {
+              id: 3,
+              type: 'modules',
+              name: 'hltParticleFlowRecHitECALUnseeded',
+              iconType: 'module',
+            },
+            {
+              id: 4,
+              type: 'modules',
+              name: 'hltParticleFlowRecHitPSUnseeded',
+              iconType: 'module',
+            },
+          ],
+        },
+        {
+          id: 5,
+          type: 'sequence',
+          name: 'HLTDoLocalPixelSequence',
+          iconType: 'sequence',
+          iconColor: 'red',
+          children: [
+            {
+              id: 6,
+              type: 'modules',
+              name: 'hltSiPixelDigis',
+              iconType: 'module',
+            },
+            {
+              id: 7,
+              type: 'modules',
+              name: 'hltSiPixelClusters',
+              iconType: 'module',
+            },
+          ],
+        },
+      ],
+    },
+  ]
+  /*     {
+      name: 'Paths',
+      type: 'paths',
+      children: [
+        {
+          type: 'paths',
+          name: 'HLTriggerFirstPath',
+          iconType: 'path',
+          iconColor: 'green',
+          children: [
+            {
+              type: 'modules',
+              name: 'hltGetConditions',
+              iconType: 'module',
+            },
+            {
+              type: 'modules',
+              name: 'hltGetRaw',
+              iconType: 'module',
+            },
+            {
+              type: 'modules',
+              name: 'hltBoolFalse',
+              iconType: 'module',
+            },
+          ],
+        },
+        {
+          type: 'paths',
+          name: 'HLT_Ele5_Open_v1',
+          iconType: 'path',
+          iconColor: 'green',
+          children: [
+            {
+              type: 'sequences',
+              name: 'HLTBeginSequence',
+              iconType: 'sequence',
+              iconColor: 'red',
+            },
+            {
+              type: 'modules',
+              name: 'hltL1sSingleEGor',
+              iconType: 'module',
+            },
+            {
+              type: 'modules',
+              name: 'hltPreEle5',
+              iconType: 'module',
+            },
+            {
+              type: 'sequences',
+              name: 'HLTEle5OpenSequence',
+              iconType: 'sequence',
+              iconColor: 'red',
+            },
+            {
+              type: 'sequences',
+              name: 'HLTEndSequence',
+              iconType: 'sequence',
+              iconColor: 'red',
+            },
+          ],
+        },
+      ],
+    }, */
+  /*     {
+      name: 'Modules',
+      type: 'mods',
+      children: [
+        {
+          type: 'modules',
+          name: 'hltIter1ClustersRefRemoval',
+          iconType: 'module',
+          children: [
+            {
+              type: 'cms.string',
+              globalType: 'parameter',
+              ctype: 'TrackClusterRemover',
+              pytype: 'EDProducer',
+              value: 'highPurity',
+              name: 'string = highPurity', //this will have to be computed (maybe coloured)
+            },
+          ],
+        },
+        {
+          type: 'modules',
+          name: 'hltParticleFlowSuperClusterECALUnseeded',
+          iconType: 'module',
+          children: [
+            {
+              type: 'cms.string',
+              globalType: 'parameter',
+              ctype: 'PFECALSuperClusterProducer',
+              pytype: 'EDProducer',
+              value: 'hltParticleFlowSuperClusterECALEndcapWithPreshower',
+              name:
+                'string = hltParticleFlowSuperClusterECALEndcapWithPreshower',
+            },
+          ],
+        },
+        {
+          type: 'modules',
+          name: 'hltDoubletRecoveryPFlowPixelSeeds',
+          iconType: 'module',
+          children: [
+            {
+              type: 'cms.double',
+              globalType: 'parameter',
+              ctype: 'SeedCreatorFromRegionConsecutiveHitsEDProducer',
+              pytype: 'EDProducer',
+              value: 1.0,
+              name: 'double = 1.0',
+            },
+          ],
+        },
+        {
+          type: 'modules',
+          name: 'hltFEDSelector',
+          iconType: 'module',
+          children: [
+            {
+              type: 'cms.vuint32',
+              globalType: 'parameter',
+              ctype: 'SiPixelClusterShapeCacheProducer',
+              pytype: 'EDProducer',
+              value: [1023, 1024],
+              name: 'vuint32 = [1023, 1024]',
+            },
+          ],
+        },
+        {
+          type: 'modules',
+          name: 'hltEgammaElectronPixelSeedsUnseeded',
+          iconType: 'module',
+          children: [
+            {
+              type: 'cms.InputTag',
+              globalType: 'parameter',
+              ctype: 'ElectronNHitSeedProducer',
+              pytype: 'EDProducer',
+              value: 'hltElePixelSeedsCombinedUnseeded',
+              name: 'InputTag = hltElePixelSeedsCombinedUnseeded',
+            },
+          ],
+        },
+        {
+          type: 'modules',
+          name: 'hltParticleFlowRecHitECALUnseeded',
+          iconType: 'module',
+          children: [
+            {
+              type: 'cms.VPSet',
+              globalType: 'parameter',
+              ctype: 'PFRecHitProducer',
+              pytype: 'EDProducer',
+              name: 'VPSet',
+              children: [
+                {
+                  type: 'cms.VPSet',
+                  globalType: 'parameter',
+                  name: 'VPSet',
+                  children: [
+                    {
+                      type: 'cms.bool',
+                      globalType: 'parameter',
+                      value: true,
+                      name: 'bool = true1',
+                    },
+                    {
+                      type: 'cms.double',
+                      globalType: 'parameter',
+                      value: 2.0,
+                      name: 'double = 2.02',
+                    },
+                  ],
+                },
+                {
+                  type: 'cms.VPSet',
+                  globalType: 'parameter',
+                  name: 'VPSet',
+                  children: [
+                    {
+                      type: 'cms.bool',
+                      globalType: 'parameter',
+                      value: true,
+                      name: 'bool = true',
+                    },
+                    {
+                      type: 'cms.double',
+                      globalType: 'parameter',
+                      value: 2.0,
+                      name: 'double = 2.0',
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          type: 'modules',
+          name: 'hltFEDSelector',
+          iconType: 'module',
+          children: [
+            {
+              type: 'cms.vstring',
+              globalType: 'parameter',
+              ctype: 'ClassifierMerger',
+              pytype: 'EDProducer',
+              value: [
+                'hltIter1PFlowTrackCutClassifierPrompt',
+                'hltIter1PFlowTrackCutClassifierDetached',
+              ],
+              name:
+                'vstring = [hltIter1PFlowTrackCutClassifierPrompt, hltIter1PFlowTrackCutClassifierDetached]',
+            },
+          ],
+        },
+      ],
+    }, */
+  /*  {
+      name: 'PSets',
+      type: 'psets',
+      children: [
+        {
+          type: 'pset', //TODO: check this
+          name: 'HLTPSetPixelLessStepTrajectoryFilter',
+          children: [
+            {
+              type: 'cms.double',
+              globalType: 'parameter',
+              value: -1.0,
+              name: 'double = -1.0', //this will have to be computed (maybe coloured)
+            },
+          ],
+        },
+        {
+          type: 'pset', //TODO: check this
+          name: 'HLTPSetInitialStepTrajectoryFilterPreSplittingForDmesonPPOnAA',
+          children: [
+            {
+              type: 'cms.VPSet',
+              globalType: 'parameter',
+              name: 'VPSet',
+              children: [
+                {
+                  type: 'cms.string',
+                  globalType: 'parameter',
+                  value:
+                    'HLTPSetInitialStepTrajectoryFilterBasePreSplittingForDmesonPPOnAA',
+                  name:
+                    'string = HLTPSetInitialStepTrajectoryFilterBasePreSplittingForDmesonPPOnAA',
+                },
+                {
+                  type: 'cms.string',
+                  globalType: 'parameter',
+                  value:
+                    'HLTPSetInitialStepTrajectoryFilterShapePreSplittingPPOnAA',
+                  name:
+                    'string = HLTPSetInitialStepTrajectoryFilterShapePreSplittingPPOnAA',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    }, */
+  //]
 
   get items() {
     return [
@@ -627,6 +975,17 @@ export default class TreeView extends Vue {
     await this.$store.dispatch('createNodeNameIdMap', this.nodeIdNameMap) // note the "await"
   } */
 
+  get selected() {
+    if (!this.active.length) return undefined
+
+    //const id = this.active[0]
+
+    console.log('OPEN ' + this.open)
+    console.log('ACTIVE ' + this.active)
+
+    return this.active[0]
+  }
+
   async fetchNodeByName(
     itemType: string,
     itemName: string,
@@ -640,7 +999,9 @@ export default class TreeView extends Vue {
     //this.getOpen(itemType, itemName, itemId, itemChildren.length)
     //let index = this.checkOpen(itemName) //close node if it's already open
     //console.log('FETCH')
-    console.log('OPENNNNN: ' + this.open)
+    //console.log('NODE ID: ' + itemId)
+    /*     console.log('OPEN ' + this.open)
+    console.log('ACTIVE ' + this.active) */
     if (itemType === 'sequence') {
       await this.$store.dispatch('sequence/fetchSequenceAndSequenceId', {
         itemName: itemName,
@@ -746,8 +1107,15 @@ export default class TreeView extends Vue {
   }
 
   public blabla() {
-    this.open = [5] //TODO open array not working properly, either find a way to fix it or drop it after tomorrow
-    console.log('OPENNNNN: ' + this.open)
+    this.open = [1] //TODO open array not working properly, either find a way to fix it or drop it after tomorrow
+    //this.active = [3]
+    //console.log('OPENNNNN: ' + this.open)
+  }
+
+  public updateOpenNodes(array: any) {
+    //console.log('OVO JE LUDNICA')
+    //console.log('THIS OPEN: ' + array)
+    this.open = array
   }
 
   public fetchAllGroups() {

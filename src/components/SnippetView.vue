@@ -190,6 +190,7 @@ export default class SnippetView extends Vue {
         itemName: nodeName,
       })
     } else if (nodeType === 'modules') {
+      //TODO: fix params and open nodes across the store
       await this.$store.dispatch('module/fetchModuleAndModuleId', nodeName)
     } else if (nodeType === 'pset') {
       await this.$store.dispatch('pset/fetchPSetAndPSetId', nodeName)
