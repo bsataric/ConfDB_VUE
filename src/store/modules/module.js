@@ -68,10 +68,12 @@ export const actions = {
     let name = payload.itemName
     let moduleParams = moduleObj.value
     let moduleId = moduleObj.moduleId
-    let moduleParamLength = payload.itemChildrenLength
+    let moduleParamLength = moduleObj.paramLength
+    let forceOpenNode = payload.forceOpenNode
+    //console.log('FORCE OPEN 1: ' + forceOpenNode)
     //console.log('moduleObj: ' + JSON.stringify(moduleObj))
     //console.log('moduleParams: ' + moduleParams)
-    console.log('moduleParamLength: ' + moduleParamLength)
+    //console.log('moduleParamLength: ' + moduleParamLength)
     if (moduleParams) {
       commit(
         'SET_SELECTED_NODE',
@@ -80,6 +82,7 @@ export const actions = {
           selectedNodeName: name,
           selectedNodeId: moduleId,
           selectedNodeParamLength: moduleParamLength,
+          forceOpenNode: forceOpenNode,
         },
         { root: true }
       )
@@ -128,13 +131,24 @@ export const getters = {
   getModuleAndModuleId: (state, getters, rootState, rootGetters) => (name) => {
     let nodeNameIdMap = rootGetters['getNodeNameIdMap']
     let moduleId = nodeNameIdMap['module.' + name]
+    let paramLength = 0
 
     for (const [key, value] of Object.entries(state.modules)) {
       //console.log('KEY ' + key)
       //console.log('VALUE ' + value)
       if (key == name) {
-        //console.log('VALUE: ' + JSON.stringify(value))
-        return { value, moduleId }
+        for (const [key1, value1] of Object.entries(value)) {
+          //console.log('KEY1 ' + key1)
+          //console.log('VALUE1 ' + value1)
+          if (key1 == 'params') {
+            paramLength = Object.entries(value1).length
+            break
+          }
+          //console.log('VALUE: ' + JSON.stringify(value))
+          //console.log('PARAMLENGTH: ' + Object.entries(value1).length)
+        }
+        //paramLength = Object.entries(value1).length
+        return { value, moduleId, paramLength }
       }
     }
   },

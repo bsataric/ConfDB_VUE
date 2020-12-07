@@ -68,7 +68,8 @@ export const actions = {
     let name = payload.itemName
     let psetParams = psetObj.value
     let psetId = psetObj.psetId
-    let psetParamLength = payload.itemChildrenLength
+    let psetParamLength = psetObj.paramLength
+    let forceOpenNode = payload.forceOpenNode
     //console.log('psetObj: ' + JSON.stringify(psetObj))
     //console.log('psetId: ' + psetId)
     //console.log('psetParams' + psetParams)
@@ -82,6 +83,7 @@ export const actions = {
           selectedNodeName: name,
           selectedNodeId: psetId,
           selectedNodeParamLength: psetParamLength,
+          forceOpenNode: forceOpenNode,
         },
         { root: true }
       )
@@ -130,6 +132,7 @@ export const getters = {
   getPSetAndPSetId: (state, getters, rootState, rootGetters) => (name) => {
     let nodeNameIdMap = rootGetters['getNodeNameIdMap']
     let psetId = nodeNameIdMap['pset.' + name]
+    let paramLength = 0
 
     //console.log(nodeNameIdMap)
     //console.log('psetId: ' + psetId)
@@ -138,8 +141,13 @@ export const getters = {
       //console.log('KEY ' + key)
       //console.log('VALUE ' + value)
       if (key == name) {
+        //for (const [key1, value1] of Object.entries(value)) {
+        //console.log('KEY1 ' + key1)
+        //console.log('VALUE1 ' + value1)
+        //}
         //console.log('VALUE: ' + JSON.stringify(value))
-        return { value, psetId }
+        paramLength = Object.entries(value).length
+        return { value, psetId, paramLength }
       }
     }
   },

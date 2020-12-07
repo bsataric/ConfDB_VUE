@@ -70,6 +70,7 @@ export const actions = {
     let sequenceParams = sequenceObj.value
     let sequenceId = sequenceObj.sequenceId
     let sequenceParamLength = sequenceObj.paramLength
+    let forceOpenNode = payload.forceOpenNode
     //console.log('sequenceObj: ' + JSON.stringify(sequenceObj))
     //console.log('sequenceId: ' + sequenceId)
     //console.log('sequenceParamLength' + sequenceParamLength)
@@ -81,6 +82,7 @@ export const actions = {
           selectedNodeName: name,
           selectedNodeId: sequenceId,
           selectedNodeParamLength: sequenceParamLength,
+          forceOpenNode: forceOpenNode,
         },
         { root: true }
       )

@@ -69,6 +69,7 @@ export const actions = {
     let pathParams = pathObj.value
     let pathId = pathObj.pathId
     let pathParamLength = pathObj.paramLength
+    let forceOpenNode = payload.forceOpenNode
     //console.log('pathObj: ' + JSON.stringify(pathObj))
     //console.log('pathId: ' + pathId)
     //console.log('pathParamLength ' + pathParamLength)
@@ -81,6 +82,7 @@ export const actions = {
           selectedNodeName: name,
           selectedNodeId: pathId,
           selectedNodeParamLength: pathParamLength,
+          forceOpenNode: forceOpenNode,
         },
         { root: true }
       )
