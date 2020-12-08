@@ -28,6 +28,7 @@ export default new Vuex.Store({
     nodeNameIdMap: {},
     openNodeIds: [],
     forcedOpenNodeIds: [],
+    forcedActiveNodeId: 0,
     openFileContent: '',
   },
   mutations: {
@@ -44,6 +45,9 @@ export default new Vuex.Store({
       let forceOpenNode = payload.forceOpenNode //if node is opened by foce open it's parent as well
 
       //console.log('FORCED OPEN NODE: ' + forceOpenNode)
+      if (forceOpenNode) {
+        state.forcedActiveNodeId = state.selectedNodeId
+      }
 
       if (state.selectedNodeParamLength == 0) {
         console.log('ITEM CHILDREN ZERO!')
@@ -174,6 +178,9 @@ export default new Vuex.Store({
     },
     getForcedOpenNodeIds(state) {
       return state.forcedOpenNodeIds
+    },
+    getForcedActiveNodeId(state) {
+      return state.forcedActiveNodeId
     },
     getOpenNodeIdsLength(state) {
       //console.log('openNodeIds.length FIRED')

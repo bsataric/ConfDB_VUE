@@ -16,11 +16,15 @@
       :open="open"
       :active="active"
       @update:open="updateOpenNodes"
+      @update:active="updateActiveNodes"
       transition
+      ref="treeReference"
     >
       <template v-slot:prepend="{ item, open }">
         <span
           @click="fetchNodeByName(item.type, item.name, item.id, item.children)"
+          :ref="item.name"
+          :id="item.type + item.name"
         >
           <v-icon v-if="!item.iconType && item.globalType != 'parameter'">
             {{ open ? 'mdi-minus-thick' : 'mdi-plus-thick' }}
@@ -66,6 +70,7 @@ import { mapGetters } from 'vuex'
       getSelectedNodeParamLength: 'getSelectedNodeParamLength',
       getOpenNodeIds: 'getOpenNodeIds',
       getForcedOpenNodeIds: 'getForcedOpenNodeIds',
+      getForcedActiveNodeId: 'getForcedActiveNodeId',
       getOpenNodeIdsLength: 'getOpenNodeIdsLength',
       getPSets: 'pset/getPSets',
       getOpenFileContent: 'getOpenFileContent',
@@ -92,8 +97,59 @@ export default class TreeView extends Vue {
   @Watch('active')
   // eslint-disable-next-line no-unused-vars
   onActiveChanged(val: any, oldVal: any) {
-    /*  console.log('active VAL:' + val)
-    console.log('active OLDVAL: ' + oldVal) */
+    console.log('active VAL:' + val)
+    console.log('active OLDVAL: ' + oldVal)
+    //@ts-ignore
+    //this.$refs[val].scrollIntoView() //TODO FIX
+  }
+
+  @Watch('getForcedActiveNodeId')
+  onForcedActiveChanged(val: any, oldVal: any) {
+    console.log('active VAL:' + val)
+    console.log('active OLDVAL: ' + oldVal)
+    this.active = [val]
+    //@ts-ignore
+    //console.log(this.$el)
+    this.$nextTick(() => {
+      //@ts-ignore
+      /*   this.$refs.treeReference.nodes[val].vnode.$el.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+        inline: 'nearest',
+      }) */
+      //@ts-ignore
+      let rect = this.$refs.treeReference.nodes[
+        val
+      ].vnode.$el.getBoundingClientRect()
+      console.log('RECT: ' + rect.top)
+      //@ts-ignore
+      this.$refs.treeReference.nodes[val].vnode.$el.style.top = '300px' //TODO: scroll into right position
+      console.log('VALLLL: ' + val)
+    })
+    //console.log(this.$refs.treeReference.nodes[val])
+    //console.log('ITEM EL 2 ' + this.$refs.HLTIterativeTrackingIteration1)
+    //let id = 'sequence.' + val.toString()
+
+    //console.log('ITEM 2 EL ' + this.$refs.sequence222)
+    //console.log('ID: ' + id)
+    //let element = document.getElementById(val.toString())
+    /*   console.log(
+      'ITEM EL 3 ' +
+        document.getElementById('sequenceHLTIterativeTrackingIteration1')
+    ) */
+    //this.$refs[val.toString()].scrollIntoView()
+    // eslint-disable-next-line no-unused-vars
+    let value, key: any
+    //@ts-ignore
+    /*     for ([key, value] of Object.entries(
+      //@ts-ignore
+      this.$refs.treeReference.nodes[val].vnode
+    )) {
+      console.log('KEY: ' + key)
+      console.log('VALUE: ' + value)
+    } */
+    //@ts-ignore
+    //console.log('ELEMENT: ' + this.$refs.treeReference.items[val])
   }
 
   @Watch('getOpenNodeIds')
@@ -1011,6 +1067,8 @@ export default class TreeView extends Vue {
     //console.log('NODE ID: ' + itemId)
     /*     console.log('OPEN ' + this.open)
     console.log('ACTIVE ' + this.active) */
+    //@ts-ignore
+    //console.log('REF: ' + this.$refs[itemId].innerHTML)
     if (itemType === 'sequence') {
       await this.$store.dispatch('sequence/fetchSequenceAndSequenceId', {
         itemName: itemName,
@@ -1121,14 +1179,28 @@ export default class TreeView extends Vue {
 
   public blabla() {
     //override
-    this.open = [1, 2] //TODO open array not working properly, either find a way to fix it or drop it after tomorrow
-    //this.active = [3]
+    //this.open = [1] //TODO open array not working properly, either find a way to fix it or drop it after tomorrow
+    //this.active = [2]
+
+    console.log('REFS: ' + this.$refs.items[0])
+    //@ts-ignore
+    //this.$refs['Sequences'].scrollIntoView()
+    for (const [key, value] of Object.entries(this.$refs)) {
+      console.log('KEY: ' + key)
+      console.log('VALUE: ' + value)
+    }
+
     //console.log('OPENNNNN: ' + this.open)
   }
 
   public updateOpenNodes(array: any) {
     //console.log('THIS OPEN: ' + array)
     this.open = array
+  }
+
+  public updateActiveNodes(array: any) {
+    console.log('THIS ACTIVE: ' + array)
+    this.active = array
   }
 
   public fetchAllGroups() {
