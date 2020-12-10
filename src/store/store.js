@@ -30,6 +30,7 @@ export default new Vuex.Store({
     forcedOpenNodeIds: [],
     forcedActiveNodeId: 0,
     openFileContent: '',
+    darkMode: false,
   },
   mutations: {
     SET_SELECTED_NODE(state, payload) {
@@ -126,6 +127,9 @@ export default new Vuex.Store({
       state.openFileContent = payload
       console.log('OPEN FILE CONTENT SET:' + payload)
     },
+    SET_DARK_MODE(state, payload) {
+      state.darkMode = payload
+    },
   },
   actions: {
     createNodeNameIdMap({ commit }, nodeNameIdMap) {
@@ -136,6 +140,9 @@ export default new Vuex.Store({
     },
     setOpenFileContent({ commit }, payload) {
       commit('SET_OPEN_FILE_CONTENT', payload)
+    },
+    setDarkMode({ commit }, payload) {
+      commit('SET_DARK_MODE', payload)
     },
   },
   getters: {
@@ -190,6 +197,9 @@ export default new Vuex.Store({
     getOpenFileContent(state) {
       console.log('GET OPEN FILE CONTENT: ' + state.getOpenFileContent)
       return state.openFileContent
+    },
+    getDarkMode(state) {
+      return state.darkMode
     },
   },
 })

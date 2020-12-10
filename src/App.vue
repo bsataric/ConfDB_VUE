@@ -1,60 +1,61 @@
 <template>
   <v-app>
-    <section confdb>
-      <section workspace ref="workspace">
-        <!--  <NotificationContainer /> -->
-        <v-container class="grey lighten-5">
-          <v-toolbar>
-            <v-app-bar-nav-icon> </v-app-bar-nav-icon>
-            <v-file-input
-              v-model="file"
-              label="Select config file..."
-            ></v-file-input>
-            <v-btn color="primary" @click="onUpload">Open</v-btn>
+    <!--  <NotificationContainer /> -->
+    <v-container>
+      <v-toolbar :dark="getDarkMode">
+        <v-app-bar-nav-icon> </v-app-bar-nav-icon>
+        <v-file-input
+          v-model="file"
+          label="Select config file..."
+        ></v-file-input>
+        <v-btn color="primary" @click="onUpload">Open</v-btn>
 
-            <v-spacer></v-spacer>
-            <v-toolbar-title>ConfDB</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-toolbar-title>ConfDB</v-toolbar-title>
 
-            <v-btn icon>
-              <v-icon>mdi-export</v-icon>
-            </v-btn>
-          </v-toolbar>
-          <v-row>
-            <v-col ref="colRef" id="colId">
-              <v-card
-                class="v-card-treeview"
-                ref="mainTreeView"
-                outlined
-                tile
-                id="treeCardId"
-              >
-                <TreeView id="treeViewId" />
-              </v-card>
-            </v-col>
-            <v-col>
-              <v-card
-                class="pa-2, v-card-tableview"
-                ref="mainTableView"
-                outlined
-                tile
-              >
-                <TableView />
-              </v-card>
-              <v-divider></v-divider>
-              <v-card
-                class="pa-2, v-card-snippetview"
-                ref="mainSnippetView"
-                outlined
-                tile
-              >
-                <SnippetView />
-              </v-card>
-            </v-col>
-          </v-row>
-          <v-btn small @click="testFunctionMA()">Test function main APP</v-btn>
-        </v-container>
-      </section>
-    </section>
+        <v-switch
+          :value="getDarkMode"
+          :label="`Dark mode`"
+          @click="switchDarkMode"
+        ></v-switch>
+      </v-toolbar>
+      <v-row>
+        <v-col ref="colRef" id="colId">
+          <v-card
+            class="v-card-treeview"
+            ref="mainTreeView"
+            outlined
+            tile
+            id="treeCardId"
+            :dark="getDarkMode"
+          >
+            <TreeView id="treeViewId" />
+          </v-card>
+        </v-col>
+        <v-col>
+          <v-card
+            class="pa-2, v-card-tableview"
+            ref="mainTableView"
+            outlined
+            tile
+            :dark="getDarkMode"
+          >
+            <TableView />
+          </v-card>
+          <v-divider></v-divider>
+          <v-card
+            class="pa-2, v-card-snippetview"
+            ref="mainSnippetView"
+            outlined
+            tile
+            :dark="getDarkMode"
+          >
+            <SnippetView />
+          </v-card>
+        </v-col>
+      </v-row>
+      <v-btn small @click="testFunctionMA()">Test function main APP</v-btn>
+    </v-container>
   </v-app>
 </template>
 
@@ -66,8 +67,14 @@ import EventCard from './components/EventCard.vue'
 import NotificationContainer from './components/NotificationContainer.vue'
 
 import { Component, Vue } from 'vue-property-decorator'
+import { mapGetters } from 'vuex'
 
 @Component({
+  computed: {
+    ...mapGetters({
+      getDarkMode: 'getDarkMode',
+    }),
+  },
   components: {
     TreeView,
     TableView,
@@ -80,6 +87,8 @@ export default class App extends Vue {
   private name: any = 'App'
   private file: any = null
   private fileContent: any = null
+  //private darkMode: boolean = true
+  private getDarkMode!: any[]
 
   public mounted() {}
 
@@ -97,6 +106,11 @@ export default class App extends Vue {
 
       this.$store.dispatch('setOpenFileContent', this.fileContent)
     }
+  }
+
+  public switchDarkMode() {
+    let darkMode = this.getDarkMode
+    this.$store.dispatch('setDarkMode', !darkMode)
   }
 
   public testFunctionMA() {

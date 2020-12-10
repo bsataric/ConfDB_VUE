@@ -51,6 +51,7 @@
       empty-text="No data"
       :style="{
         color: activeColor,
+        backgroundColor: backGroundColor,
         fontSize: fontSize + 'px',
         fontFamily: font_family,
       }"
@@ -84,7 +85,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
+import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import { mapGetters } from 'vuex'
 import ZkTable from 'vue-table-with-tree-grid'
 
@@ -97,6 +98,7 @@ import ZkTable from 'vue-table-with-tree-grid'
       getSelectedModulePaths: 'module/getSelectedModulePaths',
       getSelectedPSetParams: 'pset/getSelectedPSetParams',
       getSelectedPSetName: 'pset/getSelectedPSetName',
+      getDarkMode: 'getDarkMode',
     }),
     // ...mapState('sequence', ['sequences']),
   },
@@ -105,18 +107,30 @@ import ZkTable from 'vue-table-with-tree-grid'
   },
 })
 export default class TableView extends Vue {
+  @Watch('getDarkMode')
+  // eslint-disable-next-line no-unused-vars
+  onDarkModeChanged(val: any, oldVal: any) {
+    console.log('open VAL:' + val)
+    console.log('open OLDVAL: ' + oldVal)
+    let prevActive = this.activeColor
+    let prevBackground = this.backGroundColor
+    this.activeColor = prevBackground
+    this.backGroundColor = prevActive
+  }
+
   private getSelectedNodeType!: any
   private getSelectedModuleParams!: any[]
   private getSelectedModuleName!: any[]
   private getSelectedModulePaths!: any[]
   private getSelectedPSetParams!: any[]
   private getSelectedPSetName!: any[]
+  private getDarkMode!: any[]
 
   @Prop({ default: false }) readonly stripe!: boolean
   @Prop({ default: true }) readonly border!: boolean
   @Prop({ default: true }) readonly showHeader!: boolean //there is no option for sticky header
   @Prop({ default: false }) readonly showSummary!: boolean
-  @Prop({ default: true }) readonly showRowHover!: boolean
+  @Prop({ default: false }) readonly showRowHover!: boolean
   @Prop({ default: false }) readonly showIndex!: boolean
   @Prop({ default: true }) readonly treeType!: boolean
   @Prop({ default: true }) readonly isFold!: boolean
@@ -124,7 +138,8 @@ export default class TableView extends Vue {
   @Prop({ default: false }) readonly selectionType!: boolean
 
   //TODO: fix the styling later to look like Vuetify but for now this is OK
-  private activeColor: any = 'black'
+  private activeColor: any = '#212121'
+  private backGroundColor: any = 'white'
   private fontSize: any = 16
   private font_family: any = 'Roboto, sans-serif'
 
