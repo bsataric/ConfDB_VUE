@@ -192,7 +192,6 @@ export default class SnippetView extends Vue {
         forceOpenNode: true,
       })
     } else if (nodeType === 'modules') {
-      //TODO: fix params and open nodes across the store
       await this.$store.dispatch('module/fetchModuleAndModuleId', {
         itemName: nodeName,
         forceOpenNode: true,

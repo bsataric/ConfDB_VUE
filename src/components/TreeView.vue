@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 <template>
   <!-- change key into some computed key or something and not name since they can be same-->
   <!-- 
@@ -7,6 +6,7 @@
   -->
 
   <div>
+    <v-btn small @click="testFunction()">Test function</v-btn>
     <v-treeview
       :items="items"
       activatable
@@ -15,6 +15,7 @@
       open-on-click
       :open="open"
       :active="active"
+      @update="updateTreeView"
       @update:open="updateOpenNodes"
       @update:active="updateActiveNodes"
       transition
@@ -48,7 +49,6 @@
     </v-treeview>
     <!--     {{ getSequenceById(2) }}
  -->
-    <v-btn small @click="blabla()">Normal</v-btn>
   </div>
 </template>
 
@@ -107,25 +107,70 @@ export default class TreeView extends Vue {
   onForcedActiveChanged(val: any, oldVal: any) {
     console.log('active VAL:' + val)
     console.log('active OLDVAL: ' + oldVal)
-    this.active = [val]
+    //this.active = [val]
+    this.forcedActive = [val]
+    console.log('FORCED ACTIVE WATCHER LENGTH: ' + this.forcedActive.length)
     //@ts-ignore
     //console.log(this.$el)
-    this.$nextTick(() => {
-      //@ts-ignore
-      /*   this.$refs.treeReference.nodes[val].vnode.$el.scrollIntoView({
+    //this.$nextTick(() => {
+    //@ts-ignore
+    /*   this.$refs.treeReference.nodes[val].vnode.$el.scrollIntoView({
         behavior: 'smooth',
         block: 'start',
         inline: 'nearest',
       }) */
-      //@ts-ignore
-      let rect = this.$refs.treeReference.nodes[
+    //@ts-ignore
+    /*     let rect = this.$refs.treeReference.nodes[
         val
       ].vnode.$el.getBoundingClientRect()
-      console.log('RECT: ' + rect.top)
-      //@ts-ignore
-      this.$refs.treeReference.nodes[val].vnode.$el.style.top = '300px' //TODO: scroll into right position
-      console.log('VALLLL: ' + val)
-    })
+      console.log(
+        //@ts-ignore
+        this.$refs.treeReference.nodes[val].vnode.$el
+      ) */
+    //@ts-ignore
+    /*    this.$refs.treeReference.nodes[val].vnode.$el.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      }) */
+    /*  console.log('RECT TOP: ' + rect.top)
+      console.log('RECT BOTTOM: ' + rect.bottom)
+      console.log('PARENT HEIGHT: ' + this.$parent.$el.clientHeight) */
+    /* this.$nextTick(() => {
+        //@ts-ignore
+        this.$refs.treeReference.nodes[val].vnode.$el.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        })
+      }) */
+    //@ts-ignore
+    //let nodeTop = this.$refs.treeReference.nodes[val].vnode.$el.offsetX
+    //console.log('NODE HEIGTH: ' + nodeTop)
+    //@ts-ignore
+    /*       this.$refs.treeReference.nodes[val].vnode.$el.focus()
+     */
+    //@ts-ignore
+    //this.$parent.$el.scrollTo(0, )
+    //TODO: try to calculate dynamically position of the node within the tree
+    //(height of a single node times something - but times what?)
+    //let clientHeight = this.$parent.$el.clientHeight.toFixed(0)
+    //let rectTop = rect.top.toFixed(0)
+    /*       let difference =
+        //@ts-ignore
+        (rect.top.toFixed(0) - this.$parent.$el.clientHeight.toFixed(0)) / 2
+      console.log(
+        //@ts-ignore
+        'DIFFERENCE: ' +
+          //@ts-ignore
+          difference.toFixed(0)
+      ) */
+    //console.log(this.$root.$refs)
+    //TODO: nothing seems to work - try forcing scroll on different divs to see if it makes any difference
+    //document.getElementById('colId')?.scrollTo(0, 300)
+    //@ts-ignore
+    //this.$parent.$el.scrollTo(0, 50) //difference.toFixed(0)
+    //console.log(this.$root.$refs)
+    //console.log('VALLLL: ' + val)
+    //})
     //console.log(this.$refs.treeReference.nodes[val])
     //console.log('ITEM EL 2 ' + this.$refs.HLTIterativeTrackingIteration1)
     //let id = 'sequence.' + val.toString()
@@ -139,7 +184,7 @@ export default class TreeView extends Vue {
     ) */
     //this.$refs[val.toString()].scrollIntoView()
     // eslint-disable-next-line no-unused-vars
-    let value, key: any
+    //let value, key: any
     //@ts-ignore
     /*     for ([key, value] of Object.entries(
       //@ts-ignore
@@ -171,6 +216,7 @@ export default class TreeView extends Vue {
   private nodeIdNameMap: any = {}
   private open: any = [1]
   private active: any = []
+  private forcedActive: any = []
 
   private openSequencesList: any = []
   private openModulesList: any = []
@@ -1177,18 +1223,27 @@ export default class TreeView extends Vue {
     })
   } */
 
-  public blabla() {
+  public testFunction() {
     //override
     //this.open = [1] //TODO open array not working properly, either find a way to fix it or drop it after tomorrow
     //this.active = [2]
 
-    console.log('REFS: ' + this.$refs.items[0])
+    //console.log('REFS: ' + this.$refs.items[0])
     //@ts-ignore
     //this.$refs['Sequences'].scrollIntoView()
-    for (const [key, value] of Object.entries(this.$refs)) {
+    /*   for (const [key, value] of Object.entries(this.$refs)) {
       console.log('KEY: ' + key)
       console.log('VALUE: ' + value)
-    }
+    } */
+
+    console.log(this.$parent.$vuetify)
+    //@ts-ignore
+    console.log(this.$refs.treeReference.nodes[222].vnode.$el)
+    //@ts-ignore
+    this.$vuetify.goTo(0, {
+      //@ts-ignore
+      container: this.$refs.treeReference.nodes[222].vnode.$el,
+    })
 
     //console.log('OPENNNNN: ' + this.open)
   }
@@ -1201,6 +1256,10 @@ export default class TreeView extends Vue {
   public updateActiveNodes(array: any) {
     console.log('THIS ACTIVE: ' + array)
     this.active = array
+  }
+
+  public updateTreeView() {
+    console.log('UPDATE TREEVIEW!')
   }
 
   public fetchAllGroups() {
@@ -1228,6 +1287,71 @@ export default class TreeView extends Vue {
     //this.open = ['Modules']
 
     //this.open = [1]
+  }
+
+  updated() {
+    console.log('COMPONENT UPDATED')
+    this.$nextTick(() => {
+      //@ts-ignore
+      /*   this.$refs.treeReference.nodes[val].vnode.$el.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+        inline: 'nearest',
+      }) */
+      console.log('FORCED ACTIVE LENGTH: ' + this.forcedActive.length)
+      if (this.forcedActive.length != 0) {
+        console.log('FORCED ACTIVE: ' + this.forcedActive)
+        //@ts-ignore
+        /*     let rect = this.$refs.treeReference.nodes[
+        this.forcedActive[0]
+      ].vnode.$el.getBoundingClientRect() */
+        /*  console.log(
+          //@ts-ignore
+          this.$refs.treeReference.nodes[this.forcedActive[0]].vnode.$el
+        ) */
+        //@ts-ignore
+        /*  this.$refs.treeReference.nodes[this.forcedActive[0]].vnode.$el &&
+          //@ts-ignore
+          this.$refs.treeReference.nodes[
+            this.forcedActive[0]
+          ].vnode.$el.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+          }) */
+        //@ts-ignore
+        /* let rect = this.$refs.treeReference.nodes[
+          this.forcedActive[0]
+        ].vnode.$el.getBoundingClientRect() */
+
+        //console.log('RECT TOP: ' + rect.top)
+        //console.log('RECT BOTTOM: ' + rect.bottom)
+        //@ts-ignore
+        //console.log('PARENT HEIGHT: ' + this.$parent.$el.clientHeight)
+        console.log('SCROLLING TO 10')
+        //this.$parent.$el.scrollTo(0, 10)
+        console.log('treeCardId: ' + document.getElementById('treeCardId'))
+        let forced = this.forcedActive[0]
+
+        setTimeout(() => {
+          //TODO: maybe find a better solution for this
+          //@ts-ignore
+          this.$refs.treeReference.nodes[forced].vnode.$el.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+            inline: 'nearest',
+          })
+        }, 400)
+        //document.getElementById('treeViewId')?.scrollTo(0, 30)
+        //@ts-ignore
+        /* this.$vuetify.goTo(
+          //@ts-ignore
+          this.$refs.treeReference.nodes[this.forcedActive[0]].vnode.$el,
+          { duration: 300, offset: 0, easing: 'easeInOutCubic' }
+        ) */
+        //this.$parent.$el.scrollTo(0, 300)
+        this.forcedActive = []
+      }
+    })
   }
 }
 </script>

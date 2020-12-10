@@ -20,21 +20,38 @@
             </v-btn>
           </v-toolbar>
           <v-row>
-            <v-col>
-              <v-card class="v-card-treeview" outlined tile>
-                <TreeView />
+            <v-col ref="colRef" id="colId">
+              <v-card
+                class="v-card-treeview"
+                ref="mainTreeView"
+                outlined
+                tile
+                id="treeCardId"
+              >
+                <TreeView id="treeViewId" />
               </v-card>
             </v-col>
             <v-col>
-              <v-card class="pa-2, v-card-tableview" outlined tile>
+              <v-card
+                class="pa-2, v-card-tableview"
+                ref="mainTableView"
+                outlined
+                tile
+              >
                 <TableView />
               </v-card>
               <v-divider></v-divider>
-              <v-card class="pa-2, v-card-snippetview" outlined tile>
+              <v-card
+                class="pa-2, v-card-snippetview"
+                ref="mainSnippetView"
+                outlined
+                tile
+              >
                 <SnippetView />
               </v-card>
             </v-col>
           </v-row>
+          <v-btn small @click="testFunctionMA()">Test function main APP</v-btn>
         </v-container>
       </section>
     </section>
@@ -80,6 +97,13 @@ export default class App extends Vue {
 
       this.$store.dispatch('setOpenFileContent', this.fileContent)
     }
+  }
+
+  public testFunctionMA() {
+    //@ts-ignore
+    this.$refs.mainTreeView.$el.scrollTop = 300
+    //@ts-ignore
+    console.log(this.$refs.mainTreeView.$el)
   }
 }
 </script>
