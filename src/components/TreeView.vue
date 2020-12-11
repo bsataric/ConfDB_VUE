@@ -18,7 +18,6 @@
       @update="updateTreeView"
       @update:open="updateOpenNodes"
       @update:active="updateActiveNodes"
-      transition
       ref="treeReference"
     >
       <template v-slot:prepend="{ item, open }">
@@ -1332,15 +1331,15 @@ export default class TreeView extends Vue {
         console.log('treeCardId: ' + document.getElementById('treeCardId'))
         let forced = this.forcedActive[0]
 
-        setTimeout(() => {
-          //TODO: maybe find a better solution for this
-          //@ts-ignore
-          this.$refs.treeReference.nodes[forced].vnode.$el.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-            inline: 'nearest',
-          })
-        }, 400)
+        //setTimeout(() => {
+        //TODO: maybe find a better solution for this
+        //@ts-ignore
+        this.$refs.treeReference.nodes[forced].vnode.$el.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+          inline: 'nearest',
+        })
+        // }, 400)
         //document.getElementById('treeViewId')?.scrollTo(0, 30)
         //@ts-ignore
         /* this.$vuetify.goTo(
