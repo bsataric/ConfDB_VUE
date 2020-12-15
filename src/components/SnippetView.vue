@@ -167,7 +167,7 @@ export default class SnippetView extends Vue {
       for (const [key, value] of Object.entries(paths)) {
         //console.log('KEY: ' + key)
         //console.log('VALUE: ' + value)
-        pathsText += value + '\n'
+        pathsText += '<a id=Paths.' + value + '>' + value + '</a>' + '\n'
       }
       return pathsText
     }
@@ -177,21 +177,21 @@ export default class SnippetView extends Vue {
     let array = e.target.id.split('.')
     //console.log(array[0])
     //console.log(array[1])
-    this.openNode(array[0], array[1])
+    this.openContainedInNode(array[0], array[1])
   }
 
-  async openNode(nodeType: string, nodeName: string) {
+  async openContainedInNode(nodeType: string, nodeName: string) {
     if (nodeType == 'Sequences') {
       await this.$store.dispatch('sequence/fetchSequenceAndSequenceId', {
         itemName: nodeName,
         forceOpenNode: true,
       }) // note the "await"
-    } else if (nodeType === 'paths') {
+    } else if (nodeType === 'Paths') {
       await this.$store.dispatch('path/fetchPathAndPathId', {
         itemName: nodeName,
         forceOpenNode: true,
       })
-    } else if (nodeType === 'modules') {
+    } /* else if (nodeType === 'modules') { //TODO: THIS PROBABLY WONT HAPPEN
       await this.$store.dispatch('module/fetchModuleAndModuleId', {
         itemName: nodeName,
         forceOpenNode: true,
@@ -201,7 +201,7 @@ export default class SnippetView extends Vue {
         itemName: nodeName,
         forceOpenNode: true,
       })
-    }
+    } */
   }
 }
 </script>
