@@ -20,16 +20,15 @@
         ></v-switch>
       </v-toolbar>
       <v-row>
-        <v-col ref="colRef" id="colId">
+        <v-col>
           <v-card
             class="v-card-treeview"
             ref="mainTreeView"
             outlined
             tile
-            id="treeCardId"
             :dark="getDarkMode"
           >
-            <TreeView id="treeViewId" />
+            <TreeView />
           </v-card>
         </v-col>
         <v-col>

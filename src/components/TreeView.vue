@@ -108,92 +108,6 @@ export default class TreeView extends Vue {
     console.log('active OLDVAL: ' + oldVal)
     //this.active = [val]
     this.forcedActive = [val]
-    console.log('FORCED ACTIVE WATCHER LENGTH: ' + this.forcedActive.length)
-    //@ts-ignore
-    //console.log(this.$el)
-    //this.$nextTick(() => {
-    //@ts-ignore
-    /*   this.$refs.treeReference.nodes[val].vnode.$el.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-        inline: 'nearest',
-      }) */
-    //@ts-ignore
-    /*     let rect = this.$refs.treeReference.nodes[
-        val
-      ].vnode.$el.getBoundingClientRect()
-      console.log(
-        //@ts-ignore
-        this.$refs.treeReference.nodes[val].vnode.$el
-      ) */
-    //@ts-ignore
-    /*    this.$refs.treeReference.nodes[val].vnode.$el.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      }) */
-    /*  console.log('RECT TOP: ' + rect.top)
-      console.log('RECT BOTTOM: ' + rect.bottom)
-      console.log('PARENT HEIGHT: ' + this.$parent.$el.clientHeight) */
-    /* this.$nextTick(() => {
-        //@ts-ignore
-        this.$refs.treeReference.nodes[val].vnode.$el.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        })
-      }) */
-    //@ts-ignore
-    //let nodeTop = this.$refs.treeReference.nodes[val].vnode.$el.offsetX
-    //console.log('NODE HEIGTH: ' + nodeTop)
-    //@ts-ignore
-    /*       this.$refs.treeReference.nodes[val].vnode.$el.focus()
-     */
-    //@ts-ignore
-    //this.$parent.$el.scrollTo(0, )
-    //TODO: try to calculate dynamically position of the node within the tree
-    //(height of a single node times something - but times what?)
-    //let clientHeight = this.$parent.$el.clientHeight.toFixed(0)
-    //let rectTop = rect.top.toFixed(0)
-    /*       let difference =
-        //@ts-ignore
-        (rect.top.toFixed(0) - this.$parent.$el.clientHeight.toFixed(0)) / 2
-      console.log(
-        //@ts-ignore
-        'DIFFERENCE: ' +
-          //@ts-ignore
-          difference.toFixed(0)
-      ) */
-    //console.log(this.$root.$refs)
-    //TODO: nothing seems to work - try forcing scroll on different divs to see if it makes any difference
-    //document.getElementById('colId')?.scrollTo(0, 300)
-    //@ts-ignore
-    //this.$parent.$el.scrollTo(0, 50) //difference.toFixed(0)
-    //console.log(this.$root.$refs)
-    //console.log('VALLLL: ' + val)
-    //})
-    //console.log(this.$refs.treeReference.nodes[val])
-    //console.log('ITEM EL 2 ' + this.$refs.HLTIterativeTrackingIteration1)
-    //let id = 'sequence.' + val.toString()
-
-    //console.log('ITEM 2 EL ' + this.$refs.sequence222)
-    //console.log('ID: ' + id)
-    //let element = document.getElementById(val.toString())
-    /*   console.log(
-      'ITEM EL 3 ' +
-        document.getElementById('sequenceHLTIterativeTrackingIteration1')
-    ) */
-    //this.$refs[val.toString()].scrollIntoView()
-    // eslint-disable-next-line no-unused-vars
-    //let value, key: any
-    //@ts-ignore
-    /*     for ([key, value] of Object.entries(
-      //@ts-ignore
-      this.$refs.treeReference.nodes[val].vnode
-    )) {
-      console.log('KEY: ' + key)
-      console.log('VALUE: ' + value)
-    } */
-    //@ts-ignore
-    //console.log('ELEMENT: ' + this.$refs.treeReference.items[val])
   }
 
   @Watch('getOpenNodeIds')
@@ -1289,65 +1203,17 @@ export default class TreeView extends Vue {
   }
 
   updated() {
-    console.log('COMPONENT UPDATED')
     this.$nextTick(() => {
-      //@ts-ignore
-      /*   this.$refs.treeReference.nodes[val].vnode.$el.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-        inline: 'nearest',
-      }) */
-      console.log('FORCED ACTIVE LENGTH: ' + this.forcedActive.length)
       if (this.forcedActive.length != 0) {
-        console.log('FORCED ACTIVE: ' + this.forcedActive)
-        //@ts-ignore
-        /*     let rect = this.$refs.treeReference.nodes[
-        this.forcedActive[0]
-      ].vnode.$el.getBoundingClientRect() */
-        /*  console.log(
-          //@ts-ignore
-          this.$refs.treeReference.nodes[this.forcedActive[0]].vnode.$el
-        ) */
-        //@ts-ignore
-        /*  this.$refs.treeReference.nodes[this.forcedActive[0]].vnode.$el &&
-          //@ts-ignore
-          this.$refs.treeReference.nodes[
-            this.forcedActive[0]
-          ].vnode.$el.scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest',
-          }) */
-        //@ts-ignore
-        /* let rect = this.$refs.treeReference.nodes[
-          this.forcedActive[0]
-        ].vnode.$el.getBoundingClientRect() */
-
-        //console.log('RECT TOP: ' + rect.top)
-        //console.log('RECT BOTTOM: ' + rect.bottom)
-        //@ts-ignore
-        //console.log('PARENT HEIGHT: ' + this.$parent.$el.clientHeight)
-        console.log('SCROLLING TO 10')
-        //this.$parent.$el.scrollTo(0, 10)
-        console.log('treeCardId: ' + document.getElementById('treeCardId'))
         let forced = this.forcedActive[0]
 
-        //setTimeout(() => {
-        //TODO: maybe find a better solution for this
         //@ts-ignore
         this.$refs.treeReference.nodes[forced].vnode.$el.scrollIntoView({
           behavior: 'smooth',
           block: 'start',
           inline: 'nearest',
         })
-        // }, 400)
-        //document.getElementById('treeViewId')?.scrollTo(0, 30)
-        //@ts-ignore
-        /* this.$vuetify.goTo(
-          //@ts-ignore
-          this.$refs.treeReference.nodes[this.forcedActive[0]].vnode.$el,
-          { duration: 300, offset: 0, easing: 'easeInOutCubic' }
-        ) */
-        //this.$parent.$el.scrollTo(0, 300)
+
         this.forcedActive = []
       }
     })
