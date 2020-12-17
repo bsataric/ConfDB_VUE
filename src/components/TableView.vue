@@ -68,12 +68,6 @@
       :expand-type="$props.expandType"
       :selection-type="$props.selectionType"
     >
-      <template v-slot:$expand="cell">
-        {{
-          `My name is ${cell.row.name},
-           this rowIndex is ${cell.rowIndex}.`
-        }}
-      </template>
       <template v-slot:trkd="cell">
         <v-checkbox v-model="cell.row.trkd"></v-checkbox>
       </template>
@@ -116,6 +110,10 @@ export default class TableView extends Vue {
     let prevBackground = this.backGroundColor
     this.activeColor = prevBackground
     this.backGroundColor = prevActive
+    if (this.activeHeaderBGColor == this.headerBackGroundColor1)
+      this.activeHeaderBGColor = this.headerBackGroundColor2
+    else this.activeHeaderBGColor = this.headerBackGroundColor1
+    this.changeHeaderBGColor(this.activeHeaderBGColor)
   }
 
   private getSelectedNodeType!: any
@@ -138,8 +136,11 @@ export default class TableView extends Vue {
   @Prop({ default: false }) readonly selectionType!: boolean
 
   //TODO: fix the styling later to look like Vuetify but for now this is OK
-  private activeColor: any = '#212121'
-  private backGroundColor: any = 'white'
+  private activeColor: string = '#212121'
+  private backGroundColor: string = 'white'
+  private headerBackGroundColor1: string = '#f8f8f9'
+  private headerBackGroundColor2: string = '#37474F'
+  private activeHeaderBGColor: string = this.headerBackGroundColor1
   private fontSize: any = 16
   private font_family: any = 'Roboto, sans-serif'
 
@@ -432,6 +433,14 @@ export default class TableView extends Vue {
     //console.log(selectedModulePath)
     //console.log(pathContainngModule)
     return selectedModulePath
+  }
+
+  //Table header BG color has to be changed this way
+  public changeHeaderBGColor(backgroundColor: string) {
+    let cols: any = document.getElementsByClassName('zk-table__header-row')
+    for (let i = 0; i < cols.length; i++) {
+      cols[i].style.backgroundColor = backgroundColor
+    }
   }
 }
 </script>
