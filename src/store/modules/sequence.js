@@ -128,6 +128,70 @@ export const actions = {
         })
     }
   },
+  fetchSequenceViaId({ commit, dispatch, getters }, payload) {
+    let sequenceObj = getters.getSequenceById(payload.itemId)
+    let sequenceId = payload.itemId
+    console.log('SEQUENCE ID TYPE:' + typeof payload.itemId)
+    let name = sequenceObj.name
+    let sequenceParams = sequenceObj.value
+    let sequenceParamLength = sequenceObj.paramLength
+    let forceOpenNode = payload.forceOpenNode
+    console.log('fetchSequenceViaId')
+    //console.log('sequenceObj: ' + JSON.stringify(sequenceObj))
+    //console.log('sequenceId: ' + sequenceId)
+    //console.log('sequenceParamLength' + sequenceParamLength)
+    if (sequenceParams) {
+      commit(
+        'SET_SELECTED_NODE_VIA_ID',
+        {
+          selectedNodeId: sequenceId,
+          forceOpenNode: forceOpenNode,
+        },
+        { root: true }
+      )
+      //commit('SET_SELECTED_NODE_TYPE', 'sequence', { root: true })
+      //commit('SET_SELECTED_NODE_NAME', name, { root: true })
+      commit('SET_SEQUENCE', {
+        name: name,
+        sequenceId: sequenceId,
+        sequenceParams: sequenceParams,
+        sequenceParamLength: sequenceParamLength,
+      })
+    } else {
+      //TODO: new Sequence on right click?
+      return SequenceService.getSequenceByName(name)
+        .then((response) => {
+          //TODO: generate sequenceId
+          // let sequenceId = sequenceObj.sequenceId
+          commit(
+            'SET_SELECTED_NODE_VIA_ID', //TODO: FIX
+            {
+              selectedNodeType: 'sequence',
+              selectedNodeName: name,
+              selectedNodeId: sequenceId,
+              selectedNodeParamLength: response.data.length,
+            },
+            { root: true }
+          )
+          //commit('SET_SELECTED_NODE_TYPE', 'sequence', { root: true })
+          //commit('SET_SELECTED_NODE_NAME', name, { root: true })
+          //DUMMY
+          commit('SET_SEQUENCE', {
+            name: name,
+            sequenceId: -1,
+            sequenceParams: response.data,
+            sequenceParamLength: response.data.length,
+          })
+        })
+        .catch((error) => {
+          const notification = {
+            type: 'error',
+            message: 'There was a problem fetching sequence ' + error.message,
+          }
+          dispatch('notification/add', notification, { root: true })
+        })
+    }
+  },
 }
 export const getters = {
   seqLength: (state) => {
@@ -152,6 +216,26 @@ export const getters = {
         //console.log('PARAMLENGTH: ' + Object.entries(value).length)
         paramLength = Object.entries(value).length
         return { value, sequenceId, paramLength }
+      }
+    }
+  },
+  getSequenceById: (state, getters, rootState, rootGetters) => (id) => {
+    let nodeIDToObjectMap = rootGetters['getNodeIDToObjectMap']
+    let name = nodeIDToObjectMap[id].name
+    let paramLength = 0
+
+    for (const [key, value] of Object.entries(state.sequences)) {
+      /*    console.log('KEY ' + key)
+      console.log('VALUE ' + value) */
+
+      if (key == name) {
+        /*    for (const [key1, value1] of Object.entries(value)) {
+          console.log('key1 ' + key1)
+          console.log('value1 ' + value1)
+        } */
+        //console.log('PARAMLENGTH: ' + Object.entries(value).length)
+        paramLength = Object.entries(value).length
+        return { value, name, paramLength }
       }
     }
   },
