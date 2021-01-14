@@ -129,31 +129,36 @@ export default new Vuex.Store({
       console.log(payload.selectedNodeId)
       console.log(payload.selectedNodeParamLength) */
       //console.log(typeof state.selectedNodeId)
-
+      console.log('SELECTED NODE ID: ' + payload.selectedNodeI)
       state.selectedNodeId = payload.selectedNodeId //get all info just via ID
-      //console.log(typeof state.selectedNodeId)
-
+      console.log(typeof state.selectedNodeId)
+      console.log(
+        'state.nodeIDToObjectMap[payload.selectedNodeId]' +
+          JSON.stringify(state.nodeIDToObjectMap[payload.selectedNodeId])
+      )
       state.selectedNodeType =
         state.nodeIDToObjectMap[payload.selectedNodeId].type
       state.selectedNodeName =
         state.nodeIDToObjectMap[payload.selectedNodeId].name
+      console.log('state.selectedNodeName ' + state.selectedNodeName)
       state.selectedNodeParamLength =
         state.nodeIDToObjectMap[payload.selectedNodeId].itemChildrenLength
       state.selectedNodeParentId =
         state.nodeIDToObjectMap[payload.selectedNodeId].parentNodeId
       let forceOpenNode = payload.forceOpenNode //if node is opened by foce open it's parent as well
 
-      //console.log('FORCED OPEN NODE: ' + forceOpenNode)
+      console.log('FORCED OPEN NODE: ' + forceOpenNode)
       if (forceOpenNode) {
         state.forcedActiveNodeId = state.selectedNodeId
+        console.log('FORCED NODE ID: ' + state.forcedActiveNodeId)
       }
 
       if (state.selectedNodeParamLength == 0) {
         console.log('ITEM CHILDREN ZERO!')
         return
       }
-      let dummyArray = [1, 2]
-      if (state.selectedNodeId == 1) console.log('UMRI')
+      //let dummyArray = [1, 2]
+      //if (state.selectedNodeId == 1) console.log('UMRI')
       /*   console.log(typeof state.selectedNodeId)
       console.log(typeof 1)
       console.log(typeof state.openNodeIds)

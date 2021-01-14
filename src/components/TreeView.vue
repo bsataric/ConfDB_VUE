@@ -1204,6 +1204,13 @@ export default class TreeView extends Vue {
     /*   console.log(
       'this.getNodeIDToObjectMap:' + JSON.stringify(this.getNodeIDToObjectMap)
     ) */
+    /* console.log(
+      'this.getNodeIDToObjectMap[itemId]' + this.getNodeIDToObjectMap[itemId]
+    ) */
+    //TODO: leaf nodes for now are not inserted in object map
+    if (this.getNodeIDToObjectMap[itemId] == undefined) return
+    //if (this.getNodeIDToObjectMap[itemId].type == undefined) return
+
     console.log('SELECTED NODE TYPE: ' + this.getNodeIDToObjectMap[itemId].type)
 
     let itemType = this.getNodeIDToObjectMap[itemId].type
@@ -1227,17 +1234,25 @@ export default class TreeView extends Vue {
         itemId: itemId,
         forceOpenNode: false,
       })
-    } /* else if (itemType === 'modules') {
-      await this.$store.dispatch('module/fetchModuleAndModuleId', {
+    } else if (itemType === 'modules') {
+      /* await this.$store.dispatch('module/fetchModuleAndModuleId', {
         itemName: itemName,
+        forceOpenNode: false,
+      }) */
+      await this.$store.dispatch('module/fetchModuleViaId', {
+        itemId: itemId,
         forceOpenNode: false,
       })
     } else if (itemType === 'pset') {
-      await this.$store.dispatch('pset/fetchPSetAndPSetId', {
+      /* await this.$store.dispatch('pset/fetchPSetAndPSetId', {
         itemName: itemName,
         forceOpenNode: false,
+      })*/
+      await this.$store.dispatch('pset/fetchPSetViaId', {
+        itemId: itemId,
+        forceOpenNode: false,
       })
-    } */ else {
+    } else {
       console.log('SPECIAL CASE!')
       /*   console.log(itemType)
       console.log(itemName)
@@ -1372,6 +1387,15 @@ export default class TreeView extends Vue {
 
   public updateActiveNodes(array: any) {
     console.log('THIS ACTIVE: ' + array)
+    let difference: number = parseInt(
+      this.active
+        .filter((x) => !array.includes(x))
+        .concat(array.filter((x) => !this.active.includes(x)))
+    )
+    console.log('DIFFERENCE:' + difference)
+    console.log('DIFFERENCE TYPE: ' + typeof difference)
+    if (Object.keys(this.getNodeIDToObjectMap).length !== 0)
+      this.fetchNodeById(difference)
     this.active = array
   }
 

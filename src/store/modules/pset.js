@@ -124,6 +124,65 @@ export const actions = {
         })
     }
   },
+  fetchPSetViaId({ commit, getters, dispatch }, payload) {
+    let psetObj = getters.getPSetById(payload.itemId)
+    let psetId = payload.itemId
+    let name = psetObj.name
+    let psetParams = psetObj.value
+    let psetParamLength = psetObj.paramLength
+    let forceOpenNode = payload.forceOpenNode
+    console.log('fetchPSetViaId')
+    //console.log('psetObj: ' + JSON.stringify(psetObj))
+    //console.log('psetId: ' + psetId)
+    //console.log('psetParams' + psetParams)
+    console.log('psetParamLength: ' + psetParamLength)
+
+    if (psetParams) {
+      commit(
+        'SET_SELECTED_NODE_VIA_ID',
+        {
+          selectedNodeId: psetId,
+          forceOpenNode: forceOpenNode,
+        },
+        { root: true }
+      )
+      commit('SET_PSET', {
+        name: name,
+        psetId: psetId,
+        psetParams: psetParams,
+        psetParamLength: psetParamLength,
+      })
+    } else {
+      return PSetService.getPSetByName(name)
+        .then((response) => {
+          //TODO: generate psetId
+          // let psetId = psetObj.psetId
+          commit(
+            'SET_SELECTED_NODE_VIA_ID', //TODO: FIX
+            {
+              selectedNodeType: 'pset',
+              selectedNodeName: name,
+              selectedNodeId: psetId,
+              selectedNodeParamLength: response.data.length,
+            },
+            { root: true }
+          )
+          commit('SET_PSET', {
+            name: name,
+            psetId: -1,
+            pathParams: response.data,
+            selectedNodeParamLength: response.data.length,
+          })
+        })
+        .catch((error) => {
+          const notification = {
+            type: 'error',
+            message: 'There was a problem fetching pset ' + error.message,
+          }
+          dispatch('notification/add', notification, { root: true })
+        })
+    }
+  },
 }
 export const getters = {
   psetLength: (state) => {
@@ -148,6 +207,26 @@ export const getters = {
         //console.log('VALUE: ' + JSON.stringify(value))
         paramLength = Object.entries(value).length
         return { value, psetId, paramLength }
+      }
+    }
+  },
+  getPSetById: (state, getters, rootState, rootGetters) => (id) => {
+    let nodeIDToObjectMap = rootGetters['getNodeIDToObjectMap']
+    let name = nodeIDToObjectMap[id].name
+    let paramLength = 0
+
+    for (const [key, value] of Object.entries(state.psets)) {
+      /*    console.log('KEY ' + key)
+      console.log('VALUE ' + value) */
+
+      if (key == name) {
+        /*    for (const [key1, value1] of Object.entries(value)) {
+          console.log('key1 ' + key1)
+          console.log('value1 ' + value1)
+        } */
+        //console.log('PARAMLENGTH: ' + Object.entries(value).length)
+        paramLength = Object.entries(value).length
+        return { value, name, paramLength }
       }
     }
   },

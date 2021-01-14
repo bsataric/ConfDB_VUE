@@ -131,7 +131,6 @@ export const actions = {
   fetchSequenceViaId({ commit, dispatch, getters }, payload) {
     let sequenceObj = getters.getSequenceById(payload.itemId)
     let sequenceId = payload.itemId
-    console.log('SEQUENCE ID TYPE:' + typeof payload.itemId)
     let name = sequenceObj.name
     let sequenceParams = sequenceObj.value
     let sequenceParamLength = sequenceObj.paramLength
@@ -158,7 +157,7 @@ export const actions = {
         sequenceParamLength: sequenceParamLength,
       })
     } else {
-      //TODO: new Sequence on right click?
+      //this assumes that this node doesn't exist
       return SequenceService.getSequenceByName(name)
         .then((response) => {
           //TODO: generate sequenceId
@@ -253,26 +252,42 @@ export const getters = {
   getSequences: (state) => {
     return state.sequences
   },
-
-  getSequencesContainingModule: (state) => (moduleName) => {
+  //TODO: fix this so it returns main sequence not leaf ones
+  getSequencesContainingModule: (state, getters, rootState, rootGetters) => (
+    moduleName
+  ) => {
     //some logic here
-    let sequences = []
+    //let sequences = []
+    let sequencesIdNameMap = {} //this is reduntant but we miss ID from server
+    let nodeIDToObjectMap = rootGetters['getNodeIDToObjectMap']
 
     for (const [key, value] of Object.entries(state.sequences)) {
       //console.log('KEY: ' + JSON.stringify(key))
       //console.log('VALUE: ' + JSON.stringify(value))
       // eslint-disable-next-line no-unused-vars
       for (const [key1, value1] of Object.entries(value)) {
-        //console.log('KEY1: ' + key1)
-        //console.log('value1: ' + value1[0])
-        //console.log('value2: ' + value1[1])
+        /* console.log('KEY1: ' + key1)
+        console.log('value1: ' + value1[0])
+        console.log('value2: ' + value1[1]) */
         if (value1[0] == 'modules') {
-          if (value1[1] == moduleName) sequences.push(key)
+          if (value1[1] == moduleName) {
+            /*  console.log('KEY1: ' + key1)
+            console.log('value1: ' + value1[0])
+            console.log('value2: ' + value1[1]) */
+            //now go through main map and find IDs for the names
+            for (const [key2, value2] of Object.entries(nodeIDToObjectMap)) {
+              if (value2.name == key) {
+                //sequences.push(key)
+                sequencesIdNameMap[key2] = key
+                break
+              }
+            }
+          }
         }
       }
     }
     //console.log('getSequencesContainingModule SEQUENCES: ' + sequences)
-    return sequences //if module is not direct part of the path (but part of the sequence etc)
+    return sequencesIdNameMap //if module is not direct part of the path (but part of the sequence etc)
   },
   //create snippet text here
   // eslint-disable-next-line no-unused-vars
