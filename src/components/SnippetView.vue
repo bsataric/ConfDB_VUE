@@ -147,36 +147,38 @@ export default class SnippetView extends Vue {
       //console.log('AAAA')
       let sequences = this.getSelectedModuleSequences
       this.arrayOfSelectedObjects = sequences
-      let sequencesText = ''
+      let sequencesText = '<ul>'
       //console.log(sequences)
       // eslint-disable-next-line no-unused-vars
       for (const [key, value] of Object.entries(sequences)) {
         //console.log('KEY: ' + key)
         //console.log('VALUE: ' + value)
         sequencesText +=
-          '<a id=Sequences.' +
+          '<li><a id=Sequences.' +
           key +
           '.' +
           value +
           '>' +
           value +
           '</a>' +
-          '</br>'
+          '</li>'
       }
+      sequencesText += '</ul>'
       return sequencesText
     } else if (this.activeTab == 6) {
       //console.log('AAAA')
       let paths = this.getSelectedModulePaths
       this.arrayOfSelectedObjects = paths
-      let pathsText = ''
+      let pathsText = '<ul>'
       //console.log(paths)
       // eslint-disable-next-line no-unused-vars
       for (const [key, value] of Object.entries(paths)) {
-        console.log('KEY: ' + key)
-        console.log('VALUE: ' + value)
-        pathsText +=
-          '<a id=Paths.' + key + '.' + value + '>' + value + '</a></br>'
+        //console.log('KEY: ' + key)
+        //console.log('VALUE: ' + value)
+        pathsText += //fix new line
+          '<li><a id=Paths.' + key + '.' + value + ' >' + value + '</a></li>'
       }
+      pathsText += '</ul>'
       return pathsText
     }
     return ''
