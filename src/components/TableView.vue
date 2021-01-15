@@ -417,7 +417,12 @@ export default class TableView extends Vue {
   public getPaths(nodeType: string) {
     if (nodeType == 'modules') {
       console.log('PATHS!: ' + this.getSelectedModulePaths)
-      return this.getSelectedModulePaths
+      let values: Array<string> = []
+      // eslint-disable-next-line no-unused-vars
+      for (const [key, value] of Object.entries(this.getSelectedModulePaths)) {
+        values.push(value)
+      }
+      return values
     } else if (nodeType == 'sequence') {
       return []
     } else if (nodeType == 'path') {

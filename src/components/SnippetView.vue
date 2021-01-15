@@ -154,7 +154,14 @@ export default class SnippetView extends Vue {
         //console.log('KEY: ' + key)
         //console.log('VALUE: ' + value)
         sequencesText +=
-          '<a id=Sequences.' + key + '.' + value + '>' + value + '</a>' + '\n'
+          '<a id=Sequences.' +
+          key +
+          '.' +
+          value +
+          '>' +
+          value +
+          '</a>' +
+          '</br>'
       }
       return sequencesText
     } else if (this.activeTab == 6) {
@@ -165,9 +172,10 @@ export default class SnippetView extends Vue {
       //console.log(paths)
       // eslint-disable-next-line no-unused-vars
       for (const [key, value] of Object.entries(paths)) {
-        //console.log('KEY: ' + key)
-        //console.log('VALUE: ' + value)
-        pathsText += '<a id=Paths.' + value + '>' + value + '</a>' + '\n'
+        console.log('KEY: ' + key)
+        console.log('VALUE: ' + value)
+        pathsText +=
+          '<a id=Paths.' + key + '.' + value + '>' + value + '</a></br>'
       }
       return pathsText
     }
@@ -186,7 +194,7 @@ export default class SnippetView extends Vue {
         itemName: nodeName,
         forceOpenNode: true,
       })  */ // note the "await"
-      console.log('FORCEEEEEED: ' + itemId)
+      //console.log('FORCEEEEEED: ' + itemId)
       await this.$store.dispatch('sequence/fetchSequenceViaId', {
         itemId: itemId,
         forceOpenNode: true,
@@ -196,6 +204,10 @@ export default class SnippetView extends Vue {
         itemName: nodeName,
         forceOpenNode: true,
       }) */
+      await this.$store.dispatch('path/fetchPathViaId', {
+        itemId: itemId,
+        forceOpenNode: true,
+      })
     } /* else if (nodeType === 'modules') { //TODO: THIS PROBABLY WONT HAPPEN
       await this.$store.dispatch('module/fetchModuleAndModuleId', {
         itemName: nodeName,

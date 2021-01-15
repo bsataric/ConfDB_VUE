@@ -251,17 +251,23 @@ export const getters = {
     //this.$store.getters['path/getPathsContainingModule'](state.module.name)
   },
   getSelectedModulePaths: (state, getters, rootState, rootGetters) => {
-    let modulePaths = []
+    let modulePaths = {}
     let sequencesContainingModule = []
     modulePaths = rootGetters['path/getPathsContainingModule'](state.moduleName)
+    console.log('MODULE PATHS: ' + JSON.stringify(modulePaths))
     sequencesContainingModule = rootGetters[
       'sequence/getSequencesContainingModule'
     ](state.moduleName)
-    for (let i = 0; i < sequencesContainingModule.length; i++) {
-      let sequencePath = rootGetters['path/getPathsContainingSequence'](
-        sequencesContainingModule[i]
-      )
-      modulePaths.push(sequencePath)
+    console.log(
+      'SEQUENCES CONTAINING MODULE: ' +
+        JSON.stringify(sequencesContainingModule)
+    )
+    // eslint-disable-next-line no-unused-vars
+    for (const [key, value] of Object.entries(sequencesContainingModule)) {
+      //console.log('sequencesContainingModule[i] ' + value)
+      let sequencePaths = rootGetters['path/getPathsContainingSequence'](value)
+      console.log('SEQUENCE PATHS: ' + JSON.stringify(sequencePaths))
+      //modulePaths.push(sequencePaths)
     }
     return modulePaths
     //this.$store.getters['path/getPathsContainingModule'](state.module.name)

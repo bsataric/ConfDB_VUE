@@ -246,9 +246,11 @@ export const getters = {
   getPaths: (state) => {
     return state.paths
   },
-  getPathsContainingModule: (state) => (moduleName) => {
-    //some logic here
-    let paths = []
+  getPathsContainingModule: (state, getters, rootState, rootGetters) => (
+    moduleName
+  ) => {
+    let pathsIdNameMap = {} //this is reduntant but we miss ID from server
+    let nodeIDToObjectMap = rootGetters['getNodeIDToObjectMap']
 
     for (const [key, value] of Object.entries(state.paths)) {
       //console.log('KEY: ' + JSON.stringify(key))
@@ -258,16 +260,31 @@ export const getters = {
         //console.log('KEY1: ' + key1)
         //console.log('value1: ' + value1[0])
         if (value1[0] == 'modules') {
-          if (value1[1] == moduleName) paths.push(key)
+          if (value1[1] == moduleName) {
+            //paths.push(key)
+            for (const [key2, value2] of Object.entries(nodeIDToObjectMap)) {
+              if (value2.name == key && value2.itemChildrenLength != 0) {
+                //sequences.push(key)
+                //console.log('VALUE2: ' + JSON.stringify(value2))
+                //console.log('PARAMLENGTH: ' + value2.itemChildrenLength)
+                pathsIdNameMap[key2] = key
+                break
+              }
+            }
+          }
         }
       }
     }
-    return paths //if module is not direct part of the path (but part of the sequence etc)
+    //console.log('MODULE PATHS: ' + JSON.stringify(pathsIdNameMap))
+    return pathsIdNameMap //if module is not direct part of the path (but part of the sequence etc)
   },
 
-  getPathsContainingSequence: (state) => (sequenceName) => {
+  getPathsContainingSequence: (state, getters, rootState, rootGetters) => (
+    sequenceName
+  ) => {
     //some logic here
-    let paths = []
+    let pathsIdNameMap = {} //this is reduntant but we miss ID from server
+    let nodeIDToObjectMap = rootGetters['getNodeIDToObjectMap']
 
     for (const [key, value] of Object.entries(state.paths)) {
       //console.log('KEY: ' + JSON.stringify(key))
@@ -277,11 +294,22 @@ export const getters = {
         //console.log('KEY1: ' + key1)
         //console.log('value1: ' + value1[0])
         if (value1[0] == 'sequences') {
-          if (value1[1] == sequenceName) paths.push(key)
+          if (value1[1] == sequenceName) {
+            //paths.push(key)
+            for (const [key2, value2] of Object.entries(nodeIDToObjectMap)) {
+              if (value2.name == key && value2.itemChildrenLength != 0) {
+                //sequences.push(key)
+                //console.log('VALUE2: ' + JSON.stringify(value2))
+                //console.log('PARAMLENGTH: ' + value2.itemChildrenLength)
+                pathsIdNameMap[key2] = key
+                break
+              }
+            }
+          }
         }
       }
     }
-    return paths
+    return pathsIdNameMap
   },
   //create snippet text here
   getSelectedPathSnippet: (state) => {

@@ -252,7 +252,7 @@ export const getters = {
   getSequences: (state) => {
     return state.sequences
   },
-  //TODO: fix this so it returns main sequence not leaf ones
+
   getSequencesContainingModule: (state, getters, rootState, rootGetters) => (
     moduleName
   ) => {
@@ -276,8 +276,10 @@ export const getters = {
             console.log('value2: ' + value1[1]) */
             //now go through main map and find IDs for the names
             for (const [key2, value2] of Object.entries(nodeIDToObjectMap)) {
-              if (value2.name == key) {
+              if (value2.name == key && value2.itemChildrenLength != 0) {
                 //sequences.push(key)
+                //console.log('VALUE2: ' + JSON.stringify(value2))
+                //console.log('PARAMLENGTH: ' + value2.itemChildrenLength)
                 sequencesIdNameMap[key2] = key
                 break
               }

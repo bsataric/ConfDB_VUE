@@ -11,6 +11,7 @@
       :items="items"
       :activatable="true"
       dense
+      item-key="id"
       item-text=""
       open-on-click
       :open="open"
@@ -1358,13 +1359,13 @@ export default class TreeView extends Vue {
       console.log('VALUE: ' + value)
     } */
 
-    console.log(this.$parent.$vuetify)
+    console.log(this.$refs.treeReference)
     //@ts-ignore
-    console.log(this.$refs.treeReference.nodes[222].vnode.$el)
+    console.log(this.$refs.treeReference.nodes[1].vnode.$el)
     //@ts-ignore
     this.$vuetify.goTo(0, {
       //@ts-ignore
-      container: this.$refs.treeReference.nodes[222].vnode.$el,
+      container: this.$refs.treeReference.nodes[1].vnode.$el,
     })
 
     //console.log('OPENNNNN: ' + this.open)
@@ -1387,15 +1388,8 @@ export default class TreeView extends Vue {
 
   public updateActiveNodes(array: any) {
     console.log('THIS ACTIVE: ' + array)
-    let difference: number = parseInt(
-      this.active
-        .filter((x) => !array.includes(x))
-        .concat(array.filter((x) => !this.active.includes(x)))
-    )
-    console.log('DIFFERENCE:' + difference)
-    console.log('DIFFERENCE TYPE: ' + typeof difference)
     if (Object.keys(this.getNodeIDToObjectMap).length !== 0)
-      this.fetchNodeById(difference)
+      this.fetchNodeById(array[0])
     this.active = array
   }
 
@@ -1434,7 +1428,6 @@ export default class TreeView extends Vue {
     this.$nextTick(() => {
       if (this.forcedActive.length != 0) {
         let forced = this.forcedActive[0]
-
         //@ts-ignore
         this.$refs.treeReference.nodes[forced].vnode.$el.scrollIntoView({
           behavior: 'smooth',
