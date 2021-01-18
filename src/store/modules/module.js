@@ -184,7 +184,13 @@ export const getters = {
       let sequencePaths = rootGetters['path/getPathsContainingSequence'](value)
       console.log('SEQUENCE PATHS: ' + JSON.stringify(sequencePaths))
       //modulePaths.push(sequencePaths)
+      if (
+        Object.keys(sequencePaths).length != 0 &&
+        sequencePaths.constructor != Object
+      )
+        modulePaths = [...modulePaths, sequencePaths] //TODO: test (config has to change)
     }
+    console.log('ALL MODULE PATHS: ' + JSON.stringify(modulePaths))
     return modulePaths
     //this.$store.getters['path/getPathsContainingModule'](state.module.name)
   },

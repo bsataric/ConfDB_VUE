@@ -38,6 +38,7 @@ import { mapGetters } from 'vuex'
       //sequences
       getSelectedSequenceSnippet: 'sequence/getSelectedSequenceSnippet',
       getSelectedSequenceSequences: 'sequence/getSelectedSequenceSequences',
+      getSelectedSequencePaths: 'sequence/getSelectedSequencePaths',
       //paths
       getPathSnippet: 'path/getSelectedPathSnippet',
       //psets
@@ -51,12 +52,17 @@ export default class SnippetView extends Vue {
   //private triggered: boolean = false
   private getSelectedNodeType!: any
   private getSelectedNodeName!: any
+  //modules
   private getSelectedModuleSnippet!: any
-  private getSelectedSequenceSequences!: any
-  private getSelectedSequenceSnippet!: any
   private getSelectedModuleSequences!: any
   private getSelectedModulePaths!: any
+  //sequences
+  private getSelectedSequenceSnippet!: any
+  private getSelectedSequenceSequences!: any
+  private getSelectedSequencePaths!: any
+  //paths
   private getPathSnippet!: any
+  //psets
   private getPSetSnippet!: any
   private previousNodeName: string = ''
   private areaText: any = '<br>aaaa</br>'
@@ -121,7 +127,66 @@ export default class SnippetView extends Vue {
       sequencesText += '</ul>'
       return sequencesText
     } else if (nodeType == 'sequence') {
-      return this.getSelectedSequenceSnippet
+      let sequences = this.getSelectedSequenceSequences
+      console.log('SEQUENCESSSSS: ' + sequences)
+      this.arrayOfSelectedObjects = sequences
+      let sequencesText = '<ul>'
+      //console.log(sequences)
+      // eslint-disable-next-line no-unused-vars
+      for (const [key, value] of Object.entries(sequences)) {
+        //console.log('KEY: ' + key)
+        //console.log('VALUE: ' + value)
+        sequencesText +=
+          '<li><a id=Sequences.' +
+          key +
+          '.' +
+          value +
+          '>' +
+          value +
+          '</a>' +
+          '</li>'
+      }
+      sequencesText += '</ul>'
+      return sequencesText
+    } else if (nodeType == 'paths') {
+      return this.getPathSnippet
+    } else if (nodeType == 'pset') {
+      return this.getPSetSnippet
+    }
+    return ''
+  }
+
+  public getSelectedNodeContainedInPaths(nodeType: string) {
+    //console.log('SELECTED NODE TYPE: ' + nodeType)
+    //this.triggered = !this.triggered
+    if (nodeType == 'modules') {
+      let paths = this.getSelectedModulePaths
+      this.arrayOfSelectedObjects = paths
+      let pathsText = '<ul>'
+      //console.log(paths)
+      // eslint-disable-next-line no-unused-vars
+      for (const [key, value] of Object.entries(paths)) {
+        //console.log('KEY: ' + key)
+        //console.log('VALUE: ' + value)
+        pathsText += //fix new line
+          '<li><a id=Paths.' + key + '.' + value + ' >' + value + '</a></li>'
+      }
+      pathsText += '</ul>'
+      return pathsText
+    } else if (nodeType == 'sequence') {
+      let paths = this.getSelectedSequencePaths
+      this.arrayOfSelectedObjects = paths
+      let pathsText = '<ul>'
+      //console.log(paths)
+      // eslint-disable-next-line no-unused-vars
+      for (const [key, value] of Object.entries(paths)) {
+        //console.log('KEY: ' + key)
+        //console.log('VALUE: ' + value)
+        pathsText += //fix new line
+          '<li><a id=Paths.' + key + '.' + value + ' >' + value + '</a></li>'
+      }
+      pathsText += '</ul>'
+      return pathsText
     } else if (nodeType == 'paths') {
       return this.getPathSnippet
     } else if (nodeType == 'pset') {
@@ -173,19 +238,7 @@ export default class SnippetView extends Vue {
       return this.getSelectedNodeContainedInSequences(this.getSelectedNodeType)
     } else if (this.activeTab == 6) {
       //console.log('ACTIVE TAB 6')
-      let paths = this.getSelectedModulePaths
-      this.arrayOfSelectedObjects = paths
-      let pathsText = '<ul>'
-      //console.log(paths)
-      // eslint-disable-next-line no-unused-vars
-      for (const [key, value] of Object.entries(paths)) {
-        //console.log('KEY: ' + key)
-        //console.log('VALUE: ' + value)
-        pathsText += //fix new line
-          '<li><a id=Paths.' + key + '.' + value + ' >' + value + '</a></li>'
-      }
-      pathsText += '</ul>'
-      return pathsText
+      return this.getSelectedNodeContainedInPaths(this.getSelectedNodeType)
     }
     return ''
   }

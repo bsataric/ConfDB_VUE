@@ -194,9 +194,7 @@ export const getters = {
     //console.log('getSequencesContainingModule SEQUENCES: ' + sequences)
     return sequencesIdNameMap //if module is not direct part of the path (but part of the sequence etc)
   },
-  getSequencesContainingSequence: (state, getters, rootState, rootGetters) => (
-    moduleName
-  ) => {
+  getSelectedSequenceSequences: (state, getters, rootState, rootGetters) => {
     //some logic here
     //let sequences = []
     let sequencesIdNameMap = {} //this is reduntant but we miss ID from server
@@ -210,8 +208,8 @@ export const getters = {
         /* console.log('KEY1: ' + key1)
         console.log('value1: ' + value1[0])
         console.log('value2: ' + value1[1]) */
-        if (value1[0] == 'modules') {
-          if (value1[1] == moduleName) {
+        if (value1[0] == 'sequences') {
+          if (value1[1] == state.sequenceName) {
             /*  console.log('KEY1: ' + key1)
             console.log('value1: ' + value1[0])
             console.log('value2: ' + value1[1]) */
@@ -229,8 +227,20 @@ export const getters = {
         }
       }
     }
-    //console.log('getSequencesContainingModule SEQUENCES: ' + sequences)
-    return sequencesIdNameMap //if module is not direct part of the path (but part of the sequence etc)
+    //console.log('getSelectedSequenceSequences SEQUENCES: ' + sequences)
+    return sequencesIdNameMap //if sequence is not direct part of the path (but part of the sequence etc)
+  },
+  getSelectedSequencePaths: (state, getters, rootState, rootGetters) => {
+    let sequencePaths = {}
+
+    // eslint-disable-next-line no-unused-vars
+    sequencePaths = rootGetters['path/getPathsContainingSequence'](
+      state.sequenceName
+    )
+    console.log('SEQUENCE PATHS: ' + JSON.stringify(sequencePaths))
+
+    //console.log('ALL MODULE PATHS: ' + JSON.stringify(sequencePaths))
+    return sequencePaths
   },
   //create snippet text here
   // eslint-disable-next-line no-unused-vars

@@ -61,7 +61,7 @@ export default new Vuex.Store({
         state.forcedActiveNodeId = state.selectedNodeId
         //console.log('FORCED NODE ID: ' + state.forcedActiveNodeId)
       }
-
+      //TODO FIX LEAF SEQUENCE DISPLAYING
       if (state.selectedNodeParamLength == 0) {
         console.log('ITEM CHILDREN ZERO!')
         return
