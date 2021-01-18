@@ -70,7 +70,7 @@ export const actions = {
     let pathParams = pathObj.value
     let pathParamLength = pathObj.paramLength
     let forceOpenNode = payload.forceOpenNode
-    console.log('fetchPathViaId')
+    //console.log('fetchPathViaId')
     //console.log('pathObj: ' + JSON.stringify(pathObj))
     //console.log('pathId: ' + pathId)
     //console.log('pathParamLength ' + pathParamLength)

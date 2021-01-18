@@ -70,7 +70,7 @@ export const actions = {
     let moduleParams = moduleObj.value
     let moduleParamLength = moduleObj.paramLength
     let forceOpenNode = payload.forceOpenNode
-    console.log('fetchModuleViaId')
+    //console.log('fetchModuleViaId')
     //console.log('FORCE OPEN 1: ' + forceOpenNode)
     //console.log('moduleObj: ' + JSON.stringify(moduleObj))
     //console.log('moduleParams: ' + moduleParams)

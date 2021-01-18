@@ -36,8 +36,7 @@
     "tests/**/*.tsx",
     "src/store/helpers/SnippetCreator.js",
     "src/store/helper_functions.js",
-    "src/store/store.ts",
-    "src/store/modules/sequence.js"
+    "src/store/store.ts"
   ],
   "exclude": ["node_modules", "**/*.spec.ts"]
 }

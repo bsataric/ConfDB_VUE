@@ -11,3 +11,12 @@ export interface MainVuexState {
   openFileContent: string
   darkMode: boolean
 }
+//TODO
+export interface SequencesVuexState {
+  sequences: Map<string, Map<string, string>>
+  sequencesTotal: number
+  sequenceParams: {} //TODO
+  sequenceName: ''
+  sequenceId: -1 //current selected module ID
+  sequenceParamLength: 0
+}

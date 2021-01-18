@@ -71,7 +71,7 @@ export const actions = {
     let sequenceParams = sequenceObj.value
     let sequenceParamLength = sequenceObj.paramLength
     let forceOpenNode = payload.forceOpenNode
-    console.log('fetchSequenceViaId')
+    //console.log('fetchSequenceViaId')
     //console.log('sequenceObj: ' + JSON.stringify(sequenceObj))
     //console.log('sequenceId: ' + sequenceId)
     //console.log('sequenceParamLength' + sequenceParamLength)
@@ -157,6 +157,44 @@ export const getters = {
   },
 
   getSequencesContainingModule: (state, getters, rootState, rootGetters) => (
+    moduleName
+  ) => {
+    //some logic here
+    //let sequences = []
+    let sequencesIdNameMap = {} //this is reduntant but we miss ID from server
+    let nodeIDToObjectMap = rootGetters['getNodeIDToObjectMap']
+
+    for (const [key, value] of Object.entries(state.sequences)) {
+      //console.log('KEY: ' + JSON.stringify(key))
+      //console.log('VALUE: ' + JSON.stringify(value))
+      // eslint-disable-next-line no-unused-vars
+      for (const [key1, value1] of Object.entries(value)) {
+        /* console.log('KEY1: ' + key1)
+        console.log('value1: ' + value1[0])
+        console.log('value2: ' + value1[1]) */
+        if (value1[0] == 'modules') {
+          if (value1[1] == moduleName) {
+            /*  console.log('KEY1: ' + key1)
+            console.log('value1: ' + value1[0])
+            console.log('value2: ' + value1[1]) */
+            //now go through main map and find IDs for the names
+            for (const [key2, value2] of Object.entries(nodeIDToObjectMap)) {
+              if (value2.name == key && value2.itemChildrenLength != 0) {
+                //sequences.push(key)
+                //console.log('VALUE2: ' + JSON.stringify(value2))
+                //console.log('PARAMLENGTH: ' + value2.itemChildrenLength)
+                sequencesIdNameMap[key2] = key
+                break
+              }
+            }
+          }
+        }
+      }
+    }
+    //console.log('getSequencesContainingModule SEQUENCES: ' + sequences)
+    return sequencesIdNameMap //if module is not direct part of the path (but part of the sequence etc)
+  },
+  getSequencesContainingSequence: (state, getters, rootState, rootGetters) => (
     moduleName
   ) => {
     //some logic here

@@ -104,8 +104,8 @@ export default class TableView extends Vue {
   @Watch('getDarkMode')
   // eslint-disable-next-line no-unused-vars
   onDarkModeChanged(val: any, oldVal: any) {
-    console.log('open VAL:' + val)
-    console.log('open OLDVAL: ' + oldVal)
+    //console.log('open VAL:' + val)
+    //console.log('open OLDVAL: ' + oldVal)
     let prevActive = this.activeColor
     let prevBackground = this.backGroundColor
     this.activeColor = prevBackground
@@ -416,7 +416,7 @@ export default class TableView extends Vue {
 
   public getPaths(nodeType: string) {
     if (nodeType == 'modules') {
-      console.log('PATHS!: ' + this.getSelectedModulePaths)
+      //console.log('PATHS!: ' + this.getSelectedModulePaths)
       let values: Array<string> = []
       // eslint-disable-next-line no-unused-vars
       for (const [key, value] of Object.entries(this.getSelectedModulePaths)) {

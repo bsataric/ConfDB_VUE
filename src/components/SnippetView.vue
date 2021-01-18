@@ -31,11 +31,16 @@ import { mapGetters } from 'vuex'
     ...mapGetters({
       getSelectedNodeType: 'getSelectedNodeType',
       getSelectedNodeName: 'getSelectedNodeName',
+      //modules
       getSelectedModuleSnippet: 'module/getSelectedModuleSnippet',
       getSelectedModuleSequences: 'module/getSelectedModuleSequences',
       getSelectedModulePaths: 'module/getSelectedModulePaths',
+      //sequences
       getSelectedSequenceSnippet: 'sequence/getSelectedSequenceSnippet',
+      getSelectedSequenceSequences: 'sequence/getSelectedSequenceSequences',
+      //paths
       getPathSnippet: 'path/getSelectedPathSnippet',
+      //psets
       getPSetSnippet: 'pset/getSelectedPSetSnippet',
     }),
     // ...mapState('sequence', ['sequences']),
@@ -43,10 +48,11 @@ import { mapGetters } from 'vuex'
 })
 export default class SnippetView extends Vue {
   private activeTab: any = 3
-  private triggered: boolean = false
+  //private triggered: boolean = false
   private getSelectedNodeType!: any
   private getSelectedNodeName!: any
   private getSelectedModuleSnippet!: any
+  private getSelectedSequenceSequences!: any
   private getSelectedSequenceSnippet!: any
   private getSelectedModuleSequences!: any
   private getSelectedModulePaths!: any
@@ -76,21 +82,6 @@ export default class SnippetView extends Vue {
   }
 
   public getSelectedNodeSnippet(nodeType: string) {
-    console.log('SELECTED NODE TYPE: ' + nodeType)
-    //this.triggered = !this.triggered
-    if (nodeType == 'modules') {
-      return this.getSelectedModuleSnippet
-    } else if (nodeType == 'sequence') {
-      return this.getSelectedSequenceSnippet
-    } else if (nodeType == 'paths') {
-      return this.getPathSnippet
-    } else if (nodeType == 'pset') {
-      return this.getPSetSnippet
-    }
-    return ''
-  }
-
-  public getSelectedNodeContainedInSequences(nodeType: any) {
     //console.log('SELECTED NODE TYPE: ' + nodeType)
     //this.triggered = !this.triggered
     if (nodeType == 'modules') {
@@ -105,46 +96,10 @@ export default class SnippetView extends Vue {
     return ''
   }
 
-  public getSelectedNodeDisabledTabs(nodeType: any, index: any) {
+  public getSelectedNodeContainedInSequences(nodeType: string) {
     //console.log('SELECTED NODE TYPE: ' + nodeType)
     //this.triggered = !this.triggered
     if (nodeType == 'modules') {
-      //enable all tabs besides datasets and input tags
-      for (let i = 0; i < this.disabledTabs.length; i++) {
-        if (i == 4 || i == 5) this.disabledTabs[i] = true
-        else this.disabledTabs[i] = false
-      }
-    } else if (nodeType == 'sequence') {
-      for (let i = 0; i < this.disabledTabs.length; i++) {
-        this.disabledTabs[i] = true
-      }
-    } else if (nodeType == 'paths') {
-      for (let i = 0; i < this.disabledTabs.length; i++) {
-        this.disabledTabs[i] = true
-      }
-    } else if (nodeType == 'pset') {
-      //disable all tabs besides snippet tab
-      for (let i = 0; i < this.disabledTabs.length; i++) {
-        if (i == 3) this.disabledTabs[i] = false
-        else this.disabledTabs[i] = true
-      }
-    }
-    return this.disabledTabs[index]
-  }
-  public getTextFieldValue(nodeName: any) {
-    //console.log('activeTab CHANGED ' + activeTab)
-    //console.log('nodeName: ' + nodeName)
-    //console.log('this.previousNodeName: ' + this.previousNodeName)
-    if (this.previousNodeName != nodeName) {
-      this.activeTab = 3 //force snippet
-      //console.log('FORCING SNIPPET')
-    }
-
-    this.previousNodeName = nodeName
-    if (this.activeTab == 3)
-      return this.getSelectedNodeSnippet(this.getSelectedNodeType)
-    else if (this.activeTab == 0) {
-      //console.log('AAAA')
       let sequences = this.getSelectedModuleSequences
       this.arrayOfSelectedObjects = sequences
       let sequencesText = '<ul>'
@@ -165,8 +120,59 @@ export default class SnippetView extends Vue {
       }
       sequencesText += '</ul>'
       return sequencesText
+    } else if (nodeType == 'sequence') {
+      return this.getSelectedSequenceSnippet
+    } else if (nodeType == 'paths') {
+      return this.getPathSnippet
+    } else if (nodeType == 'pset') {
+      return this.getPSetSnippet
+    }
+    return ''
+  }
+
+  public getSelectedNodeDisabledTabs(nodeType: string, index: number) {
+    //console.log('SELECTED NODE TYPE: ' + nodeType)
+    //this.triggered = !this.triggered
+    if (nodeType == 'modules') {
+      //enable all tabs besides datasets and input tags
+      for (let i = 0; i < this.disabledTabs.length; i++) {
+        if (i == 4 || i == 5) this.disabledTabs[i] = true
+        else this.disabledTabs[i] = false
+      }
+    } else if (nodeType == 'sequence') {
+      for (let i = 0; i < this.disabledTabs.length; i++) {
+        if (i == 4 || i == 5) this.disabledTabs[i] = true
+        else this.disabledTabs[i] = false
+      }
+    } else if (nodeType == 'paths') {
+      for (let i = 0; i < this.disabledTabs.length; i++) {
+        this.disabledTabs[i] = true
+      }
+    } else if (nodeType == 'pset') {
+      //disable all tabs besides snippet tab
+      for (let i = 0; i < this.disabledTabs.length; i++) {
+        if (i == 3) this.disabledTabs[i] = false
+        else this.disabledTabs[i] = true
+      }
+    }
+    return this.disabledTabs[index]
+  }
+  public getTextFieldValue(nodeName: string) {
+    //console.log('activeTab CHANGED ' + activeTab)
+    //console.log('nodeName: ' + nodeName)
+    //console.log('this.previousNodeName: ' + this.previousNodeName)
+    if (this.previousNodeName != nodeName) {
+      this.activeTab = 3 //force snippet
+      //console.log('FORCING SNIPPET')
+    }
+
+    this.previousNodeName = nodeName
+    if (this.activeTab == 3)
+      return this.getSelectedNodeSnippet(this.getSelectedNodeType)
+    else if (this.activeTab == 0) {
+      return this.getSelectedNodeContainedInSequences(this.getSelectedNodeType)
     } else if (this.activeTab == 6) {
-      //console.log('AAAA')
+      //console.log('ACTIVE TAB 6')
       let paths = this.getSelectedModulePaths
       this.arrayOfSelectedObjects = paths
       let pathsText = '<ul>'

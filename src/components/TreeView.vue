@@ -93,37 +93,37 @@ export default class TreeView extends Vue {
   @Watch('active')
   // eslint-disable-next-line no-unused-vars
   onActiveChanged(val: any, oldVal: any) {
-    console.log('active VAL:' + val)
-    console.log('active OLDVAL: ' + oldVal)
-    //@ts-ignore
-    //this.$refs[val].scrollIntoView() //TODO FIX
+    //console.log('active VAL:' + val)
+    //console.log('active OLDVAL: ' + oldVal)
   }
 
   @Watch('getForcedActiveNodeId')
+  // eslint-disable-next-line no-unused-vars
   onForcedActiveChanged(val: any, oldVal: any) {
-    console.log('active VAL:' + val)
-    console.log('active OLDVAL: ' + oldVal)
+    //console.log('active VAL:' + val)
+    //console.log('active OLDVAL: ' + oldVal)
     //this.active = [val]
     this.forcedActive = [val]
   }
 
   @Watch('getOpenNodeIds')
+  // eslint-disable-next-line no-unused-vars
   onOpenNodeChanged(val: any, oldVal: any) {
-    console.log('getOpenNodeIds VAL:' + val)
-    console.log('getOpenNodeIds OLDVAL: ' + oldVal)
+    //console.log('getOpenNodeIds VAL:' + val)
+    //console.log('getOpenNodeIds OLDVAL: ' + oldVal)
   }
 
   @Watch('getForcedOpenNodeIds')
+  // eslint-disable-next-line no-unused-vars
   onForcedOpenNodeChanged(val: any, oldVal: any) {
-    console.log('getForcedOpenNodeIds VAL:' + val)
-    console.log('getForcedOpenNodeIds OLDVAL: ' + oldVal)
+    //console.log('getForcedOpenNodeIds VAL:' + val)
+    //console.log('getForcedOpenNodeIds OLDVAL: ' + oldVal)
     this.open = val
   }
 
   //private openNodes: any = []
   //private openNodeIds: any = []
   //private nodeIds: any = []
-  private nodeIdNameMap: any = {}
   private nodeIDToObjectMap: any = {} //ID to Object map (name, type, children length passed to the Vuex store)
   private open: any = [1]
   private active: any = []
@@ -491,11 +491,6 @@ export default class TreeView extends Vue {
     ]
   }
 
-  /*  get open() {
-    console.log('GET OPEN CALLED')
-    return this.getOpenNodeIds
-  } */
-
   public parseSequences(sequenceData: any) {
     let sequencesObject: Object = {
       id: 1,
@@ -504,8 +499,6 @@ export default class TreeView extends Vue {
       children: [],
     }
     //this.nodeIds.push(1)
-    this.nodeIdNameMap['Sequences'] = 1
-
     //console.log(sequencesObject)
     for (const [key, value] of Object.entries(sequenceData)) {
       //loop over sequnces - create new Sequence object and add it to children of the seqs
@@ -517,12 +510,8 @@ export default class TreeView extends Vue {
         iconColor: 'red',
         children: [],
       }
-      /*      if (sequenceObject['id'] == 1) {
-        console.log('ID 1')
-        console.log(sequenceObject['name'])
-      } */
+
       //this.nodeIds.push(this.idCounter)
-      this.nodeIdNameMap['sequence.' + key] = this.idCounter //top level we need
       //TRY
       let sequenceObjectId = this.idCounter //remember counter to use it after children are populated
       //this.nodeIDToObjectMap[this.idCounter] = { name: key, type: 'sequence' }
@@ -541,9 +530,6 @@ export default class TreeView extends Vue {
           nestedSequenceObject['name'] = Object(value1)[1]
           nestedSequenceObject['iconType'] = 'module'
           nestedSequenceObject['children'] = []
-          this.nodeIdNameMap[
-            'sequence.module.' + Object(value1)[1]
-          ] = this.idCounter
           //TRY nested sequence
           this.nodeIDToObjectMap[this.idCounter] = {
             name: Object(value1)[1],
@@ -558,9 +544,6 @@ export default class TreeView extends Vue {
           nestedSequenceObject['iconType'] = 'sequence'
           nestedSequenceObject['iconColor'] = 'red'
           nestedSequenceObject['children'] = []
-          this.nodeIdNameMap[
-            'sequence.sequence.' + Object(value1)[1]
-          ] = this.idCounter
           //TRY nested sequence
           this.nodeIDToObjectMap[this.idCounter] = {
             name: Object(value1)[1],
@@ -604,7 +587,6 @@ export default class TreeView extends Vue {
       children: [],
     }
     // this.nodeIds.push(this.idCounter)
-    this.nodeIdNameMap['Paths'] = this.idCounter
     //TRY remember the paths id
     let pathsIdCounter = this.idCounter
     //this.nodeIDToObjectMap[this.idCounter] = { name: 'Paths', type: 'pts' }
@@ -622,7 +604,6 @@ export default class TreeView extends Vue {
       }
       let pathIdCounter = this.idCounter
       //this.nodeIds.push(this.idCounter)
-      this.nodeIdNameMap['path.' + key] = this.idCounter
       //TRY
       //this.nodeIDToObjectMap[this.idCounter] = { name: key, type: 'paths' }
 
@@ -640,9 +621,6 @@ export default class TreeView extends Vue {
           nestedPathObject['name'] = Object(value1)[1]
           nestedPathObject['iconType'] = 'module'
           nestedPathObject['children'] = []
-          this.nodeIdNameMap[
-            'path.module.' + Object(value1)[1]
-          ] = this.idCounter
           //TRY
           this.nodeIDToObjectMap[this.idCounter] = {
             name: Object(value1)[1],
@@ -657,9 +635,6 @@ export default class TreeView extends Vue {
           nestedPathObject['iconType'] = 'sequence'
           nestedPathObject['iconColor'] = 'red'
           nestedPathObject['children'] = []
-          this.nodeIdNameMap[
-            'path.sequence.' + Object(value1)[1]
-          ] = this.idCounter
           //TRY
           this.nodeIDToObjectMap[this.idCounter] = {
             name: Object(value1)[1],
@@ -815,7 +790,6 @@ export default class TreeView extends Vue {
       children: [],
     }
     //this.nodeIds.push(this.idCounter)
-    this.nodeIdNameMap['Modules'] = this.idCounter
     //TRY
     let modulesIdCounter = this.idCounter
     //this.nodeIDToObjectMap[this.idCounter] = { name: 'Modules', type: 'mods' }
@@ -833,7 +807,6 @@ export default class TreeView extends Vue {
         children: [],
       }
       // this.nodeIds.push(this.idCounter)
-      this.nodeIdNameMap['module.' + key] = this.idCounter
 
       let moduleIdCounter = this.idCounter
       //TRY
@@ -952,7 +925,6 @@ export default class TreeView extends Vue {
       children: [],
     }
     //this.nodeIds.push(this.idCounter)
-    this.nodeIdNameMap['Psets'] = this.idCounter
 
     let psetsIdCounter = this.idCounter
     //TRY
@@ -969,7 +941,6 @@ export default class TreeView extends Vue {
         children: [],
       }
       // this.nodeIds.push(this.idCounter)
-      this.nodeIdNameMap['pset.' + key] = this.idCounter
 
       let psetIdCounter = this.idCounter
       //TRY
@@ -1074,7 +1045,6 @@ export default class TreeView extends Vue {
         fileData: fileData,
       }) // note the "await"
       this.parseSequences(this.getSequences)
-      //console.log(this.nodeIdNameMap)
     } else if (name == 'paths') {
       await this.$store.dispatch('path/fetchPaths', {
         fromFile: fromFile,
@@ -1115,19 +1085,16 @@ export default class TreeView extends Vue {
   } */
 
   async fetchNodeById(itemId: number) {
-    /*     console.log(itemType)
-    console.log(itemName)
-    console.log(itemId)
-    console.log(itemChildren.length) */
+    /*   
     //this.getOpen(itemType, itemName, itemId, itemChildren.length)
     //let index = this.checkOpen(itemName) //close node if it's already open
     //console.log('FETCH')
     //console.log('NODE ID: ' + itemId)
-    /*     console.log('OPEN ' + this.open)
-    console.log('ACTIVE ' + this.active) */
+    console.log('OPEN ' + this.open)
+    console.log('ACTIVE ' + this.active) 
     //@ts-ignore
     //console.log('REF: ' + this.$refs[itemId].innerHTML)
-    console.log('FETCH 1 TRIGGERED')
+    //console.log('FETCH 1 TRIGGERED')
 
     /*   console.log(
       'this.getNodeIDToObjectMap:' + JSON.stringify(this.getNodeIDToObjectMap)
@@ -1139,7 +1106,7 @@ export default class TreeView extends Vue {
     if (this.getNodeIDToObjectMap[itemId] == undefined) return
     //if (this.getNodeIDToObjectMap[itemId].type == undefined) return
 
-    console.log('SELECTED NODE TYPE: ' + this.getNodeIDToObjectMap[itemId].type)
+    //console.log('SELECTED NODE TYPE: ' + this.getNodeIDToObjectMap[itemId].type)
 
     let itemType = this.getNodeIDToObjectMap[itemId].type
 
@@ -1165,7 +1132,7 @@ export default class TreeView extends Vue {
         forceOpenNode: false,
       })
     } else {
-      console.log('SPECIAL CASE!')
+      //console.log('SPECIAL CASE!')
       //console.log(itemChildren.length)
       await this.$store.dispatch('setSelectedNodeViaID', {
         selectedNodeId: itemId,
@@ -1175,64 +1142,6 @@ export default class TreeView extends Vue {
     //open only if it is not already open
     //this.openNodes = ['Modules', 'hltFEDSelector']
   }
-
-  /*   public checkOpen(openNodeName: string) {
-    let index = this.openNodes.indexOf(openNodeName)
-    if (index != -1) {
-      //element already open
-      this.openNodes.splice(index, 1)
-      console.log('ELEMENT ALREADY OPEN this.open: ' + this.openNodes)
-    }
-    return index
-  } */
-
-  /*   public getOpen(
-    openNodeType: string,
-    openNodeName: string,
-    openNodeId: number,
-    itemChildrenLength: number
-  ) {
-    if (itemChildrenLength == 0) {
-      console.log('ITEM CHILDREN ZERO!')
-      return this.openNodeIds.length
-    }
-
-    let idIndex = this.openNodeIds.indexOf(openNodeId)
-
-    //console.log('OPEN NODES BEFORE: ' + this.openNodeIds)
-
-    if (idIndex == -1) this.openNodeIds.push(openNodeId)
-    else this.openNodeIds.splice(idIndex, 1)
-
-    //console.log('OPEN NODES AFTER: ' + this.openNodeIds)
-    return this.openNodeIds.length
-  } */
-
-  /*   public calculateOpenNodesLength(nodeType: string, nodeName: string) {
-    console.log('OPEN ON DEMAND')
-    //this.getOpen(nodeType, nodeName)
-    return this.openNodes.length
-  } */
-
-  // eslint-disable-next-line no-unused-vars
-  /*   public returnOpenNodes(nodeName: any) {
-    console.log('RETURN OPEN NODES')
-    console.log('getSelectedNodeType: ' + this.getSelectedNodeType)
-    console.log('getSelectedNodeName: ' + this.getSelectedNodeName)
-    console.log('getSelectedNodeId: ' + this.getSelectedNodeId)
-    console.log(
-      'getSelectedNodeParamLength: ' + this.getSelectedNodeParamLength
-    )
-    console.log('getOpenNodeIds' + this.getOpenNodeIds)
-
-    return this.getOpenNodeIds
-  } */
-
-  // eslint-disable-next-line no-unused-vars
-  /*   public returnOpenNodes(nodeName: any) {
-    console.log('returnOpenNodes TRIGGERED')
-    return this.getOpenNodeIds
-  } */
 
   async sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms))
@@ -1272,30 +1181,27 @@ export default class TreeView extends Vue {
     //console.log('OPENNNNN: ' + this.open)
   }
 
+  //Very important function, basically decides which node is clicked upon and gets all info about it
   public updateOpenNodes(array: any) {
-    console.log('THIS OPEN BEFORE: ' + this.open)
+    //console.log('THIS OPEN BEFORE: ' + this.open)
     let difference: number = parseInt(
       this.open
         .filter((x) => !array.includes(x))
         .concat(array.filter((x) => !this.open.includes(x)))
     )
-    console.log('DIFFERENCE:' + difference)
-    console.log('DIFFERENCE TYPE: ' + typeof difference)
+    //console.log('DIFFERENCE:' + difference)
+    //console.log('DIFFERENCE TYPE: ' + typeof difference)
     if (Object.keys(this.getNodeIDToObjectMap).length !== 0)
       this.fetchNodeById(difference)
     this.open = array
-    console.log('THIS OPEN AFTER: ' + array)
+    //console.log('THIS OPEN AFTER: ' + array)
   }
 
   public updateActiveNodes(array: any) {
-    console.log('THIS ACTIVE: ' + array)
+    //console.log('THIS ACTIVE: ' + array)
     if (Object.keys(this.getNodeIDToObjectMap).length !== 0)
       this.fetchNodeById(array[0])
     this.active = array
-  }
-
-  public updateTreeView() {
-    console.log('UPDATE TREEVIEW!')
   }
 
   public fetchAllGroups() {

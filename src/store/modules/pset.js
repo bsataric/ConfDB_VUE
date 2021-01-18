@@ -70,11 +70,11 @@ export const actions = {
     let psetParams = psetObj.value
     let psetParamLength = psetObj.paramLength
     let forceOpenNode = payload.forceOpenNode
-    console.log('fetchPSetViaId')
+    //console.log('fetchPSetViaId')
     //console.log('psetObj: ' + JSON.stringify(psetObj))
     //console.log('psetId: ' + psetId)
     //console.log('psetParams' + psetParams)
-    console.log('psetParamLength: ' + psetParamLength)
+    //console.log('psetParamLength: ' + psetParamLength)
 
     if (psetParams) {
       commit(

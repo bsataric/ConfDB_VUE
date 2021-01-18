@@ -38,9 +38,9 @@ export default new Vuex.Store({
   state,
   mutations: {
     SET_SELECTED_NODE_VIA_ID(state, payload) {
-      console.log('SELECTED NODE ID: ' + payload.selectedNodeId)
+      //console.log('SELECTED NODE ID: ' + payload.selectedNodeId)
       state.selectedNodeId = payload.selectedNodeId //get all info just via ID
-      console.log(typeof state.selectedNodeId)
+      //console.log(typeof state.selectedNodeId)
       console.log(
         'state.nodeIDToObjectMap[payload.selectedNodeId]' +
           JSON.stringify(state.nodeIDToObjectMap[payload.selectedNodeId])
@@ -56,34 +56,21 @@ export default new Vuex.Store({
         state.nodeIDToObjectMap[payload.selectedNodeId].parentNodeId
       let forceOpenNode = payload.forceOpenNode //if node is opened by foce open it's parent as well
 
-      console.log('FORCED OPEN NODE: ' + forceOpenNode)
+      //console.log('FORCED OPEN NODE: ' + forceOpenNode)
       if (forceOpenNode) {
         state.forcedActiveNodeId = state.selectedNodeId
-        console.log('FORCED NODE ID: ' + state.forcedActiveNodeId)
+        //console.log('FORCED NODE ID: ' + state.forcedActiveNodeId)
       }
 
       if (state.selectedNodeParamLength == 0) {
         console.log('ITEM CHILDREN ZERO!')
         return
       }
-      //let dummyArray = [1, 2]
-      //if (state.selectedNodeId == 1) console.log('UMRI')
-      /*   console.log(typeof state.selectedNodeId)
-      console.log(typeof 1)
-      console.log(typeof state.openNodeIds)
-      console.log(typeof dummyArray)
-      console.log(typeof state.selectedNodeType)
-      console.log(typeof state) */
+
       let idIndex = state.openNodeIds.indexOf(payload.selectedNodeId)
-      console.log('SELECTED NODE ID: ' + state.selectedNodeId)
-      console.log('OPEN NODES BEFORE: ' + state.openNodeIds)
-
-      /*  let dummyNodeId = 2
-      let dummyArray = [1, 2]
-      let dummyIndex = dummyArray.indexOf(dummyNodeId)
-      console.log('dummyIndex: ' + dummyIndex) */
-
-      console.log('IDINDEX: ' + idIndex)
+      //console.log('SELECTED NODE ID: ' + state.selectedNodeId)
+      //console.log('OPEN NODES BEFORE: ' + state.openNodeIds)
+      //console.log('IDINDEX: ' + idIndex)
 
       if (idIndex == -1) {
         //console.log('OVDE USAO')
@@ -91,7 +78,7 @@ export default new Vuex.Store({
           //if force is enwoked both node and it's parent have to be opened
           //console.log('SELECTED NODE TYPE: ' + state.selectedNodeType)
 
-          console.log('PARENT NODE ID: ' + state.selectedNodeParentId)
+          //console.log('PARENT NODE ID: ' + state.selectedNodeParentId)
           let parentNodeIndex = state.openNodeIds.indexOf(
             state.selectedNodeParentId
           )
@@ -105,7 +92,7 @@ export default new Vuex.Store({
       } else {
         if (forceOpenNode) {
           //if force is enwoked both node and it's parent have to be opened
-          console.log('PARENT NODE ID: ' + state.selectedNodeParentId)
+          //console.log('PARENT NODE ID: ' + state.selectedNodeParentId)
 
           let parentNodeIndex = state.openNodeIds.indexOf(
             state.selectedNodeParentId
@@ -116,13 +103,13 @@ export default new Vuex.Store({
           }
           //else do nothing (both nodes are already open - TODO MAYBE FOCUS OR ACTIVATE)
         }
-        console.log('SPLICE')
+        //console.log('SPLICE')
         state.openNodeIds.splice(idIndex, 1) //close the node if already open
       }
 
       //console.log('OPEN NODES AFTER: ' + state.openNodeIds)
       if (forceOpenNode) {
-        console.log('FORCED OPEN!')
+        //console.log('FORCED OPEN!')
         state.forcedOpenNodeIds = [...state.openNodeIds] //cannot assign by reference, but copy whole array
       }
       //state.openNodeIds = [1]
@@ -134,9 +121,9 @@ export default new Vuex.Store({
       ) */
     },
     SET_OPEN_FILE_CONTENT(state, payload) {
-      console.log('SETTING OPEN FILE CONTENT:')
+      //console.log('SETTING OPEN FILE CONTENT:')
       state.openFileContent = payload
-      console.log('OPEN FILE CONTENT SET:' + payload)
+      //console.log('OPEN FILE CONTENT SET:' + payload)
     },
     SET_DARK_MODE(state, payload) {
       state.darkMode = payload
@@ -193,7 +180,7 @@ export default new Vuex.Store({
       return state.openNodeIds.length
     },
     getOpenFileContent(state) {
-      console.log('GET OPEN FILE CONTENT: ' + state.getOpenFileContent)
+      //console.log('GET OPEN FILE CONTENT: ' + state.getOpenFileContent)
       return state.openFileContent
     },
     getDarkMode(state) {
