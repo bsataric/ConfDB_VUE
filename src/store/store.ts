@@ -19,7 +19,6 @@ const state: MainVuexState = {
   selectedNodeId: -1,
   selectedNodeParamLength: 0,
   selectedNodeParentId: 0,
-  nodeNameIdMap: {},
   nodeIDToObjectMap: {},
   openNodeIds: [],
   forcedOpenNodeIds: [],
@@ -38,98 +37,8 @@ export default new Vuex.Store({
   },
   state,
   mutations: {
-    SET_SELECTED_NODE(state, payload) {
-      /*   console.log(payload.selectedNodeType)
-      console.log(payload.selectedNodeName)
-      console.log(payload.selectedNodeId)
-      console.log(payload.selectedNodeParamLength) */
-
-      state.selectedNodeType = payload.selectedNodeType
-      state.selectedNodeName = payload.selectedNodeName
-      state.selectedNodeId = payload.selectedNodeId
-      state.selectedNodeParamLength = payload.selectedNodeParamLength
-      let forceOpenNode = payload.forceOpenNode //if node is opened by foce open it's parent as well
-
-      //console.log('FORCED OPEN NODE: ' + forceOpenNode)
-      if (forceOpenNode) {
-        state.forcedActiveNodeId = state.selectedNodeId
-      }
-
-      if (state.selectedNodeParamLength == 0) {
-        console.log('ITEM CHILDREN ZERO!')
-        return
-      }
-
-      let idIndex = state.openNodeIds.indexOf(state.selectedNodeId)
-
-      //console.log('OPEN NODES BEFORE: ' + state.openNodeIds)
-
-      if (idIndex == -1) {
-        //console.log('OVDE USAO')
-        if (forceOpenNode) {
-          //if force is enwoked both node and it's parent have to be opened
-          //let parentNodeId = this.getParentNodeId(state)
-          //console.log('SELECTED NODE TYPE: ' + state.selectedNodeType)
-          let parentNodeId = 0
-          if (state.selectedNodeType == 'sequence') {
-            parentNodeId = state.nodeNameIdMap['Sequences']
-          } else if (state.selectedNodeType == 'path') {
-            parentNodeId = state.nodeNameIdMap['Paths']
-          } else if (state.selectedNodeType == 'module') {
-            parentNodeId = state.nodeNameIdMap['Modules']
-          } else if (state.selectedNodeType == 'pset') {
-            parentNodeId = state.nodeNameIdMap['PSets']
-          }
-
-          console.log('PARENT NODE ID: ' + parentNodeId)
-          let parentNodeIndex = state.openNodeIds.indexOf(parentNodeId)
-          if (parentNodeIndex == -1) {
-            //push parent node on array as well
-            state.openNodeIds.push(parentNodeId)
-          }
-          //else do nothing (TODO MAYBE FOCUS OR ACTIVATE)
-        }
-        state.openNodeIds.push(state.selectedNodeId)
-      } else {
-        if (forceOpenNode) {
-          //if force is enwoked both node and it's parent have to be opened
-          let parentNodeId = 0
-          if (state.selectedNodeType == 'sequence') {
-            parentNodeId = state.nodeNameIdMap['Sequences']
-          } else if (state.selectedNodeType == 'path') {
-            parentNodeId = state.nodeNameIdMap['Paths']
-          } else if (state.selectedNodeType == 'module') {
-            parentNodeId = state.nodeNameIdMap['Modules']
-          } else if (state.selectedNodeType == 'pset') {
-            parentNodeId = state.nodeNameIdMap['PSets']
-          }
-          console.log('PARENT NODE ID: ' + parentNodeId)
-
-          let parentNodeIndex = state.openNodeIds.indexOf(parentNodeId)
-          if (parentNodeIndex == -1) {
-            //push parent node on array as well
-            state.openNodeIds.push(parentNodeId)
-          }
-          //else do nothing (both nodes are already open - TODO MAYBE FOCUS OR ACTIVATE)
-        } else {
-          state.openNodeIds.splice(idIndex, 1)
-        }
-      }
-
-      //console.log('OPEN NODES AFTER: ' + state.openNodeIds)
-      if (forceOpenNode) {
-        console.log('FORCED OPEN!')
-        state.forcedOpenNodeIds = [...state.openNodeIds] //cannot assign by reference, but copy whole array
-      }
-      //state.openNodeIds = [1]
-    },
     SET_SELECTED_NODE_VIA_ID(state, payload) {
-      /*   console.log(payload.selectedNodeType)
-      console.log(payload.selectedNodeName)
-      console.log(payload.selectedNodeId)
-      console.log(payload.selectedNodeParamLength) */
-      //console.log(typeof state.selectedNodeId)
-      console.log('SELECTED NODE ID: ' + payload.selectedNodeI)
+      console.log('SELECTED NODE ID: ' + payload.selectedNodeId)
       state.selectedNodeId = payload.selectedNodeId //get all info just via ID
       console.log(typeof state.selectedNodeId)
       console.log(
@@ -180,18 +89,7 @@ export default new Vuex.Store({
         //console.log('OVDE USAO')
         if (forceOpenNode) {
           //if force is enwoked both node and it's parent have to be opened
-          //let parentNodeId = this.getParentNodeId(state)
           //console.log('SELECTED NODE TYPE: ' + state.selectedNodeType)
-          /*     let parentNodeId = 0
-          if (state.selectedNodeType == 'sequence') {
-            parentNodeId = state.nodeNameIdMap['Sequences']
-          } else if (state.selectedNodeType == 'path') {
-            parentNodeId = state.nodeNameIdMap['Paths']
-          } else if (state.selectedNodeType == 'module') {
-            parentNodeId = state.nodeNameIdMap['Modules']
-          } else if (state.selectedNodeType == 'pset') {
-            parentNodeId = state.nodeNameIdMap['PSets']
-          } */
 
           console.log('PARENT NODE ID: ' + state.selectedNodeParentId)
           let parentNodeIndex = state.openNodeIds.indexOf(
@@ -207,16 +105,6 @@ export default new Vuex.Store({
       } else {
         if (forceOpenNode) {
           //if force is enwoked both node and it's parent have to be opened
-          /*     let parentNodeId = 0
-          if (state.selectedNodeType == 'sequence') {
-            parentNodeId = state.nodeNameIdMap['Sequences']
-          } else if (state.selectedNodeType == 'path') {
-            parentNodeId = state.nodeNameIdMap['Paths']
-          } else if (state.selectedNodeType == 'module') {
-            parentNodeId = state.nodeNameIdMap['Modules']
-          } else if (state.selectedNodeType == 'pset') {
-            parentNodeId = state.nodeNameIdMap['PSets']
-          } */
           console.log('PARENT NODE ID: ' + state.selectedNodeParentId)
 
           let parentNodeIndex = state.openNodeIds.indexOf(
@@ -239,10 +127,6 @@ export default new Vuex.Store({
       }
       //state.openNodeIds = [1]
     },
-    SET_NODE_NAME_ID_MAP(state, payload) {
-      state.nodeNameIdMap = payload
-      //console.log('MAP: ' + JSON.stringify(state.nodeNameIdMap))
-    },
     SET_ID_TO_OBJECT_MAP(state, payload) {
       state.nodeIDToObjectMap = payload
       /*   console.log(
@@ -259,14 +143,8 @@ export default new Vuex.Store({
     },
   },
   actions: {
-    createNodeNameIdMap({ commit }, nodeNameIdMap) {
-      commit('SET_NODE_NAME_ID_MAP', nodeNameIdMap)
-    },
-    createNodeIDNameTypeMap({ commit }, nodeIDToObjectMap) {
+    createNodeIDToObjectMap({ commit }, nodeIDToObjectMap) {
       commit('SET_ID_TO_OBJECT_MAP', nodeIDToObjectMap)
-    },
-    setSelectedNode({ commit }, payload) {
-      commit('SET_SELECTED_NODE', payload)
     },
     setSelectedNodeViaID({ commit }, payload) {
       commit('SET_SELECTED_NODE_VIA_ID', payload)
@@ -291,24 +169,8 @@ export default new Vuex.Store({
     getSelectedNodeParamLength(state) {
       return state.selectedNodeParamLength
     },
-    getNodeNameIdMap(state) {
-      return state.nodeNameIdMap
-    },
     getNodeIDToObjectMap(state) {
       return state.nodeIDToObjectMap
-    },
-    getParentNodeId(state) {
-      let parentNodeId = 0
-      if (state.selectedNodeType == 'sequence') {
-        parentNodeId = state.nodeNameIdMap['Sequences']
-      } else if (state.selectedNodeType == 'path') {
-        parentNodeId = state.nodeNameIdMap['Paths']
-      } else if (state.selectedNodeType == 'module') {
-        parentNodeId = state.nodeNameIdMap['Modules']
-      } else if (state.selectedNodeType == 'pset') {
-        parentNodeId = state.nodeNameIdMap['PSets']
-      }
-      return parentNodeId
     },
     getOpenNodeIds(state) {
       //console.log('openNodeIds FIRED')

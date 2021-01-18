@@ -192,34 +192,20 @@ export default class SnippetView extends Vue {
 
   async openContainedInNode(nodeType: string, itemId: number) {
     if (nodeType == 'Sequences') {
-      /* await this.$store.dispatch('sequence/fetchSequenceAndSequenceId', {
-        itemName: nodeName,
-        forceOpenNode: true,
-      })  */ // note the "await"
       //console.log('FORCEEEEEED: ' + itemId)
       await this.$store.dispatch('sequence/fetchSequenceViaId', {
         itemId: itemId,
         forceOpenNode: true,
       })
     } else if (nodeType === 'Paths') {
-      /* await this.$store.dispatch('path/fetchPathAndPathId', {
-        itemName: nodeName,
-        forceOpenNode: true,
-      }) */
       await this.$store.dispatch('path/fetchPathViaId', {
         itemId: itemId,
         forceOpenNode: true,
       })
-    } /* else if (nodeType === 'modules') { //TODO: THIS PROBABLY WONT HAPPEN
-      await this.$store.dispatch('module/fetchModuleAndModuleId', {
-        itemName: nodeName,
-        forceOpenNode: true,
-      })
-    } else if (nodeType === 'pset') {
-      await this.$store.dispatch('pset/fetchPSetAndPSetId', {
-        itemName: nodeName,
-        forceOpenNode: true,
-      })
+    } /* else if (nodeType === 'tasks') { //TODO: THIS PROBABLY WONT HAPPEN
+
+    } else if (nodeType === 'switchProducers') {
+
     } */
   }
 }

@@ -63,66 +63,6 @@ export const actions = {
       commit('SET_MODULES', modulesData)
     }
   },
-  fetchModuleAndModuleId({ commit, getters, dispatch }, payload) {
-    let moduleObj = getters.getModuleAndModuleId(payload.itemName)
-    let name = payload.itemName
-    let moduleParams = moduleObj.value
-    let moduleId = moduleObj.moduleId
-    let moduleParamLength = moduleObj.paramLength
-    let forceOpenNode = payload.forceOpenNode
-    //console.log('FORCE OPEN 1: ' + forceOpenNode)
-    //console.log('moduleObj: ' + JSON.stringify(moduleObj))
-    //console.log('moduleParams: ' + moduleParams)
-    //console.log('moduleParamLength: ' + moduleParamLength)
-    if (moduleParams) {
-      commit(
-        'SET_SELECTED_NODE',
-        {
-          selectedNodeType: 'module',
-          selectedNodeName: name,
-          selectedNodeId: moduleId,
-          selectedNodeParamLength: moduleParamLength,
-          forceOpenNode: forceOpenNode,
-        },
-        { root: true }
-      )
-      commit('SET_MODULE', {
-        name: name,
-        moduleId: moduleId,
-        moduleParams: moduleParams,
-        moduleParamLength: moduleParamLength,
-      })
-    } else {
-      return ModuleService.getModuleByName(name)
-        .then((response) => {
-          //TODO: generate moduleId
-          // let moduleId = moduleObj.moduleId
-          commit(
-            'SET_SELECTED_NODE',
-            {
-              selectedNodeType: 'module',
-              selectedNodeName: name,
-              selectedNodeId: moduleId,
-              selectedNodeParamLength: response.data.length,
-            },
-            { root: true }
-          )
-          commit('SET_MODULE', {
-            name: name,
-            moduleId: -1,
-            moduleParams: response.data,
-            selectedNodeParamLength: response.data.length,
-          })
-        })
-        .catch((error) => {
-          const notification = {
-            type: 'error',
-            message: 'There was a problem fetching module ' + error.message,
-          }
-          dispatch('notification/add', notification, { root: true })
-        })
-    }
-  },
   fetchModuleViaId({ commit, getters, dispatch }, payload) {
     let moduleObj = getters.getModuleById(payload.itemId)
     let moduleId = payload.itemId
@@ -186,30 +126,6 @@ export const actions = {
 export const getters = {
   moduleLength: (state) => {
     return state.modules.length
-  },
-  getModuleAndModuleId: (state, getters, rootState, rootGetters) => (name) => {
-    let nodeNameIdMap = rootGetters['getNodeNameIdMap']
-    let moduleId = nodeNameIdMap['module.' + name]
-    let paramLength = 0
-
-    for (const [key, value] of Object.entries(state.modules)) {
-      //console.log('KEY ' + key)
-      //console.log('VALUE ' + value)
-      if (key == name) {
-        for (const [key1, value1] of Object.entries(value)) {
-          //console.log('KEY1 ' + key1)
-          //console.log('VALUE1 ' + value1)
-          if (key1 == 'params') {
-            paramLength = Object.entries(value1).length
-            break
-          }
-          //console.log('VALUE: ' + JSON.stringify(value))
-          //console.log('PARAMLENGTH: ' + Object.entries(value1).length)
-        }
-        //paramLength = Object.entries(value1).length
-        return { value, moduleId, paramLength }
-      }
-    }
   },
   getModuleById: (state, getters, rootState, rootGetters) => (id) => {
     let nodeIDToObjectMap = rootGetters['getNodeIDToObjectMap']

@@ -63,66 +63,6 @@ export const actions = {
       commit('SET_PATHS', pathsData)
     }
   },
-  fetchPathAndPathId({ commit, getters, dispatch }, payload) {
-    let pathObj = getters.getPathAndPathId(payload.itemName)
-    let name = payload.itemName
-    let pathParams = pathObj.value
-    let pathId = pathObj.pathId
-    let pathParamLength = pathObj.paramLength
-    let forceOpenNode = payload.forceOpenNode
-    //console.log('pathObj: ' + JSON.stringify(pathObj))
-    //console.log('pathId: ' + pathId)
-    //console.log('pathParamLength ' + pathParamLength)
-
-    if (pathParams) {
-      commit(
-        'SET_SELECTED_NODE',
-        {
-          selectedNodeType: 'path',
-          selectedNodeName: name,
-          selectedNodeId: pathId,
-          selectedNodeParamLength: pathParamLength,
-          forceOpenNode: forceOpenNode,
-        },
-        { root: true }
-      )
-      commit('SET_PATH', {
-        name: name,
-        pathId: pathId,
-        pathParams: pathParams,
-        pathParamLength: pathParamLength,
-      })
-    } else {
-      return PathService.getPathByName(name)
-        .then((response) => {
-          //TODO: generate pathId
-          // let pathId = pathObj.pathId
-          commit(
-            'SET_SELECTED_NODE',
-            {
-              selectedNodeType: 'path',
-              selectedNodeName: name,
-              selectedNodeId: pathId,
-              selectedNodeParamLength: response.data.length,
-            },
-            { root: true }
-          )
-          commit('SET_PATH', {
-            name: name,
-            pathId: -1,
-            pathParams: response.data,
-            sequenceParamLength: response.data.length,
-          })
-        })
-        .catch((error) => {
-          const notification = {
-            type: 'error',
-            message: 'There was a problem fetching path ' + error.message,
-          }
-          dispatch('notification/add', notification, { root: true })
-        })
-    }
-  },
   fetchPathViaId({ commit, getters, dispatch }, payload) {
     let pathObj = getters.getPathById(payload.itemId)
     let pathId = payload.itemId
@@ -186,27 +126,6 @@ export const actions = {
 export const getters = {
   pathLength: (state) => {
     return state.paths.length
-  },
-  getPathAndPathId: (state, getters, rootState, rootGetters) => (name) => {
-    let nodeNameIdMap = rootGetters['getNodeNameIdMap']
-    let pathId = nodeNameIdMap['path.' + name]
-    let paramLength = 0
-
-    for (const [key, value] of Object.entries(state.paths)) {
-      //console.log('KEY ' + key)
-      //console.log('VALUE ' + value)
-      if (key == name) {
-        /*     for (const [key1, value1] of Object.entries(value)) {
-          console.log('KEY1 ' + key1)
-          console.log('VALUE1 ' + value1)
-        } */
-        //console.log('PARAMLENGTH: ' + Object.entries(value).length)
-        paramLength = Object.entries(value).length
-
-        //console.log('VALUE: ' + JSON.stringify(value))
-        return { value, pathId, paramLength }
-      }
-    }
   },
   getPathById: (state, getters, rootState, rootGetters) => (id) => {
     let nodeIDToObjectMap = rootGetters['getNodeIDToObjectMap']

@@ -1094,18 +1094,14 @@ export default class TreeView extends Vue {
       })
       this.parsePSets(this.getPSets)
       //console.log('AFTER PSETS: ' + this.nodeIds)
-      await this.$store.dispatch('createNodeNameIdMap', this.nodeIdNameMap) // note the "await"
       //TRY NEW DISPATCH
       await this.$store.dispatch(
-        'createNodeIDNameTypeMap',
+        'createNodeIDToObjectMap',
         this.nodeIDToObjectMap
       ) // note the "await"
     }
   }
 
-  /*   async setNodeIds() {
-    await this.$store.dispatch('createNodeNameIdMap', this.nodeIdNameMap) // note the "await"
-  } */
   /* 
   get selected() {
     if (!this.active.length) return undefined
@@ -1117,75 +1113,6 @@ export default class TreeView extends Vue {
 
     return this.active[0]
   } */
-
-  async fetchNodeByName(
-    itemType: string,
-    itemName: string,
-    itemId: number,
-    itemChildren: any[]
-  ) {
-    /*     console.log(itemType)
-    console.log(itemName)
-    console.log(itemId)
-    console.log(itemChildren.length) */
-    //this.getOpen(itemType, itemName, itemId, itemChildren.length)
-    //let index = this.checkOpen(itemName) //close node if it's already open
-    //console.log('FETCH')
-    //console.log('NODE ID: ' + itemId)
-    /*     console.log('OPEN ' + this.open)
-    console.log('ACTIVE ' + this.active) */
-    //@ts-ignore
-    //console.log('REF: ' + this.$refs[itemId].innerHTML)
-    console.log('FETCH TRIGGERED')
-
-    console.log('SELECTED NODE TYPE: ' + this.getNodeIDToObjectMap[itemId].type)
-
-    if (itemType === 'sequence') {
-      /* await this.$store.dispatch('sequence/fetchSequenceAndSequenceId', {
-        itemName: itemName,
-        forceOpenNode: false,
-      }) // note the "await" */
-      /*    await this.$store.dispatch('sequence/fetchSequenceViaId', {
-        itemId: itemId,
-        forceOpenNode: false,
-      }) */
-      // note the "await"
-    } else if (itemType === 'paths') {
-      /*   await this.$store.dispatch('path/fetchPathAndPathId', {
-        itemName: itemName,
-        forceOpenNode: false,
-      }) */
-    } else if (itemType === 'modules') {
-      /*    await this.$store.dispatch('module/fetchModuleAndModuleId', {
-        itemName: itemName,
-        forceOpenNode: false,
-      }) */
-    } else if (itemType === 'pset') {
-      /*    await this.$store.dispatch('pset/fetchPSetAndPSetId', {
-        itemName: itemName,
-        forceOpenNode: false,
-      }) */
-    } else {
-      console.log('SPECIAL CASE!')
-      console.log(itemType)
-      console.log(itemName)
-      console.log(itemId)
-      console.log(itemChildren.length)
-      /*  await this.$store.dispatch('setSelectedNode', {
-        selectedNodeType: itemType,
-        selectedNodeName: itemName,
-        selectedNodeId: itemId,
-        selectedNodeParamLength: itemChildren.length,
-      }) */
-      /* console.log(itemChildren.length)
-      await this.$store.dispatch('setSelectedNodeViaID', {
-        selectedNodeId: itemId,
-      }) */
-    }
-    //if (index == -1)
-    //open only if it is not already open
-    //this.openNodes = ['Modules', 'hltFEDSelector']
-  }
 
   async fetchNodeById(itemId: number) {
     /*     console.log(itemType)
@@ -1217,54 +1144,28 @@ export default class TreeView extends Vue {
     let itemType = this.getNodeIDToObjectMap[itemId].type
 
     if (itemType === 'sequence') {
-      /* await this.$store.dispatch('sequence/fetchSequenceAndSequenceId', {
-        itemName: itemName,
-        forceOpenNode: false,
-      }) // note the "await" */
       //console.log('FETCH SEQUENCE ID TYPE: ' + typeof itemId)
       await this.$store.dispatch('sequence/fetchSequenceViaId', {
         itemId: itemId,
         forceOpenNode: false,
       }) // note the "await"
     } else if (itemType === 'paths') {
-      /* await this.$store.dispatch('path/fetchPathAndPathId', {
-        itemName: itemName,
-        forceOpenNode: false,
-      }) */
       await this.$store.dispatch('path/fetchPathViaId', {
         itemId: itemId,
         forceOpenNode: false,
       })
     } else if (itemType === 'modules') {
-      /* await this.$store.dispatch('module/fetchModuleAndModuleId', {
-        itemName: itemName,
-        forceOpenNode: false,
-      }) */
       await this.$store.dispatch('module/fetchModuleViaId', {
         itemId: itemId,
         forceOpenNode: false,
       })
     } else if (itemType === 'pset') {
-      /* await this.$store.dispatch('pset/fetchPSetAndPSetId', {
-        itemName: itemName,
-        forceOpenNode: false,
-      })*/
       await this.$store.dispatch('pset/fetchPSetViaId', {
         itemId: itemId,
         forceOpenNode: false,
       })
     } else {
       console.log('SPECIAL CASE!')
-      /*   console.log(itemType)
-      console.log(itemName)
-      console.log(itemId)
-      console.log(itemChildren.length) */
-      /*  await this.$store.dispatch('setSelectedNode', {
-        selectedNodeType: itemType,
-        selectedNodeName: itemName,
-        selectedNodeId: itemId,
-        selectedNodeParamLength: itemChildren.length,
-      }) */
       //console.log(itemChildren.length)
       await this.$store.dispatch('setSelectedNodeViaID', {
         selectedNodeId: itemId,
