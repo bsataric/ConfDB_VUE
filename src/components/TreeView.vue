@@ -21,7 +21,11 @@
       ref="treeReference"
     >
       <template v-slot:prepend="{ item, open }">
-        <span :ref="item.name" :id="item.type + item.name">
+        <span
+          :ref="item.name"
+          :id="item.type + item.name"
+          @contextmenu="showRightClickMenu($event, item.type)"
+        >
           <v-icon v-if="!item.iconType && item.globalType != 'parameter'">
             {{ open ? 'mdi-minus-thick' : 'mdi-plus-thick' }}
           </v-icon>
@@ -42,8 +46,27 @@
         </span>
       </template>
     </v-treeview>
-    <!--     {{ getSequenceById(2) }}
- -->
+    <v-menu
+      v-model="showMenu"
+      :position-x="x"
+      :position-y="y"
+      absolute
+      offset-y
+      :dark="getDarkMode"
+    >
+      <v-list>
+        <v-list-item
+          v-for="menuItem in this.getMenuItems"
+          :key="menuItem[0]"
+          @click="clickAction"
+        >
+          <v-list-item-title
+            >{{ menuItem[0] }}
+            <v-divider v-if="menuItem[1] == 'Separator'"></v-divider>
+          </v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </v-menu>
   </div>
 </template>
 
@@ -70,6 +93,7 @@ import { mapGetters } from 'vuex'
       getOpenNodeIdsLength: 'getOpenNodeIdsLength',
       getPSets: 'pset/getPSets',
       getOpenFileContent: 'getOpenFileContent',
+      getDarkMode: 'getDarkMode',
     }),
     // ...mapState('sequence', ['sequences']),
   },
@@ -130,8 +154,8 @@ export default class TreeView extends Vue {
   private forcedActive: any = []
   //private configLoaded: boolean = false
 
-  private openSequencesList: any = []
-  private openModulesList: any = []
+  //private openSequencesList: any = []
+  //private openModulesList: any = []
   private getSequences!: any[] // are assigned via mapState
   private getPaths!: any[]
   private getModules!: any[]
@@ -153,6 +177,70 @@ export default class TreeView extends Vue {
   private globalPSetsObject: Object = {}
 
   private idCounter = 1 //TODO: this is dummy this has to be provided from the server
+
+  //right click menu variables
+  private rightClickNodeType = ''
+  private showMenu: boolean = false
+  private x: number = 0
+  private y: number = 0
+  private menuItems: any = [
+    [
+      //main sequence node
+      ['Add Sequence', 'Separator'],
+      ['Remove Unreferenced Sequences', 'No Separator'],
+      ['Resolve Unnecessary Sequences', 'Separator'],
+      ['Sort', 'No Separator'],
+    ],
+    [
+      //sequence node
+      ['Add Module', 'No Separator'],
+      ['Add Sequence', 'No Separator'],
+      ['Add Task', 'No Separator'],
+      ['Add SwithcProducer', 'Separator'],
+      ['Rename Sequence', 'No Separator'],
+      ['Clone Sequence', 'No Separator'],
+      ['Deep Clone Sequence', 'No Separator'],
+      ['Remove Sequence', 'No Separator'],
+      ['Replace Sequence', 'No Separator'],
+    ],
+    [
+      //main path node
+      ['Add Path', 'Seprator'],
+      ['Sort', 'No Seprator'],
+    ],
+    [
+      //path node
+      ['Add Module', 'No Separator'],
+      ['Add Path', 'No Separator'],
+      ['Add Sequence', 'No Separator'],
+      ['Add Task', 'No Separator'],
+      ['Add SwithcProducer', 'Separator'],
+      ['Remove Path', 'No Separator'],
+      ['Clone Path', 'Separator'],
+      ['Assign to P. Dataset', 'No Separator'],
+      ['Remove from P. Dataset', 'Separator'],
+      ['endpath', 'No Separator'],
+      ['Replace Path', 'No Separator'],
+    ],
+    [
+      //main modules node
+      ['Sort', 'No Seprator'],
+    ],
+    [
+      //module node
+      ['Rename Module', 'No Seprator'],
+      ['Replace Module', 'No Seprator'],
+    ],
+    [
+      //main PSet node
+      ['Add PSet', 'No Seprator'],
+    ],
+    [
+      //PSet node
+      ['Add PSet', 'No Seprator'],
+      ['Remove PSet', 'No Seprator'],
+    ],
+  ]
 
   private iconTypes: any = {
     sequence: 'mdi-view-sequential',
@@ -489,6 +577,22 @@ export default class TreeView extends Vue {
       this.globalModulesObject,
       this.globalPSetsObject,
     ]
+  }
+
+  get getMenuItems() {
+    //TODO CHGANGE THIS INTO NORMAL MAP
+    //console.log('RIGHT CLICK NODE TYPE: ' + nodeType)
+    //console.log('this.menuItems[0]: ' + this.menuItems[0])
+    if (this.rightClickNodeType == 'seqs') return this.menuItems[0]
+    else if (this.rightClickNodeType == 'sequences') return this.menuItems[1]
+    else if (this.rightClickNodeType == 'pts') return this.menuItems[2]
+    else if (this.rightClickNodeType == 'paths') return this.menuItems[3]
+    else if (this.rightClickNodeType == 'mods') return this.menuItems[4]
+    else if (this.rightClickNodeType == 'modules') return this.menuItems[5]
+    else if (this.rightClickNodeType == 'psets') return this.menuItems[6]
+    else if (this.rightClickNodeType == 'pset') return this.menuItems[7]
+    //return this.menuItems[nodeType]
+    return []
   }
 
   public parseSequences(sequenceData: any) {
@@ -1127,6 +1231,23 @@ export default class TreeView extends Vue {
     //if (index == -1)
     //open only if it is not already open
     //this.openNodes = ['Modules', 'hltFEDSelector']
+  }
+
+  // eslint-disable-next-line no-unused-vars
+  public clickAction(e) {
+    alert('clicked')
+  }
+
+  public showRightClickMenu(e, itemType: string) {
+    e.preventDefault()
+    console.log('RIGHT CLICK ITEM TYPE: ' + itemType)
+    this.rightClickNodeType = itemType
+    this.showMenu = false
+    this.x = e.clientX
+    this.y = e.clientY
+    this.$nextTick(() => {
+      this.showMenu = true
+    })
   }
 
   async sleep(ms) {
