@@ -88,11 +88,11 @@ export default class SnippetView extends Vue {
   }
 
   public getSelectedNodeSnippet(nodeType: string) {
-    //console.log('SELECTED NODE TYPE: ' + nodeType)
+    console.log('SELECTED NODE TYPE: ' + nodeType)
     //this.triggered = !this.triggered
     if (nodeType == 'modules') {
       return this.getSelectedModuleSnippet
-    } else if (nodeType == 'sequence') {
+    } else if (nodeType == 'sequences') {
       return this.getSelectedSequenceSnippet
     } else if (nodeType == 'paths') {
       return this.getPathSnippet
@@ -126,7 +126,7 @@ export default class SnippetView extends Vue {
       }
       sequencesText += '</ul>'
       return sequencesText
-    } else if (nodeType == 'sequence') {
+    } else if (nodeType == 'sequences') {
       let sequences = this.getSelectedSequenceSequences
       console.log('SEQUENCESSSSS: ' + sequences)
       this.arrayOfSelectedObjects = sequences
@@ -173,7 +173,7 @@ export default class SnippetView extends Vue {
       }
       pathsText += '</ul>'
       return pathsText
-    } else if (nodeType == 'sequence') {
+    } else if (nodeType == 'sequences') {
       let paths = this.getSelectedSequencePaths
       this.arrayOfSelectedObjects = paths
       let pathsText = '<ul>'
@@ -204,7 +204,7 @@ export default class SnippetView extends Vue {
         if (i == 4 || i == 5) this.disabledTabs[i] = true
         else this.disabledTabs[i] = false
       }
-    } else if (nodeType == 'sequence') {
+    } else if (nodeType == 'sequences') {
       for (let i = 0; i < this.disabledTabs.length; i++) {
         if (i == 4 || i == 5) this.disabledTabs[i] = true
         else this.disabledTabs[i] = false
@@ -232,9 +232,9 @@ export default class SnippetView extends Vue {
     }
 
     this.previousNodeName = nodeName
-    if (this.activeTab == 3)
+    if (this.activeTab == 3) {
       return this.getSelectedNodeSnippet(this.getSelectedNodeType)
-    else if (this.activeTab == 0) {
+    } else if (this.activeTab == 0) {
       return this.getSelectedNodeContainedInSequences(this.getSelectedNodeType)
     } else if (this.activeTab == 6) {
       //console.log('ACTIVE TAB 6')

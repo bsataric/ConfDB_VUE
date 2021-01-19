@@ -101,7 +101,7 @@ export const actions = {
           commit(
             'SET_SELECTED_NODE_VIA_ID', //TODO: FIX
             {
-              selectedNodeType: 'sequence',
+              selectedNodeType: 'sequences',
               selectedNodeName: name,
               selectedNodeId: sequenceId,
               selectedNodeParamLength: response.data.length,

@@ -352,7 +352,7 @@ export default class TableView extends Vue {
     //console.log('SELECTED NODE TYPE: ' + nodeType)
     if (nodeType == 'modules') {
       return this.parseParams(this.getSelectedModuleParams, nodeType)
-    } else if (nodeType == 'sequence') {
+    } else if (nodeType == 'sequences') {
       return []
     } else if (nodeType == 'paths') {
       return []
@@ -365,7 +365,7 @@ export default class TableView extends Vue {
   public getSelectedNodeEDProducer(nodeType: any) {
     if (nodeType == 'module') {
       return 'EDProducer'
-    } else if (nodeType == 'sequence') {
+    } else if (nodeType == 'sequences') {
       return ''
     } else if (nodeType == 'path') {
       return ''
@@ -378,7 +378,7 @@ export default class TableView extends Vue {
   public getSelectedNodeEDProducerValue(nodeType: string) {
     if (nodeType == 'modules') {
       return this.getSelectedModuleName
-    } else if (nodeType == 'sequence') {
+    } else if (nodeType == 'sequences') {
       return ''
     } else if (nodeType == 'paths') {
       return ''
@@ -391,7 +391,7 @@ export default class TableView extends Vue {
   public getSelectedNodeLabel(nodeType: string) {
     if (nodeType == 'modules') {
       return this.getSelectedModuleName
-    } else if (nodeType == 'sequence') {
+    } else if (nodeType == 'sequences') {
       return ''
     } else if (nodeType == 'paths') {
       return ''
@@ -404,7 +404,7 @@ export default class TableView extends Vue {
   public getPathsDisabled(nodeType: any) {
     if (nodeType == 'modules') {
       return false
-    } else if (nodeType == 'sequence') {
+    } else if (nodeType == 'sequences') {
       return true
     } else if (nodeType == 'path') {
       return true
@@ -423,7 +423,7 @@ export default class TableView extends Vue {
         values.push(value)
       }
       return values
-    } else if (nodeType == 'sequence') {
+    } else if (nodeType == 'sequences') {
       return []
     } else if (nodeType == 'path') {
       return []

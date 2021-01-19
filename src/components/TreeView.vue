@@ -170,7 +170,7 @@ export default class TreeView extends Vue {
       children: [
         {
           id: 2,
-          type: 'sequence',
+          type: 'sequences',
           name: 'HLTPFClusteringForEgammaUnseeded',
           iconType: 'sequence',
           iconColor: 'red',
@@ -191,7 +191,7 @@ export default class TreeView extends Vue {
         },
         {
           id: 5,
-          type: 'sequence',
+          type: 'sequences',
           name: 'HLTDoLocalPixelSequence',
           iconType: 'sequence',
           iconColor: 'red',
@@ -503,7 +503,7 @@ export default class TreeView extends Vue {
     for (const [key, value] of Object.entries(sequenceData)) {
       //loop over sequnces - create new Sequence object and add it to children of the seqs
       let sequenceObject: Object = {
-        type: 'sequence',
+        type: 'sequences',
         name: key,
         id: ++this.idCounter,
         iconType: 'sequence',
@@ -512,9 +512,7 @@ export default class TreeView extends Vue {
       }
 
       //this.nodeIds.push(this.idCounter)
-      //TRY
       let sequenceObjectId = this.idCounter //remember counter to use it after children are populated
-      //this.nodeIDToObjectMap[this.idCounter] = { name: key, type: 'sequence' }
 
       //console.log(`${key}`)
       // eslint-disable-next-line no-unused-vars
@@ -530,7 +528,7 @@ export default class TreeView extends Vue {
           nestedSequenceObject['name'] = Object(value1)[1]
           nestedSequenceObject['iconType'] = 'module'
           nestedSequenceObject['children'] = []
-          //TRY nested sequence
+
           this.nodeIDToObjectMap[this.idCounter] = {
             name: Object(value1)[1],
             type: 'modules',
@@ -544,7 +542,7 @@ export default class TreeView extends Vue {
           nestedSequenceObject['iconType'] = 'sequence'
           nestedSequenceObject['iconColor'] = 'red'
           nestedSequenceObject['children'] = []
-          //TRY nested sequence
+
           this.nodeIDToObjectMap[this.idCounter] = {
             name: Object(value1)[1],
             type: 'sequences',
@@ -554,17 +552,16 @@ export default class TreeView extends Vue {
         }
         sequenceObject['children'].push(nestedSequenceObject)
       }
-      //TRY one sequence
+
       this.nodeIDToObjectMap[sequenceObjectId] = {
         name: key,
-        type: 'sequence',
+        type: 'sequences',
         itemChildrenLength: sequenceObject['children'].length,
         parentNodeId: 1,
       }
       sequencesObject['children'].push(sequenceObject)
     }
 
-    //TRY all sequences
     this.nodeIDToObjectMap[1] = {
       name: 'Sequences',
       type: 'seqs',
@@ -587,7 +584,7 @@ export default class TreeView extends Vue {
       children: [],
     }
     // this.nodeIds.push(this.idCounter)
-    //TRY remember the paths id
+    //remember the paths id
     let pathsIdCounter = this.idCounter
     //this.nodeIDToObjectMap[this.idCounter] = { name: 'Paths', type: 'pts' }
 
@@ -604,8 +601,6 @@ export default class TreeView extends Vue {
       }
       let pathIdCounter = this.idCounter
       //this.nodeIds.push(this.idCounter)
-      //TRY
-      //this.nodeIDToObjectMap[this.idCounter] = { name: key, type: 'paths' }
 
       //console.log(`${key}`)
       // eslint-disable-next-line no-unused-vars
@@ -621,7 +616,7 @@ export default class TreeView extends Vue {
           nestedPathObject['name'] = Object(value1)[1]
           nestedPathObject['iconType'] = 'module'
           nestedPathObject['children'] = []
-          //TRY
+
           this.nodeIDToObjectMap[this.idCounter] = {
             name: Object(value1)[1],
             type: 'modules',
@@ -635,7 +630,7 @@ export default class TreeView extends Vue {
           nestedPathObject['iconType'] = 'sequence'
           nestedPathObject['iconColor'] = 'red'
           nestedPathObject['children'] = []
-          //TRY
+
           this.nodeIDToObjectMap[this.idCounter] = {
             name: Object(value1)[1],
             type: 'sequences',
@@ -654,7 +649,6 @@ export default class TreeView extends Vue {
       pathsObject['children'].push(pathObject)
     }
 
-    //TRY all paths
     this.nodeIDToObjectMap[pathsIdCounter] = {
       name: 'Paths',
       type: 'pts',
@@ -790,7 +784,6 @@ export default class TreeView extends Vue {
       children: [],
     }
     //this.nodeIds.push(this.idCounter)
-    //TRY
     let modulesIdCounter = this.idCounter
     //this.nodeIDToObjectMap[this.idCounter] = { name: 'Modules', type: 'mods' }
 
@@ -809,8 +802,6 @@ export default class TreeView extends Vue {
       // this.nodeIds.push(this.idCounter)
 
       let moduleIdCounter = this.idCounter
-      //TRY
-      //this.nodeIDToObjectMap[this.idCounter] = { name: key, type: 'modules' }
       //console.log(`${key}`)
       // eslint-disable-next-line no-unused-vars
       for (const [key1, value1] of Object.entries(Object(value))) {
@@ -927,8 +918,6 @@ export default class TreeView extends Vue {
     //this.nodeIds.push(this.idCounter)
 
     let psetsIdCounter = this.idCounter
-    //TRY
-    //this.nodeIDToObjectMap[this.idCounter] = { name: 'PSets', type: 'psets' }
 
     for (const [key, value] of Object.entries(psetData)) {
       //loop over sequnces - create new Sequence object and add it to children of the seqs
@@ -943,8 +932,6 @@ export default class TreeView extends Vue {
       // this.nodeIds.push(this.idCounter)
 
       let psetIdCounter = this.idCounter
-      //TRY
-      //this.nodeIDToObjectMap[this.idCounter] = { name: key, type: 'pset' }
 
       //console.log(`${key}`)
       // eslint-disable-next-line no-unused-vars
@@ -1064,7 +1051,6 @@ export default class TreeView extends Vue {
       })
       this.parsePSets(this.getPSets)
       //console.log('AFTER PSETS: ' + this.nodeIds)
-      //TRY NEW DISPATCH
       await this.$store.dispatch(
         'createNodeIDToObjectMap',
         this.nodeIDToObjectMap
@@ -1110,7 +1096,7 @@ export default class TreeView extends Vue {
 
     let itemType = this.getNodeIDToObjectMap[itemId].type
 
-    if (itemType === 'sequence') {
+    if (itemType === 'sequences') {
       //console.log('FETCH SEQUENCE ID TYPE: ' + typeof itemId)
       await this.$store.dispatch('sequence/fetchSequenceViaId', {
         itemId: itemId,
@@ -1200,6 +1186,7 @@ export default class TreeView extends Vue {
   public updateActiveNodes(array: any) {
     //console.log('THIS ACTIVE: ' + array)
     if (Object.keys(this.getNodeIDToObjectMap).length !== 0)
+      //if map is initialized
       this.fetchNodeById(array[0])
     this.active = array
   }
