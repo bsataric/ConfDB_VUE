@@ -24,7 +24,7 @@
         <span
           :ref="item.name"
           :id="item.type + item.name"
-          @contextmenu="showRightClickMenu($event, item.type)"
+          @contextmenu="showRightClickMenu($event, item.type, item.id)"
         >
           <v-icon v-if="!item.iconType && item.globalType != 'parameter'">
             {{ open ? 'mdi-minus-thick' : 'mdi-plus-thick' }}
@@ -58,7 +58,7 @@
         <v-list-item
           v-for="menuItem in this.getMenuItems"
           :key="menuItem[0]"
-          @click="clickAction"
+          @click="clickAction($event, menuItem[0])"
         >
           <v-list-item-title
             >{{ menuItem[0] }}
@@ -67,6 +67,25 @@
         </v-list-item>
       </v-list>
     </v-menu>
+    <v-row justify="center">
+      <v-dialog v-model="dialog" persistent max-width="290">
+        <v-card>
+          <v-card-title class="headline">
+            {{ this.dialogText }}
+          </v-card-title>
+          <v-text-field v-model="dialogValue"></v-text-field>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="green darken-1" text @click="cancelClicked()">
+              Cancel
+            </v-btn>
+            <v-btn color="green darken-1" text @click="okClicked()">
+              OK
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-row>
   </div>
 </template>
 
@@ -180,6 +199,7 @@ export default class TreeView extends Vue {
 
   //right click menu variables
   private rightClickNodeType = ''
+  private rightClickNodeId = 0
   private showMenu: boolean = false
   private x: number = 0
   private y: number = 0
@@ -242,14 +262,19 @@ export default class TreeView extends Vue {
     ],
   ]
 
+  private dialog: boolean = false
+  private dialogText: string = ''
+  private dialogValue: string = ''
+  private actionCallBack!: (string, number) => boolean
+
   private iconTypes: any = {
     sequence: 'mdi-view-sequential',
     module: 'mdi-view-module',
     path: 'mdi-filmstrip',
     pset: 'mdi-format-list-bulleted',
   }
-  private tree: any = []
-
+  //private tree: any = []
+  /* 
   private items1: any = [
     {
       id: 1,
@@ -300,7 +325,7 @@ export default class TreeView extends Vue {
         },
       ],
     },
-  ]
+  ] */
   /*     {
       name: 'Paths',
       type: 'paths',
@@ -1234,20 +1259,72 @@ export default class TreeView extends Vue {
   }
 
   // eslint-disable-next-line no-unused-vars
-  public clickAction(e) {
-    alert('clicked')
+  public clickAction(e, actionName: string) {
+    console.log(actionName)
+    console.log(this.rightClickNodeType)
+    console.log(this.rightClickNodeId)
+    if (this.rightClickNodeType == 'seqs') {
+      if (actionName == 'Add Sequence') {
+        //console.log('ADDING SEQUENCE')
+        this.dialog = true
+        this.dialogText = 'Sequence name:'
+        //this.insertSequence('AAA', this.rightClickNodeId)
+        this.actionCallBack = this.insertSequence
+      }
+    }
   }
 
-  public showRightClickMenu(e, itemType: string) {
+  public insertSequence(sequenceName: string, sequenceNodeId: number): boolean {
+    console.log('INSERTING SEQUENCE ' + sequenceName)
+    let newSequenceObject: Object = {
+      type: 'sequences',
+      name: sequenceName,
+      id: ++this.idCounter,
+      iconType: 'sequence',
+      iconColor: 'red',
+      children: [],
+    }
+    console.log(newSequenceObject)
+    console.log('sequenceNodeId' + sequenceNodeId)
+    /* console.log(
+      'this.items[sequenceNodeId]: ' +
+        JSON.stringify(this.globalSequencesObject['children'])
+    )  */
+    this.globalSequencesObject['children'].push(newSequenceObject)
+    /*    for (const [key, value] of Object.entries(this.globalSequencesObject)) {
+      console.log('KEY: ' + key)
+      console.log('VALUE: ' + value)
+    } */
+    return true
+  }
+
+  public showRightClickMenu(e, itemType: string, itemId: number) {
     e.preventDefault()
     console.log('RIGHT CLICK ITEM TYPE: ' + itemType)
     this.rightClickNodeType = itemType
+    this.rightClickNodeId = itemId
     this.showMenu = false
     this.x = e.clientX
     this.y = e.clientY
     this.$nextTick(() => {
       this.showMenu = true
     })
+  }
+
+  async okClicked() {
+    console.log(this.dialogValue)
+    this.actionCallBack(this.dialogValue, this.rightClickNodeId)
+    //TODO: set new object into main map and focus
+    /* await this.$store.dispatch(
+      'appendNodeIDToObjectMap',
+      this.nodeIDToObjectMap
+    )  */
+    this.dialog = false
+  }
+
+  public cancelClicked() {
+    this.dialog = false
+    console.log('CANCEL CLICKED')
   }
 
   async sleep(ms) {

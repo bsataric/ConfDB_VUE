@@ -133,6 +133,9 @@ export default new Vuex.Store({
     createNodeIDToObjectMap({ commit }, nodeIDToObjectMap) {
       commit('SET_ID_TO_OBJECT_MAP', nodeIDToObjectMap)
     },
+    appendNodeIDToObjectMap({ commit }, appendNodeIDToObjectMap) {
+      commit('APPEND_ID_TO_OBJECT_MAP', appendNodeIDToObjectMap)
+    },
     setSelectedNodeViaID({ commit }, payload) {
       commit('SET_SELECTED_NODE_VIA_ID', payload)
     },
