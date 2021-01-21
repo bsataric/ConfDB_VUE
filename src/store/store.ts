@@ -56,16 +56,16 @@ export default new Vuex.Store({
         state.nodeIDToObjectMap[payload.selectedNodeId].parentNodeId
       let forceOpenNode = payload.forceOpenNode //if node is opened by foce open it's parent as well
 
-      //console.log('FORCED OPEN NODE: ' + forceOpenNode)
+      console.log('FORCED OPEN NODE: ' + forceOpenNode)
       if (forceOpenNode) {
         state.forcedActiveNodeId = state.selectedNodeId
         //console.log('FORCED NODE ID: ' + state.forcedActiveNodeId)
       }
       //TODO FIX LEAF SEQUENCE DISPLAYING
-      if (state.selectedNodeParamLength == 0) {
+      /*    if (state.selectedNodeParamLength == 0) {
         console.log('ITEM CHILDREN ZERO!')
         return
-      }
+      } */
 
       let idIndex = state.openNodeIds.indexOf(payload.selectedNodeId)
       //console.log('SELECTED NODE ID: ' + state.selectedNodeId)
@@ -82,6 +82,7 @@ export default new Vuex.Store({
           let parentNodeIndex = state.openNodeIds.indexOf(
             state.selectedNodeParentId
           )
+          console.log('PARENT NODE INDEX: ' + parentNodeIndex)
           if (parentNodeIndex == -1) {
             //push parent node on array as well
             state.openNodeIds.push(state.selectedNodeParentId)
@@ -97,6 +98,7 @@ export default new Vuex.Store({
           let parentNodeIndex = state.openNodeIds.indexOf(
             state.selectedNodeParentId
           )
+          console.log('PARENT NODE INDEX: ' + parentNodeIndex)
           if (parentNodeIndex == -1) {
             //push parent node on array as well
             state.openNodeIds.push(state.selectedNodeParentId)
@@ -120,6 +122,17 @@ export default new Vuex.Store({
         'nodeIDToObjectMap:' + JSON.stringify(state.nodeIDToObjectMap)
       ) */
     },
+    APPEND_ID_TO_OBJECT_MAP(state, payload) {
+      console.log('APPEND_ID_TO_OBJECT_MAP')
+      console.log(
+        'payload.nodeIDToObject' + JSON.stringify(payload.nodeIDToObject)
+      )
+      console.log('payload.id ' + payload.id)
+      state.nodeIDToObjectMap[payload.id] = payload.nodeIDToObject
+      /*   console.log(
+        'nodeIDToObjectMap:' + JSON.stringify(state.nodeIDToObjectMap)
+      ) */
+    },
     SET_OPEN_FILE_CONTENT(state, payload) {
       //console.log('SETTING OPEN FILE CONTENT:')
       state.openFileContent = payload
@@ -133,8 +146,8 @@ export default new Vuex.Store({
     createNodeIDToObjectMap({ commit }, nodeIDToObjectMap) {
       commit('SET_ID_TO_OBJECT_MAP', nodeIDToObjectMap)
     },
-    appendNodeIDToObjectMap({ commit }, appendNodeIDToObjectMap) {
-      commit('APPEND_ID_TO_OBJECT_MAP', appendNodeIDToObjectMap)
+    appendNodeIDToObjectMap({ commit }, nodeIDToObject) {
+      commit('APPEND_ID_TO_OBJECT_MAP', nodeIDToObject)
     },
     setSelectedNodeViaID({ commit }, payload) {
       commit('SET_SELECTED_NODE_VIA_ID', payload)

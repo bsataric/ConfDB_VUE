@@ -68,12 +68,15 @@
       </v-list>
     </v-menu>
     <v-row justify="center">
-      <v-dialog v-model="dialog" persistent max-width="290">
+      <v-dialog v-model="dialog" persistent max-width="290" :dark="getDarkMode">
         <v-card>
           <v-card-title class="headline">
             {{ this.dialogText }}
           </v-card-title>
-          <v-text-field v-model="dialogValue"></v-text-field>
+          <div style="margin-left: 40px">
+            <!-- TODO: FIX THIS STYLING -->
+            <v-text-field v-model="dialogValue"></v-text-field>
+          </div>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="green darken-1" text @click="cancelClicked()">
@@ -99,6 +102,8 @@ import { mapGetters } from 'vuex'
   computed: {
     ...mapGetters({
       getSequences: 'sequence/getSequences',
+      getSequenceByName: 'sequence/getSequenceByName',
+      getSequenceById: 'sequence/getSequenceById',
       getPaths: 'path/getPaths',
       getModules: 'module/getModules',
       getSelectedNodeType: 'getSelectedNodeType',
@@ -176,6 +181,8 @@ export default class TreeView extends Vue {
   //private openSequencesList: any = []
   //private openModulesList: any = []
   private getSequences!: any[] // are assigned via mapState
+  private getSequenceByName!: any
+  private getSequenceById!: any
   private getPaths!: any[]
   private getModules!: any[]
   private getPSets!: any[]
@@ -216,7 +223,7 @@ export default class TreeView extends Vue {
       ['Add Module', 'No Separator'],
       ['Add Sequence', 'No Separator'],
       ['Add Task', 'No Separator'],
-      ['Add SwithcProducer', 'Separator'],
+      ['Add SwitchProducer', 'Separator'],
       ['Rename Sequence', 'No Separator'],
       ['Clone Sequence', 'No Separator'],
       ['Deep Clone Sequence', 'No Separator'],
@@ -234,7 +241,7 @@ export default class TreeView extends Vue {
       ['Add Path', 'No Separator'],
       ['Add Sequence', 'No Separator'],
       ['Add Task', 'No Separator'],
-      ['Add SwithcProducer', 'Separator'],
+      ['Add SwitchProducer', 'Separator'],
       ['Remove Path', 'No Separator'],
       ['Clone Path', 'Separator'],
       ['Assign to P. Dataset', 'No Separator'],
@@ -265,7 +272,7 @@ export default class TreeView extends Vue {
   private dialog: boolean = false
   private dialogText: string = ''
   private dialogValue: string = ''
-  private actionCallBack!: (string, number) => boolean
+  private actionCallBack!: (string, number) => void
 
   private iconTypes: any = {
     sequence: 'mdi-view-sequential',
@@ -605,7 +612,7 @@ export default class TreeView extends Vue {
   }
 
   get getMenuItems() {
-    //TODO CHGANGE THIS INTO NORMAL MAP
+    //TODO CHANGE THIS INTO NORMAL MAP
     //console.log('RIGHT CLICK NODE TYPE: ' + nodeType)
     //console.log('this.menuItems[0]: ' + this.menuItems[0])
     if (this.rightClickNodeType == 'seqs') return this.menuItems[0]
@@ -1265,37 +1272,157 @@ export default class TreeView extends Vue {
     console.log(this.rightClickNodeId)
     if (this.rightClickNodeType == 'seqs') {
       if (actionName == 'Add Sequence') {
-        //console.log('ADDING SEQUENCE')
+        //console.log('Add Sequence')
         this.dialog = true
         this.dialogText = 'Sequence name:'
         //this.insertSequence('AAA', this.rightClickNodeId)
         this.actionCallBack = this.insertSequence
+      } else if (actionName == 'Remove Unreferenced Sequences') {
+        //TODO
+        console.log('Remove Unreferenced Sequences')
+      } else if (actionName == 'Resolve Unnecessary Sequences') {
+        //TODO
+        console.log('Resolve Unnecessary Sequences')
+      } else if (actionName == 'Sort') {
+        //TODO
+        console.log('Sort')
+      }
+    } else if (this.rightClickNodeType == 'Sequences') {
+      if (actionName == 'Add Module') {
+        console.log('Add Module')
+        //TODO
+      } else if (actionName == 'Add Sequence') {
+        //TODO
+        console.log('Add Sequence')
+      } else if (actionName == 'Add Task') {
+        //TODO
+        console.log('Add Task')
+      } else if (actionName == 'Add SwitchProducer') {
+        //TODO
+        console.log('Add SwitchProducer')
+      } else if (actionName == 'Rename Sequence') {
+        //TODO
+        console.log('Rename Sequence')
+        this.dialog = true
+        this.dialogText = 'New sequence name:' //TODO FIX MODAL FOR RENAME
+        this.actionCallBack = this.renameSequence
+      } else if (actionName == 'Clone Sequence') {
+        //TODO
+        console.log('Clone Sequence')
+      } else if (actionName == 'Deep Clone Sequence') {
+        //TODO
+        console.log('Deep Clone Sequence')
+      } else if (actionName == 'Remove Sequence') {
+        //TODO
+        console.log('Remove Sequence')
+      } else if (actionName == 'Replace Sequence') {
+        //TODO
+        console.log('Replace Sequence')
       }
     }
   }
 
-  public insertSequence(sequenceName: string, sequenceNodeId: number): boolean {
-    console.log('INSERTING SEQUENCE ' + sequenceName)
-    let newSequenceObject: Object = {
-      type: 'sequences',
-      name: sequenceName,
-      id: ++this.idCounter,
-      iconType: 'sequence',
-      iconColor: 'red',
-      children: [],
-    }
-    console.log(newSequenceObject)
-    console.log('sequenceNodeId' + sequenceNodeId)
-    /* console.log(
+  async insertSequence(sequenceName: string, sequenceNodeId: number) {
+    console.log('TRYING TO INSERT SEQUENCE ' + sequenceName)
+    //first check if there is sequence with the same name
+    if (this.getSequenceByName(sequenceName) == undefined) {
+      await this.$store.dispatch('sequence/createSequenceLocally', {
+        sequenceName: sequenceName,
+        sequenceParams: [],
+      })
+      let newSequenceObject: Object = {
+        type: 'sequences',
+        name: sequenceName,
+        id: ++this.idCounter,
+        iconType: 'sequence',
+        iconColor: 'red',
+        children: [],
+      }
+      console.log(newSequenceObject)
+      console.log('sequenceNodeId' + sequenceNodeId)
+      /* console.log(
       'this.items[sequenceNodeId]: ' +
         JSON.stringify(this.globalSequencesObject['children'])
     )  */
-    this.globalSequencesObject['children'].push(newSequenceObject)
-    /*    for (const [key, value] of Object.entries(this.globalSequencesObject)) {
+      this.globalSequencesObject['children'].push(newSequenceObject) //add new node to the sequence node
+      /*    for (const [key, value] of Object.entries(this.globalSequencesObject)) {
       console.log('KEY: ' + key)
       console.log('VALUE: ' + value)
     } */
-    return true
+
+      let nodeIDToObject = {
+        name: sequenceName,
+        type: 'sequences',
+        itemChildrenLength: 0,
+        parentNodeId: 1,
+      }
+
+      //set new object into main map and focus
+      await this.$store.dispatch('appendNodeIDToObjectMap', {
+        id: this.idCounter,
+        nodeIDToObject: nodeIDToObject,
+      })
+      //Focus and open/active new node
+      await this.$store.dispatch('sequence/fetchSequenceViaId', {
+        itemId: this.idCounter,
+        forceOpenNode: true,
+      })
+    } else {
+      //TODO DISPATCH NOTIFICATION BAR
+      console.log('THERE IS SEQUENCE WITH THE SAME NAME!')
+    }
+  }
+
+  async renameSequence(sequenceName: string, sequenceNodeId: number) {
+    console.log('TRYING TO INSERT SEQUENCE ' + sequenceName)
+    //first check if there is sequence with the same name
+    if (this.getSequenceById(sequenceNodeId) != undefined) {
+      await this.$store.dispatch('sequence/renameSequenceLocally', {
+        sequenceId: sequenceNodeId,
+        sequenceName: sequenceName,
+      })
+      /*    let newSequenceObject: Object = {
+        type: 'sequences',
+        name: sequenceName,
+        id: ++this.idCounter,
+        iconType: 'sequence',
+        iconColor: 'red',
+        children: [],
+      } */
+      //console.log(newSequenceObject)
+      //console.log('sequenceNodeId' + sequenceNodeId)
+      /* console.log(
+      'this.items[sequenceNodeId]: ' +
+        JSON.stringify(this.globalSequencesObject['children'])
+    )  */
+      //change name in object here
+      //this.globalSequencesObject['children'].push(newSequenceObject) //add new node to the sequence node
+      /*    for (const [key, value] of Object.entries(this.globalSequencesObject)) {
+      console.log('KEY: ' + key)
+      console.log('VALUE: ' + value)
+    } */
+
+      let nodeIDToObject = {
+        name: sequenceName,
+        type: 'sequences',
+        itemChildrenLength: 0,
+        parentNodeId: 1,
+      }
+
+      //set new object into main map and focus
+      await this.$store.dispatch('appendNodeIDToObjectMap', {
+        id: this.idCounter,
+        nodeIDToObject: nodeIDToObject,
+      })
+      //Focus and open/active new node
+      /*   await this.$store.dispatch('sequence/fetchSequenceViaId', {
+        itemId: this.idCounter,
+        forceOpenNode: true,
+      }) */
+    } else {
+      //TODO DISPATCH NOTIFICATION BAR
+      console.log('THERE IS SEQUENCE WITH THE SAME NAME!')
+    }
   }
 
   public showRightClickMenu(e, itemType: string, itemId: number) {
@@ -1314,11 +1441,7 @@ export default class TreeView extends Vue {
   async okClicked() {
     console.log(this.dialogValue)
     this.actionCallBack(this.dialogValue, this.rightClickNodeId)
-    //TODO: set new object into main map and focus
-    /* await this.$store.dispatch(
-      'appendNodeIDToObjectMap',
-      this.nodeIDToObjectMap
-    )  */
+
     this.dialog = false
   }
 
@@ -1417,6 +1540,7 @@ export default class TreeView extends Vue {
   }
 
   updated() {
+    console.log('UPDATED')
     this.$nextTick(() => {
       if (this.forcedActive.length != 0) {
         let forced = this.forcedActive[0]
@@ -1430,6 +1554,27 @@ export default class TreeView extends Vue {
         this.forcedActive = []
       }
     })
+  }
+
+  // it has to be done this way since dialog cannot catch events otherwise
+  public onKeyDown(e) {
+    if (e.key == 'Escape') {
+      if (this.dialog) {
+        this.cancelClicked()
+      }
+      // or if you have created a dialog as a custom component, emit an event
+      // this.$emit('closeDialog')
+    } else if (e.key == 'Enter') {
+      if (this.dialog) this.okClicked()
+    }
+  }
+
+  mounted() {
+    document.addEventListener('keydown', this.onKeyDown)
+  }
+
+  beforeDestroy() {
+    document.removeEventListener('keydown', this.onKeyDown)
   }
 }
 </script>
@@ -1445,5 +1590,12 @@ export default class TreeView extends Vue {
 }
 .param-name-style {
   font-weight: bold;
+}
+.v-text-field {
+  width: 200px;
+}
+.center {
+  display: flex;
+  align-items: center;
 }
 </style>

@@ -118,13 +118,15 @@ export default {
     //console.log(sequenceParams)
     //console.log('getSequenceSnippet CALLED!')
     let sequenceSnippet = sequenceName + ' = cms.Sequence('
-    sequenceParams.forEach((val, key, sequenceParams) => {
-      if (Object.is(sequenceParams.length - 1, key)) {
-        sequenceSnippet += ' ' + val[1] + ' )'
-      } else {
-        sequenceSnippet += ' ' + val[1] + ' + '
-      }
-    })
+    if (sequenceParams.length == 0) sequenceSnippet += ')'
+    else
+      sequenceParams.forEach((val, key, sequenceParams) => {
+        if (Object.is(sequenceParams.length - 1, key)) {
+          sequenceSnippet += ' ' + val[1] + ' )'
+        } else {
+          sequenceSnippet += ' ' + val[1] + ' + '
+        }
+      })
     return sequenceSnippet
     //return JSON.stringify(sequenceParams)
   },

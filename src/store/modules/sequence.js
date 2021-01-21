@@ -12,11 +12,11 @@ export const state = {
   sequenceParamLength: 0,
 }
 export const mutations = {
-  ADD_SEQUENCE(state, sequence) {
-    state.sequences.push(sequence)
+  ADD_SEQUENCE(state, payload) {
+    state.sequences[payload.sequenceName] = payload.sequenceParams
   },
-  SET_SEQUENCES(state, sequences) {
-    state.sequences = sequences
+  SET_SEQUENCES(state, payload) {
+    state.sequences = payload
   },
   SET_SEQUENCE(state, payload) {
     state.sequenceName = payload.name
@@ -26,10 +26,10 @@ export const mutations = {
   },
 }
 export const actions = {
-  createSequence({ commit, dispatch }, sequence) {
-    return SequenceService.postSequence(sequence)
+  createSequenceOnServer({ commit, dispatch }, payload) {
+    return SequenceService.postSequence(payload)
       .then(() => {
-        commit('ADD_SEQUENCE', sequence)
+        commit('ADD_SEQUENCE', payload)
         const notification = {
           type: 'success',
           message: 'Your sequence has been created! ',
@@ -45,6 +45,9 @@ export const actions = {
         dispatch('notification/add', notification, { root: true })
         throw error
       })
+  }, //actions always return promises!!!
+  createSequenceLocally({ commit }, payload) {
+    commit('ADD_SEQUENCE', payload)
   },
   fetchSequences({ commit, dispatch }, payload) {
     if (!payload.fromFile) {
@@ -135,22 +138,13 @@ export const getters = {
   getSequenceById: (state, getters, rootState, rootGetters) => (id) => {
     let nodeIDToObjectMap = rootGetters['getNodeIDToObjectMap']
     let name = nodeIDToObjectMap[id].name
-    let paramLength = 0
+    let value = state.sequences[name]
+    let paramLength = state.sequences[name].length //TODO: eliminate key - value loops where possible
 
-    for (const [key, value] of Object.entries(state.sequences)) {
-      /*    console.log('KEY ' + key)
-      console.log('VALUE ' + value) */
-
-      if (key == name) {
-        /*    for (const [key1, value1] of Object.entries(value)) {
-          console.log('key1 ' + key1)
-          console.log('value1 ' + value1)
-        } */
-        //console.log('PARAMLENGTH: ' + Object.entries(value).length)
-        paramLength = Object.entries(value).length
-        return { value, name, paramLength }
-      }
-    }
+    return { value, name, paramLength }
+  },
+  getSequenceByName: (state) => (name) => {
+    return state.sequences[name]
   },
   getSequences: (state) => {
     return state.sequences

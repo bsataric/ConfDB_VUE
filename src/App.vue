@@ -62,7 +62,6 @@
 import TreeView from './components/TreeView.vue'
 import TableView from './components/TableView.vue'
 import SnippetView from './components/SnippetView.vue'
-import EventCard from './components/EventCard.vue'
 import NotificationContainer from './components/NotificationContainer.vue'
 
 import { Component, Vue } from 'vue-property-decorator'
@@ -78,7 +77,6 @@ import { mapGetters } from 'vuex'
     TreeView,
     TableView,
     SnippetView,
-    EventCard,
     NotificationContainer,
   },
 })
