@@ -46,7 +46,7 @@
         </span>
       </template>
     </v-treeview>
-    <v-menu
+    <!--  <v-menu
       v-model="showMenu"
       :position-x="x"
       :position-y="y"
@@ -66,15 +66,14 @@
           </v-list-item-title>
         </v-list-item>
       </v-list>
-    </v-menu>
-    <v-row justify="center">
+    </v-menu> -->
+    <!--     <v-row justify="center">
       <v-dialog v-model="dialog" persistent max-width="290" :dark="getDarkMode">
         <v-card>
           <v-card-title class="headline">
             {{ this.dialogText }}
           </v-card-title>
           <div style="margin-left: 40px">
-            <!-- TODO: FIX THIS STYLING -->
             <v-text-field v-model="dialogValue"></v-text-field>
           </div>
           <v-card-actions>
@@ -88,11 +87,20 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-    </v-row>
+    </v-row> -->
+    <TreeViewRightClick
+      :rightClickNodeType="this.rightClickNodeType"
+      :rightClickNodeId="this.rightClickNodeId"
+      :showMenu="this.showMenu"
+      :x="this.x"
+      :y="this.y"
+    />
   </div>
 </template>
 
 <script lang="ts">
+import TreeViewRightClick from './TreeViewRightClick.vue'
+
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { mapGetters } from 'vuex'
 
@@ -120,6 +128,9 @@ import { mapGetters } from 'vuex'
       getDarkMode: 'getDarkMode',
     }),
     // ...mapState('sequence', ['sequences']),
+  },
+  components: {
+    TreeViewRightClick,
   },
 })
 export default class TreeView extends Vue {
@@ -1438,7 +1449,7 @@ export default class TreeView extends Vue {
     })
   }
 
-  async okClicked() {
+  /*   async okClicked() {
     console.log(this.dialogValue)
     this.actionCallBack(this.dialogValue, this.rightClickNodeId)
 
@@ -1448,7 +1459,7 @@ export default class TreeView extends Vue {
   public cancelClicked() {
     this.dialog = false
     console.log('CANCEL CLICKED')
-  }
+  } */
 
   async sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms))
@@ -1557,7 +1568,7 @@ export default class TreeView extends Vue {
   }
 
   // it has to be done this way since dialog cannot catch events otherwise
-  public onKeyDown(e) {
+  /*   public onKeyDown(e) {
     if (e.key == 'Escape') {
       if (this.dialog) {
         this.cancelClicked()
@@ -1567,15 +1578,15 @@ export default class TreeView extends Vue {
     } else if (e.key == 'Enter') {
       if (this.dialog) this.okClicked()
     }
-  }
+  } */
 
-  mounted() {
+  /*   mounted() {
     document.addEventListener('keydown', this.onKeyDown)
   }
 
   beforeDestroy() {
     document.removeEventListener('keydown', this.onKeyDown)
-  }
+  } */
 }
 </script>
 
