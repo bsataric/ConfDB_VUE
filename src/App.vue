@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <!--  <NotificationContainer /> -->
+    <NotificationSnackBar />
     <v-container>
       <v-toolbar :dark="getDarkMode">
         <v-app-bar-nav-icon> </v-app-bar-nav-icon>
@@ -62,7 +62,7 @@
 import TreeView from './components/TreeView.vue'
 import TableView from './components/TableView.vue'
 import SnippetView from './components/SnippetView.vue'
-import NotificationContainer from './components/NotificationContainer.vue'
+import NotificationSnackBar from './components/NotificationSnackBar.vue'
 
 import { Component, Vue } from 'vue-property-decorator'
 import { mapGetters } from 'vuex'
@@ -77,7 +77,7 @@ import { mapGetters } from 'vuex'
     TreeView,
     TableView,
     SnippetView,
-    NotificationContainer,
+    NotificationSnackBar,
   },
 })
 export default class App extends Vue {

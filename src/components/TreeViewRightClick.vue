@@ -71,6 +71,7 @@ import { mapGetters } from 'vuex'
       getPSets: 'pset/getPSets',
       getOpenFileContent: 'getOpenFileContent',
       getDarkMode: 'getDarkMode',
+      getIDCounter: 'getIDCounter',
     }),
     // ...mapState('sequence', ['sequences']),
   },
@@ -82,12 +83,10 @@ export default class TreeViewRightClick extends Vue {
   @Prop(Number) readonly x: number | undefined
   @Prop(Number) readonly y: number | undefined
 
-  @Watch('getOpenFileContent')
-  // eslint-disable-next-line no-unused-vars
-  onOpenFileContentChanged(val: any, oldVal: any) {
-    //console.log('VAL:' + val)
-    //console.log('OLDVAL: ' + oldVal)
-    //this.fetchAllGroupsFromFile(val)
+  @Watch('getIDCounter')
+  onIDCounterChanged(val: any, oldVal: any) {
+    console.log('getIDCounter from right click VAL:' + val)
+    console.log('getIDCounter from right click OLDVAL: ' + oldVal)
   }
 
   private getSequences!: any[] // are assigned via mapState
@@ -106,6 +105,7 @@ export default class TreeViewRightClick extends Vue {
   private getOpenNodeIds!: any
   private getForcedOpenNodeIds!: any
   private getOpenNodeIdsLength!: any
+  private getIDCounter!: any
 
   private menuItems: any = [
     [
@@ -198,7 +198,7 @@ export default class TreeViewRightClick extends Vue {
         this.dialog = true
         this.dialogText = 'Sequence name:'
         //this.insertSequence('AAA', this.rightClickNodeId)
-        //this.actionCallBack = this.insertSequence
+        this.actionCallBack = this.insertSequence
       } else if (actionName == 'Remove Unreferenced Sequences') {
         //TODO
         console.log('Remove Unreferenced Sequences')
@@ -243,57 +243,77 @@ export default class TreeViewRightClick extends Vue {
       }
     }
   }
-
+  //TODO CREATE SEQUENCE IN STORES AND PASS IT TO THE TREEVIEW
+  // eslint-disable-next-line no-unused-vars
   async insertSequence(sequenceName: string, sequenceNodeId: number) {
     console.log('TRYING TO INSERT SEQUENCE ' + sequenceName)
 
     //first check if there is sequence with the same name
-    //if (this.getSequenceByName(sequenceName) == undefined) {
-    await this.$store.dispatch('sequence/createSequenceLocally', {
-      sequenceName: sequenceName,
-      sequenceParams: [],
-    })
-    let newSequenceObject: Object = {
-      type: 'sequences',
-      name: sequenceName,
-      //id: ++this.idCounter,
-      iconType: 'sequence',
-      iconColor: 'red',
-      children: [],
-    }
-    console.log(newSequenceObject)
-    console.log('sequenceNodeId' + sequenceNodeId)
-    /* console.log(
+    if (this.getSequenceByName(sequenceName) == undefined) {
+      await this.$store.dispatch('sequence/createSequenceLocally', {
+        sequenceName: sequenceName,
+        sequenceParams: [],
+      })
+
+      await this.$store.dispatch('incrementIDCounter')
+
+      let newSequenceId = this.getIDCounter
+
+      let newSequenceObject: Object = {
+        type: 'sequences',
+        name: sequenceName,
+        id: newSequenceId,
+        iconType: 'sequence',
+        iconColor: 'red',
+        children: [],
+      }
+      //console.log(newSequenceObject)
+      //console.log('sequenceNodeId' + sequenceNodeId)
+      /* console.log(
       'this.items[sequenceNodeId]: ' +
         JSON.stringify(this.globalSequencesObject['children'])
     )  */
-    //this.globalSequencesObject['children'].push(newSequenceObject) //add new node to the sequence node
-    /*    for (const [key, value] of Object.entries(this.globalSequencesObject)) {
+
+      //DONE in TreeView (send object to TreeView)
+      this.$emit('add-node', newSequenceObject)
+
+      //this.globalSequencesObject['children'].push(newSequenceObject) //add new node to the sequence node
+      /*    for (const [key, value] of Object.entries(this.globalSequencesObject)) {
       console.log('KEY: ' + key)
       console.log('VALUE: ' + value)
     } */
 
-    let nodeIDToObject = {
-      name: sequenceName,
-      type: 'sequences',
-      itemChildrenLength: 0,
-      parentNodeId: 1,
-    }
+      let nodeIDToObject = {
+        name: sequenceName,
+        type: 'sequences',
+        itemChildrenLength: 0,
+        parentNodeId: 1,
+      }
 
-    //set new object into main map and focus
-    await this.$store.dispatch('appendNodeIDToObjectMap', {
-      //id: this.idCounter,
-      nodeIDToObject: nodeIDToObject,
-    })
-    //Focus and open/active new node
-    await this.$store.dispatch('sequence/fetchSequenceViaId', {
-      //itemId: this.idCounter,
-      forceOpenNode: true,
-    })
-    //} else {
-    //TODO DISPATCH NOTIFICATION BAR
-    console.log('THERE IS SEQUENCE WITH THE SAME NAME!')
-    //}
+      //set new object into main map
+      await this.$store.dispatch('appendNodeIDToObjectMap', {
+        id: newSequenceId,
+        nodeIDToObject: nodeIDToObject,
+      })
+      //Focus and open/active new node
+      await this.$store.dispatch('sequence/fetchSequenceViaId', {
+        itemId: newSequenceId,
+        forceOpenNode: true,
+      })
+
+      console.log('DISPATCH SUCCESS') //TODO FIX SNACKBAR REAPEARRING
+      await this.$store.dispatch('setSnackBarText', {
+        snackBarText: 'Sequence successfully created!',
+        snackBarColor: 'green',
+      })
+    } else {
+      //TODO DISPATCH NOTIFICATION BAR
+      console.log('DISPATCH ERROR')
+      await this.$store.dispatch('setSnackBarText', {
+        snackBarText: 'ERROR: There is sequence with the same name!',
+        snackBarColor: 'red',
+      })
+    }
   }
 
   async renameSequence(sequenceName: string, sequenceNodeId: number) {

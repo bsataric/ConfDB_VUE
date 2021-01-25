@@ -5,7 +5,6 @@ import * as sequence from '@/store/modules/sequence.js'
 import * as path from '@/store/modules/path.js'
 import * as module from '@/store/modules/module.js'
 import * as pset from '@/store/modules/pset.js'
-import * as notification from '@/store/modules/notification.js'
 
 Vue.use(Vuex)
 
@@ -25,6 +24,10 @@ const state: MainVuexState = {
   forcedActiveNodeId: 0,
   openFileContent: '',
   darkMode: false,
+  idCounter: 0,
+  snackBarOpen: false,
+  snackBarText: '',
+  snackBarColor: '',
 }
 
 export default new Vuex.Store({
@@ -33,7 +36,6 @@ export default new Vuex.Store({
     path,
     module,
     pset,
-    notification,
   },
   state,
   mutations: {
@@ -118,7 +120,7 @@ export default new Vuex.Store({
     },
     SET_ID_TO_OBJECT_MAP(state, payload) {
       state.nodeIDToObjectMap = payload
-      /*   console.log(
+      /*      console.log(
         'nodeIDToObjectMap:' + JSON.stringify(state.nodeIDToObjectMap)
       ) */
     },
@@ -133,6 +135,17 @@ export default new Vuex.Store({
         'nodeIDToObjectMap:' + JSON.stringify(state.nodeIDToObjectMap)
       ) */
     },
+    REMOVE_ID_OBJECT_FROM_MAP(state, payload) {
+      delete state.nodeIDToObjectMap[payload]
+    },
+    SET_INITIAL_ID_COUNTER(state, payload) {
+      console.log('SETTING INITIAL ID COUNTER: ' + payload)
+      state.idCounter = payload
+    },
+    INCREMENT_ID_COUNTER(state) {
+      console.log('INCREMENTING ID COUNTER')
+      state.idCounter++
+    },
     SET_OPEN_FILE_CONTENT(state, payload) {
       //console.log('SETTING OPEN FILE CONTENT:')
       state.openFileContent = payload
@@ -140,6 +153,12 @@ export default new Vuex.Store({
     },
     SET_DARK_MODE(state, payload) {
       state.darkMode = payload
+    },
+    SET_SNACKBAR_TEXT(state, payload) {
+      state.snackBarOpen = true
+      console.log('SNACKBAR COLOR: ' + payload.snackBarColor)
+      state.snackBarText = payload.snackBarText
+      state.snackBarColor = payload.snackBarColor
     },
   },
   actions: {
@@ -149,14 +168,24 @@ export default new Vuex.Store({
     appendNodeIDToObjectMap({ commit }, nodeIDToObject) {
       commit('APPEND_ID_TO_OBJECT_MAP', nodeIDToObject)
     },
+    removeNodeIDObjectFromMap({ commit }, payload) {},
     setSelectedNodeViaID({ commit }, payload) {
       commit('SET_SELECTED_NODE_VIA_ID', payload)
+    },
+    setInitialIDCounter({ commit }, payload) {
+      commit('SET_INITIAL_ID_COUNTER', payload)
+    },
+    incrementIDCounter({ commit }) {
+      commit('INCREMENT_ID_COUNTER')
     },
     setOpenFileContent({ commit }, payload) {
       commit('SET_OPEN_FILE_CONTENT', payload)
     },
     setDarkMode({ commit }, payload) {
       commit('SET_DARK_MODE', payload)
+    },
+    setSnackBarText({ commit }, payload) {
+      commit('SET_SNACKBAR_TEXT', payload)
     },
   },
   getters: {
@@ -174,6 +203,9 @@ export default new Vuex.Store({
     },
     getNodeIDToObjectMap(state) {
       return state.nodeIDToObjectMap
+    },
+    getIDCounter(state) {
+      return state.idCounter
     },
     getOpenNodeIds(state) {
       //console.log('openNodeIds FIRED')
@@ -201,6 +233,16 @@ export default new Vuex.Store({
     },
     getDarkMode(state) {
       return state.darkMode
+    },
+    getSnackBarOpen(state) {
+      return state.snackBarOpen
+    },
+    getSnackBarText(state) {
+      return state.snackBarText
+    },
+    getSnackBarColor(state) {
+      //console.log('SNACKBAR COLOR: ' + state.snackBarColor)
+      return state.snackBarColor
     },
   },
 })

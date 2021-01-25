@@ -10,6 +10,10 @@ export interface MainVuexState {
   forcedActiveNodeId: number
   openFileContent: string
   darkMode: boolean
+  idCounter: number
+  snackBarOpen: boolean
+  snackBarText: string
+  snackBarColor: string
 }
 //TODO
 export interface SequencesVuexState {
