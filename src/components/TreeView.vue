@@ -1314,10 +1314,6 @@ export default class TreeView extends Vue {
     })
   }
 
-  async sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms))
-  }
-
   // eslint-disable-next-line no-unused-vars
   /*   public getOpenNodeIdsWithDelay(nodeName: any) {
     this.sleep(50).then(() => {

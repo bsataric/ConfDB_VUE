@@ -1,6 +1,5 @@
 <template>
   <v-app>
-    <NotificationSnackBar />
     <v-container>
       <v-toolbar :dark="getDarkMode">
         <v-app-bar-nav-icon> </v-app-bar-nav-icon>
@@ -54,6 +53,7 @@
         </v-col>
       </v-row>
       <v-btn small @click="testFunctionMA()">Test function main APP</v-btn>
+      <NotificationSnackBar />
     </v-container>
   </v-app>
 </template>

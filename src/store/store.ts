@@ -5,6 +5,7 @@ import * as sequence from '@/store/modules/sequence.js'
 import * as path from '@/store/modules/path.js'
 import * as module from '@/store/modules/module.js'
 import * as pset from '@/store/modules/pset.js'
+import Utils from '@/lib/utils.ts'
 
 Vue.use(Vuex)
 
@@ -159,6 +160,9 @@ export default new Vuex.Store({
       console.log('SNACKBAR COLOR: ' + payload.snackBarColor)
       state.snackBarText = payload.snackBarText
       state.snackBarColor = payload.snackBarColor
+      Utils.sleep(4000).then(() => {
+        state.snackBarOpen = false
+      })
     },
   },
   actions: {

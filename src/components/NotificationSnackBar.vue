@@ -22,7 +22,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Watch } from 'vue-property-decorator'
+//import Utils from '@/lib/utils.ts'
 
 import { mapGetters } from 'vuex'
 
@@ -38,7 +39,19 @@ import { mapGetters } from 'vuex'
   },
 })
 export default class NotificationSnackBar extends Vue {
+  @Watch('getSnackBarOpen')
+  onIDCounterChanged(val: any, oldVal: any) {
+    console.log('getSnackBarOpen VAL:' + val)
+    console.log('getSnackBarOpen OLDVAL: ' + oldVal)
+    /*    this.snackBarOpen = val
+    Utils.sleep(this.timeout).then(() => {
+      //let central store update cycle finish properly
+      this.snackBarOpen = !this.snackBarOpen
+    }) */
+  }
+
   private timeout: number = 4000
+  private snackBarOpen: boolean = false
 }
 </script>
 

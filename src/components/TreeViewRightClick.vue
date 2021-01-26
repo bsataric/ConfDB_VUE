@@ -250,65 +250,55 @@ export default class TreeViewRightClick extends Vue {
 
     //first check if there is sequence with the same name
     if (this.getSequenceByName(sequenceName) == undefined) {
-      await this.$store.dispatch('sequence/createSequenceLocally', {
-        sequenceName: sequenceName,
-        sequenceParams: [],
-      })
+      Promise.all([
+        this.$store.dispatch('sequence/createSequenceLocally', {
+          sequenceName: sequenceName,
+          sequenceParams: [],
+        }),
 
-      await this.$store.dispatch('incrementIDCounter')
+        this.$store.dispatch('incrementIDCounter'),
+      ]).finally(() => {
+        let newSequenceId = this.getIDCounter
 
-      let newSequenceId = this.getIDCounter
+        let newSequenceObject: Object = {
+          type: 'sequences',
+          name: sequenceName,
+          id: newSequenceId,
+          iconType: 'sequence',
+          iconColor: 'red',
+          children: [],
+        }
 
-      let newSequenceObject: Object = {
-        type: 'sequences',
-        name: sequenceName,
-        id: newSequenceId,
-        iconType: 'sequence',
-        iconColor: 'red',
-        children: [],
-      }
-      //console.log(newSequenceObject)
-      //console.log('sequenceNodeId' + sequenceNodeId)
-      /* console.log(
-      'this.items[sequenceNodeId]: ' +
-        JSON.stringify(this.globalSequencesObject['children'])
-    )  */
+        //DONE in TreeView (send object to TreeView)
+        this.$emit('add-node', newSequenceObject)
 
-      //DONE in TreeView (send object to TreeView)
-      this.$emit('add-node', newSequenceObject)
+        let nodeIDToObject = {
+          name: sequenceName,
+          type: 'sequences',
+          itemChildrenLength: 0,
+          parentNodeId: 1,
+        }
 
-      //this.globalSequencesObject['children'].push(newSequenceObject) //add new node to the sequence node
-      /*    for (const [key, value] of Object.entries(this.globalSequencesObject)) {
-      console.log('KEY: ' + key)
-      console.log('VALUE: ' + value)
-    } */
-
-      let nodeIDToObject = {
-        name: sequenceName,
-        type: 'sequences',
-        itemChildrenLength: 0,
-        parentNodeId: 1,
-      }
-
-      //set new object into main map
-      await this.$store.dispatch('appendNodeIDToObjectMap', {
-        id: newSequenceId,
-        nodeIDToObject: nodeIDToObject,
-      })
-      //Focus and open/active new node
-      await this.$store.dispatch('sequence/fetchSequenceViaId', {
-        itemId: newSequenceId,
-        forceOpenNode: true,
-      })
-
-      console.log('DISPATCH SUCCESS') //TODO FIX SNACKBAR REAPEARRING
-      await this.$store.dispatch('setSnackBarText', {
-        snackBarText: 'Sequence successfully created!',
-        snackBarColor: 'green',
+        Promise.all([
+          //set new object into main map
+          this.$store.dispatch('appendNodeIDToObjectMap', {
+            id: newSequenceId,
+            nodeIDToObject: nodeIDToObject,
+          }),
+          //Focus and open/active new node
+          this.$store.dispatch('sequence/fetchSequenceViaId', {
+            itemId: newSequenceId,
+            forceOpenNode: true,
+          }),
+        ]).finally(() => {
+          //Display snackbar success
+          this.$store.dispatch('setSnackBarText', {
+            snackBarText: 'Sequence successfully created!',
+            snackBarColor: 'green',
+          })
+        })
       })
     } else {
-      //TODO DISPATCH NOTIFICATION BAR
-      console.log('DISPATCH ERROR')
       await this.$store.dispatch('setSnackBarText', {
         snackBarText: 'ERROR: There is sequence with the same name!',
         snackBarColor: 'red',
