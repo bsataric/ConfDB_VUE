@@ -14,18 +14,24 @@ Vue.use(Vuex)
 } */
 
 const state: MainVuexState = {
-  selectedNodeType: '', //TODO: maybe create action or something to change this through it
+  //selected node information
+  selectedNodeType: '',
   selectedNodeName: '',
   selectedNodeId: -1,
   selectedNodeParamLength: 0,
   selectedNodeParentId: 0,
-  nodeIDToObjectMap: {},
+  //node ID to Object map containing (type, name, itemChildrenLength, parentNodeId) with node id as key
+  nodeIDToVuexObjectMap: {},
+  //arrays with node id's - open nodes and forced open nodes
   openNodeIds: [],
   forcedOpenNodeIds: [],
   forcedActiveNodeId: 0,
+  //content of the opened JSON file
   openFileContent: '',
   darkMode: false,
+  //global node ID counter
   idCounter: 0,
+  //snackbar variables
   snackBarOpen: false,
   snackBarText: '',
   snackBarColor: '',
@@ -45,18 +51,18 @@ export default new Vuex.Store({
       state.selectedNodeId = payload.selectedNodeId //get all info just via ID
       //console.log(typeof state.selectedNodeId)
       console.log(
-        'state.nodeIDToObjectMap[payload.selectedNodeId]' +
-          JSON.stringify(state.nodeIDToObjectMap[payload.selectedNodeId])
+        'state.nodeIDToVuexObjectMap[payload.selectedNodeId]' +
+          JSON.stringify(state.nodeIDToVuexObjectMap[payload.selectedNodeId])
       )
       state.selectedNodeType =
-        state.nodeIDToObjectMap[payload.selectedNodeId].type
+        state.nodeIDToVuexObjectMap[payload.selectedNodeId].type
       state.selectedNodeName =
-        state.nodeIDToObjectMap[payload.selectedNodeId].name
+        state.nodeIDToVuexObjectMap[payload.selectedNodeId].name
       console.log('state.selectedNodeName ' + state.selectedNodeName)
       state.selectedNodeParamLength =
-        state.nodeIDToObjectMap[payload.selectedNodeId].itemChildrenLength
+        state.nodeIDToVuexObjectMap[payload.selectedNodeId].itemChildrenLength
       state.selectedNodeParentId =
-        state.nodeIDToObjectMap[payload.selectedNodeId].parentNodeId
+        state.nodeIDToVuexObjectMap[payload.selectedNodeId].parentNodeId
       let forceOpenNode = payload.forceOpenNode //if node is opened by foce open it's parent as well
 
       console.log('FORCED OPEN NODE: ' + forceOpenNode)
@@ -120,24 +126,31 @@ export default new Vuex.Store({
       //state.openNodeIds = [1]
     },
     SET_ID_TO_OBJECT_MAP(state, payload) {
-      state.nodeIDToObjectMap = payload
+      state.nodeIDToVuexObjectMap = payload
       /*      console.log(
-        'nodeIDToObjectMap:' + JSON.stringify(state.nodeIDToObjectMap)
+        'nodeIDToVuexObjectMap:' + JSON.stringify(state.nodeIDToVuexObjectMap)
       ) */
     },
+    CREATE_NODE_ID_TO_OBJECT_REFERENCES(state) {
+      //now pass through all the parameters of
+      for (const [key, value] of Object.entries(state.nodeIDToVuexObjectMap)) {
+        //console.log('KEY: ' + key)
+        //console.log('VALUE: ' + JSON.stringify(value))
+      }
+    },
     APPEND_ID_TO_OBJECT_MAP(state, payload) {
-      console.log('APPEND_ID_TO_OBJECT_MAP')
+      /* console.log('APPEND_ID_TO_OBJECT_MAP')
       console.log(
         'payload.nodeIDToObject' + JSON.stringify(payload.nodeIDToObject)
       )
-      console.log('payload.id ' + payload.id)
-      state.nodeIDToObjectMap[payload.id] = payload.nodeIDToObject
+      console.log('payload.id ' + payload.id) */
+      state.nodeIDToVuexObjectMap[payload.id] = payload.nodeIDToObject
       /*   console.log(
-        'nodeIDToObjectMap:' + JSON.stringify(state.nodeIDToObjectMap)
+        'nodeIDToVuexObjectMap:' + JSON.stringify(state.nodeIDToVuexObjectMap)
       ) */
     },
     REMOVE_ID_OBJECT_FROM_MAP(state, payload) {
-      delete state.nodeIDToObjectMap[payload]
+      delete state.nodeIDToVuexObjectMap[payload]
     },
     SET_INITIAL_ID_COUNTER(state, payload) {
       console.log('SETTING INITIAL ID COUNTER: ' + payload)
@@ -164,10 +177,17 @@ export default new Vuex.Store({
         state.snackBarOpen = false
       })
     },
+    SET_SNACKBAR_OPEN(state, payload) {
+      state.snackBarOpen = payload
+    },
   },
   actions: {
-    createNodeIDToObjectMap({ commit }, nodeIDToObjectMap) {
-      commit('SET_ID_TO_OBJECT_MAP', nodeIDToObjectMap)
+    createNodeIDToObjectMap({ commit }, nodeIDToVuexObjectMap) {
+      commit('SET_ID_TO_OBJECT_MAP', nodeIDToVuexObjectMap)
+      commit('CREATE_NODE_ID_TO_OBJECT_REFERENCES')
+    },
+    createObjectReferences({ commit }) {
+      commit('CREATE_NODE_ID_TO_OBJECT_REFERENCES')
     },
     appendNodeIDToObjectMap({ commit }, nodeIDToObject) {
       commit('APPEND_ID_TO_OBJECT_MAP', nodeIDToObject)
@@ -191,6 +211,10 @@ export default new Vuex.Store({
     setSnackBarText({ commit }, payload) {
       commit('SET_SNACKBAR_TEXT', payload)
     },
+    setSnackBarOpen({ commit }, payload) {
+      console.log('CLOSING SNACKBAR')
+      commit('SET_SNACKBAR_OPEN', payload)
+    },
   },
   getters: {
     getSelectedNodeType(state) {
@@ -205,8 +229,8 @@ export default new Vuex.Store({
     getSelectedNodeParamLength(state) {
       return state.selectedNodeParamLength
     },
-    getNodeIDToObjectMap(state) {
-      return state.nodeIDToObjectMap
+    getNodeIDToVuexObjectMap(state) {
+      return state.nodeIDToVuexObjectMap
     },
     getIDCounter(state) {
       return state.idCounter

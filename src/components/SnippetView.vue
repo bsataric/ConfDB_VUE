@@ -33,12 +33,15 @@ import { mapGetters } from 'vuex'
       getSelectedNodeName: 'getSelectedNodeName',
       //modules
       getSelectedModuleSnippet: 'module/getSelectedModuleSnippet',
-      getSelectedModuleSequences: 'module/getSelectedModuleSequences',
-      getSelectedModulePaths: 'module/getSelectedModulePaths',
+      getSequencesContainingCurrentModule:
+        'module/getSequencesContainingCurrentModule',
+      getPathsContainingCurrentModule: 'module/getPathsContainingCurrentModule',
       //sequences
       getSelectedSequenceSnippet: 'sequence/getSelectedSequenceSnippet',
-      getSelectedSequenceSequences: 'sequence/getSelectedSequenceSequences',
-      getSelectedSequencePaths: 'sequence/getSelectedSequencePaths',
+      getSequencesContainingCurrentSequence:
+        'sequence/getSequencesContainingCurrentSequence',
+      getPathsContainingCurrentSequence:
+        'sequence/getPathsContainingCurrentSequence',
       //paths
       getPathSnippet: 'path/getSelectedPathSnippet',
       //psets
@@ -54,12 +57,12 @@ export default class SnippetView extends Vue {
   private getSelectedNodeName!: any
   //modules
   private getSelectedModuleSnippet!: any
-  private getSelectedModuleSequences!: any
-  private getSelectedModulePaths!: any
+  private getSequencesContainingCurrentModule!: any
+  private getPathsContainingCurrentModule!: any
   //sequences
   private getSelectedSequenceSnippet!: any
-  private getSelectedSequenceSequences!: any
-  private getSelectedSequencePaths!: any
+  private getSequencesContainingCurrentSequence!: any
+  private getPathsContainingCurrentSequence!: any
   //paths
   private getPathSnippet!: any
   //psets
@@ -106,7 +109,7 @@ export default class SnippetView extends Vue {
     //console.log('SELECTED NODE TYPE: ' + nodeType)
     //this.triggered = !this.triggered
     if (nodeType == 'modules') {
-      let sequences = this.getSelectedModuleSequences
+      let sequences = this.getSequencesContainingCurrentModule
       this.arrayOfSelectedObjects = sequences
       let sequencesText = '<ul>'
       //console.log(sequences)
@@ -127,7 +130,7 @@ export default class SnippetView extends Vue {
       sequencesText += '</ul>'
       return sequencesText
     } else if (nodeType == 'sequences') {
-      let sequences = this.getSelectedSequenceSequences
+      let sequences = this.getSequencesContainingCurrentSequence
       console.log('SEQUENCESSSSS: ' + sequences)
       this.arrayOfSelectedObjects = sequences
       let sequencesText = '<ul>'
@@ -160,7 +163,7 @@ export default class SnippetView extends Vue {
     //console.log('SELECTED NODE TYPE: ' + nodeType)
     //this.triggered = !this.triggered
     if (nodeType == 'modules') {
-      let paths = this.getSelectedModulePaths
+      let paths = this.getPathsContainingCurrentModule
       this.arrayOfSelectedObjects = paths
       let pathsText = '<ul>'
       //console.log(paths)
@@ -174,7 +177,7 @@ export default class SnippetView extends Vue {
       pathsText += '</ul>'
       return pathsText
     } else if (nodeType == 'sequences') {
-      let paths = this.getSelectedSequencePaths
+      let paths = this.getPathsContainingCurrentSequence
       this.arrayOfSelectedObjects = paths
       let pathsText = '<ul>'
       //console.log(paths)

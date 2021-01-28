@@ -13,7 +13,7 @@
       {{ getSnackBarText }}
 
       <template v-slot:action="{ attrs }">
-        <v-btn color="blue" text v-bind="attrs" @click="snackbar = false">
+        <v-btn color="blue" text v-bind="attrs" @click="closeSnackbar()">
           Close
         </v-btn>
       </template>
@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator'
+import { Component, Vue } from 'vue-property-decorator'
 //import Utils from '@/lib/utils.ts'
 
 import { mapGetters } from 'vuex'
@@ -39,19 +39,11 @@ import { mapGetters } from 'vuex'
   },
 })
 export default class NotificationSnackBar extends Vue {
-  @Watch('getSnackBarOpen')
-  onIDCounterChanged(val: any, oldVal: any) {
-    console.log('getSnackBarOpen VAL:' + val)
-    console.log('getSnackBarOpen OLDVAL: ' + oldVal)
-    /*    this.snackBarOpen = val
-    Utils.sleep(this.timeout).then(() => {
-      //let central store update cycle finish properly
-      this.snackBarOpen = !this.snackBarOpen
-    }) */
-  }
-
   private timeout: number = 4000
-  private snackBarOpen: boolean = false
+
+  async closeSnackbar() {
+    await this.$store.dispatch('setSnackBarOpen', false)
+  }
 }
 </script>
 

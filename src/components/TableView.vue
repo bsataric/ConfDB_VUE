@@ -89,7 +89,7 @@ import ZkTable from 'vue-table-with-tree-grid'
       getSelectedNodeType: 'getSelectedNodeType',
       getSelectedModuleParams: 'module/getSelectedModuleParams',
       getSelectedModuleName: 'module/getSelectedModuleName',
-      getSelectedModulePaths: 'module/getSelectedModulePaths',
+      getPathsContainingCurrentModule: 'module/getPathsContainingCurrentModule',
       getSelectedPSetParams: 'pset/getSelectedPSetParams',
       getSelectedPSetName: 'pset/getSelectedPSetName',
       getDarkMode: 'getDarkMode',
@@ -119,7 +119,7 @@ export default class TableView extends Vue {
   private getSelectedNodeType!: any
   private getSelectedModuleParams!: any[]
   private getSelectedModuleName!: any[]
-  private getSelectedModulePaths!: any[]
+  private getPathsContainingCurrentModule!: any[]
   private getSelectedPSetParams!: any[]
   private getSelectedPSetName!: any[]
   private getDarkMode!: any[]
@@ -416,10 +416,12 @@ export default class TableView extends Vue {
 
   public getPaths(nodeType: string) {
     if (nodeType == 'modules') {
-      //console.log('PATHS!: ' + this.getSelectedModulePaths)
+      //console.log('PATHS!: ' + this.getPathsContainingCurrentModule)
       let values: Array<string> = []
       // eslint-disable-next-line no-unused-vars
-      for (const [key, value] of Object.entries(this.getSelectedModulePaths)) {
+      for (const [key, value] of Object.entries(
+        this.getPathsContainingCurrentModule
+      )) {
         values.push(value)
       }
       return values
@@ -434,7 +436,7 @@ export default class TableView extends Vue {
   }
 
   get paths() {
-    let selectedModulePath = this.getSelectedModulePaths
+    let selectedModulePath = this.getPathsContainingCurrentModule
     // eslint-disable-next-line no-unused-vars
     //console.log(selectedModulePath)
     //console.log(pathContainngModule)

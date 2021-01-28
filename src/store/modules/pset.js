@@ -128,8 +128,8 @@ export const getters = {
     return state.psets.length
   },
   getPSetById: (state, getters, rootState, rootGetters) => (id) => {
-    let nodeIDToObjectMap = rootGetters['getNodeIDToObjectMap']
-    let name = nodeIDToObjectMap[id].name
+    let nodeIDToVuexObjectMap = rootGetters['getNodeIDToVuexObjectMap']
+    let name = nodeIDToVuexObjectMap[id].name
     let paramLength = 0
 
     for (const [key, value] of Object.entries(state.psets)) {

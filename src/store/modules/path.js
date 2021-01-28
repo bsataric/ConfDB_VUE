@@ -128,8 +128,8 @@ export const getters = {
     return state.paths.length
   },
   getPathById: (state, getters, rootState, rootGetters) => (id) => {
-    let nodeIDToObjectMap = rootGetters['getNodeIDToObjectMap']
-    let name = nodeIDToObjectMap[id].name
+    let nodeIDToVuexObjectMap = rootGetters['getNodeIDToVuexObjectMap']
+    let name = nodeIDToVuexObjectMap[id].name
     let paramLength = 0
 
     for (const [key, value] of Object.entries(state.paths)) {
@@ -169,7 +169,7 @@ export const getters = {
     moduleName
   ) => {
     let pathsIdNameMap = {} //this is reduntant but we miss ID from server
-    let nodeIDToObjectMap = rootGetters['getNodeIDToObjectMap']
+    let nodeIDToVuexObjectMap = rootGetters['getNodeIDToVuexObjectMap']
 
     for (const [key, value] of Object.entries(state.paths)) {
       //console.log('KEY: ' + JSON.stringify(key))
@@ -181,7 +181,9 @@ export const getters = {
         if (value1[0] == 'modules') {
           if (value1[1] == moduleName) {
             //paths.push(key)
-            for (const [key2, value2] of Object.entries(nodeIDToObjectMap)) {
+            for (const [key2, value2] of Object.entries(
+              nodeIDToVuexObjectMap
+            )) {
               if (value2.name == key && value2.itemChildrenLength != 0) {
                 //sequences.push(key)
                 //console.log('VALUE2: ' + JSON.stringify(value2))
@@ -203,7 +205,7 @@ export const getters = {
   ) => {
     //some logic here
     let pathsIdNameMap = {} //this is reduntant but we miss ID from server
-    let nodeIDToObjectMap = rootGetters['getNodeIDToObjectMap']
+    let nodeIDToVuexObjectMap = rootGetters['getNodeIDToVuexObjectMap']
 
     for (const [key, value] of Object.entries(state.paths)) {
       //console.log('KEY: ' + JSON.stringify(key))
@@ -215,7 +217,9 @@ export const getters = {
         if (value1[0] == 'sequences') {
           if (value1[1] == sequenceName) {
             //paths.push(key)
-            for (const [key2, value2] of Object.entries(nodeIDToObjectMap)) {
+            for (const [key2, value2] of Object.entries(
+              nodeIDToVuexObjectMap
+            )) {
               if (value2.name == key && value2.itemChildrenLength != 0) {
                 //sequences.push(key)
                 //console.log('VALUE2: ' + JSON.stringify(value2))

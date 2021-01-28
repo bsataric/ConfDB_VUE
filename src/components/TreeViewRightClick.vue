@@ -62,7 +62,7 @@ import { mapGetters } from 'vuex'
       getSelectedNodeType: 'getSelectedNodeType',
       getSelectedNodeName: 'getSelectedNodeName',
       getSelectedNodeId: 'getSelectedNodeId',
-      getNodeIDToObjectMap: 'getNodeIDToObjectMap',
+      getNodeIDToVuexObjectMap: 'getNodeIDToVuexObjectMap',
       getSelectedNodeParamLength: 'getSelectedNodeParamLength',
       getOpenNodeIds: 'getOpenNodeIds',
       getForcedOpenNodeIds: 'getForcedOpenNodeIds',
@@ -77,11 +77,11 @@ import { mapGetters } from 'vuex'
   },
 })
 export default class TreeViewRightClick extends Vue {
-  @Prop(String) readonly rightClickNodeType: string | undefined
-  @Prop(Number) readonly rightClickNodeId: number | undefined
-  @Prop(Boolean) readonly showMenu: boolean | undefined
-  @Prop(Number) readonly x: number | undefined
-  @Prop(Number) readonly y: number | undefined
+  @Prop(String) readonly rightClickNodeType!: string
+  @Prop(Number) readonly rightClickNodeId!: number
+  @Prop(Boolean) readonly showMenu!: boolean
+  @Prop(Number) readonly x!: number
+  @Prop(Number) readonly y!: number
 
   @Watch('getIDCounter')
   onIDCounterChanged(val: any, oldVal: any) {
@@ -100,7 +100,7 @@ export default class TreeViewRightClick extends Vue {
   private getSelectedNodeName!: string
   private getSelectedNodeType!: string
   private getSelectedNodeId!: number
-  private getNodeIDToObjectMap!: any //maybe unecessary since we have map as variable
+  private getNodeIDToVuexObjectMap!: any //maybe unecessary since we have map as variable
   private getSelectedNodeParamLength!: number
   private getOpenNodeIds!: any
   private getForcedOpenNodeIds!: any
@@ -169,7 +169,7 @@ export default class TreeViewRightClick extends Vue {
   private dialog: boolean = false
   private dialogText: string = ''
   private dialogValue: string = ''
-  private actionCallBack!: (string, number) => void
+  private actionCallBack!: (name: string, id: number) => void
 
   get getMenuItems() {
     //TODO CHANGE THIS INTO NORMAL MAP
@@ -189,15 +189,14 @@ export default class TreeViewRightClick extends Vue {
 
   // eslint-disable-next-line no-unused-vars
   public clickAction(e, actionName: string) {
-    console.log(actionName)
-    console.log(this.rightClickNodeType)
-    console.log(this.rightClickNodeId)
+    console.log('ACTION NAME: ' + actionName)
+    console.log('NODE TYPE: ' + this.rightClickNodeType)
+    console.log('NODE ID: ' + this.rightClickNodeId)
     if (this.rightClickNodeType == 'seqs') {
       if (actionName == 'Add Sequence') {
         //console.log('Add Sequence')
         this.dialog = true
         this.dialogText = 'Sequence name:'
-        //this.insertSequence('AAA', this.rightClickNodeId)
         this.actionCallBack = this.insertSequence
       } else if (actionName == 'Remove Unreferenced Sequences') {
         //TODO
@@ -209,7 +208,7 @@ export default class TreeViewRightClick extends Vue {
         //TODO
         console.log('Sort')
       }
-    } else if (this.rightClickNodeType == 'Sequences') {
+    } else if (this.rightClickNodeType == 'sequences') {
       if (actionName == 'Add Module') {
         console.log('Add Module')
         //TODO
@@ -224,10 +223,10 @@ export default class TreeViewRightClick extends Vue {
         console.log('Add SwitchProducer')
       } else if (actionName == 'Rename Sequence') {
         //TODO
-        console.log('Rename Sequence')
+        //console.log('Rename Sequence')
         this.dialog = true
         this.dialogText = 'New sequence name:' //TODO FIX MODAL FOR RENAME
-        //this.actionCallBack = this.renameSequence
+        this.actionCallBack = this.renameSequence
       } else if (actionName == 'Clone Sequence') {
         //TODO
         console.log('Clone Sequence')
@@ -243,9 +242,10 @@ export default class TreeViewRightClick extends Vue {
       }
     }
   }
-  //TODO CREATE SEQUENCE IN STORES AND PASS IT TO THE TREEVIEW
+
   // eslint-disable-next-line no-unused-vars
   async insertSequence(sequenceName: string, sequenceNodeId: number) {
+    //sequenceNodeId is not used for new node
     console.log('TRYING TO INSERT SEQUENCE ' + sequenceName)
 
     //first check if there is sequence with the same name
@@ -306,70 +306,65 @@ export default class TreeViewRightClick extends Vue {
     }
   }
 
-  async renameSequence(sequenceName: string, sequenceNodeId: number) {
-    console.log('TRYING TO INSERT SEQUENCE ' + sequenceName)
+  // eslint-disable-next-line no-unused-vars
+  async renameSequence(newSequenceName: string, sequenceNodeId: number) {
+    console.log('TRYING TO RENAME SEQUENCE ' + newSequenceName)
     //first check if there is sequence with the same name
-    //if (this.getSequenceById(sequenceNodeId) != undefined) {
-    await this.$store.dispatch('sequence/renameSequenceLocally', {
-      sequenceId: sequenceNodeId,
-      sequenceName: sequenceName,
-    })
-    /*    let newSequenceObject: Object = {
-        type: 'sequences',
-        name: sequenceName,
-        id: ++this.idCounter,
-        iconType: 'sequence',
-        iconColor: 'red',
-        children: [],
-      } */
-    //console.log(newSequenceObject)
-    //console.log('sequenceNodeId' + sequenceNodeId)
-    /* console.log(
-      'this.items[sequenceNodeId]: ' +
-        JSON.stringify(this.globalSequencesObject['children'])
-    )  */
-    //change name in object here
-    //this.globalSequencesObject['children'].push(newSequenceObject) //add new node to the sequence node
-    /*    for (const [key, value] of Object.entries(this.globalSequencesObject)) {
-      console.log('KEY: ' + key)
-      console.log('VALUE: ' + value)
-    } */
+    //first check if there is sequence with the same name
+    /*   if (this.getSequenceByName(newSequenceName) == undefined) {
+      Promise.all([
+        this.$store.dispatch('sequence/renameSequenceLocally', {
+          newSequenceName: newSequenceName,
+          sequenceNodeId: sequenceNodeId,
+        }),
+      ]).finally(() => { */
+    //let newSequenceId = this.getIDCounter
 
-    let nodeIDToObject = {
-      name: sequenceName,
-      type: 'sequences',
-      itemChildrenLength: 0,
-      parentNodeId: 1,
-    }
+    /*  let newSequenceObject: Object = {
+          type: 'sequences',
+          name: sequenceName,
+          id: newSequenceId,
+          iconType: 'sequence',
+          iconColor: 'red',
+          children: [],
+        } */
 
-    //set new object into main map and focus
-    await this.$store.dispatch('appendNodeIDToObjectMap', {
-      //id: this.idCounter,
-      nodeIDToObject: nodeIDToObject,
-    })
+    //DONE in TreeView (send object to TreeView)
+    this.$emit('update-node-name', sequenceNodeId, newSequenceName)
+
+    /*  let nodeIDToObject = {
+          name: newSequenceName,
+          type: 'sequences',
+          itemChildrenLength: 0,
+          parentNodeId: 1,
+        } */
+
+    /*    Promise.all([
+          //set new object into main map
+          this.$store.dispatch('changeNameInIDToObjectMap', {
+            id: sequenceNodeId,
+            newName: newSequenceName,
+          }), */
     //Focus and open/active new node
-    /*   await this.$store.dispatch('sequence/fetchSequenceViaId', {
-        itemId: this.idCounter,
-        forceOpenNode: true,
-      }) */
-    //} else {
-    //TODO DISPATCH NOTIFICATION BAR
-    console.log('THERE IS SEQUENCE WITH THE SAME NAME!')
-    // }
+    /* this.$store.dispatch('sequence/fetchSequenceViaId', {
+            itemId: newSequenceId,
+            forceOpenNode: true,
+          }), */
+    //]).finally(() => {
+    //Display snackbar success
+    /*     this.$store.dispatch('setSnackBarText', {
+            snackBarText: 'Sequence successfully renamed!',
+            snackBarColor: 'green',
+          })
+        })
+      })
+    } else {
+      await this.$store.dispatch('setSnackBarText', {
+        snackBarText: 'ERROR: There is sequence with the same name!',
+        snackBarColor: 'red',
+      })
+    } */
   }
-
-  //public showRightClickMenu(e, itemType: string, itemId: number) {
-  //e.preventDefault()
-  //console.log('RIGHT CLICK ITEM TYPE: ' + itemType)
-  //this.rightClickNodeType = itemType
-  //this.rightClickNodeId = itemId
-  //this.showMenu = false
-  //this.x = e.clientX
-  //this.y = e.clientY
-  /* this.$nextTick(() => {
-      this.showMenu = true
-    }) */
-  //}
 
   async okClicked() {
     console.log(this.dialogValue)

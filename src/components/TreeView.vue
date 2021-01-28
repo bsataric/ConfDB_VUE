@@ -1,10 +1,4 @@
 <template>
-  <!-- change key into some computed key or something and not name since they can be same-->
-  <!-- 
-          :open="openNodes"
-      :key="openNodes.length"
-  -->
-
   <div>
     <v-btn small @click="testFunction()">Test function</v-btn>
     <v-treeview
@@ -46,48 +40,6 @@
         </span>
       </template>
     </v-treeview>
-    <!--  <v-menu
-      v-model="showMenu"
-      :position-x="x"
-      :position-y="y"
-      absolute
-      offset-y
-      :dark="getDarkMode"
-    >
-      <v-list>
-        <v-list-item
-          v-for="menuItem in this.getMenuItems"
-          :key="menuItem[0]"
-          @click="clickAction($event, menuItem[0])"
-        >
-          <v-list-item-title
-            >{{ menuItem[0] }}
-            <v-divider v-if="menuItem[1] == 'Separator'"></v-divider>
-          </v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </v-menu> -->
-    <!--     <v-row justify="center">
-      <v-dialog v-model="dialog" persistent max-width="290" :dark="getDarkMode">
-        <v-card>
-          <v-card-title class="headline">
-            {{ this.dialogText }}
-          </v-card-title>
-          <div style="margin-left: 40px">
-            <v-text-field v-model="dialogValue"></v-text-field>
-          </div>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="green darken-1" text @click="cancelClicked()">
-              Cancel
-            </v-btn>
-            <v-btn color="green darken-1" text @click="okClicked()">
-              OK
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-    </v-row> -->
     <TreeViewRightClick
       :rightClickNodeType="this.rightClickNodeType"
       :rightClickNodeId="this.rightClickNodeId"
@@ -95,7 +47,7 @@
       :x="this.x"
       :y="this.y"
       @add-node="addNode"
-      @update-node="updateNode"
+      @update-node-name="updateNodeName"
       @remove-node="removeNode"
     />
   </div>
@@ -120,7 +72,7 @@ import { mapGetters } from 'vuex'
       getSelectedNodeType: 'getSelectedNodeType',
       getSelectedNodeName: 'getSelectedNodeName',
       getSelectedNodeId: 'getSelectedNodeId',
-      getNodeIDToObjectMap: 'getNodeIDToObjectMap',
+      getNodeIDToVuexObjectMap: 'getNodeIDToVuexObjectMap',
       getSelectedNodeParamLength: 'getSelectedNodeParamLength',
       getOpenNodeIds: 'getOpenNodeIds',
       getForcedOpenNodeIds: 'getForcedOpenNodeIds',
@@ -193,7 +145,8 @@ export default class TreeView extends Vue {
   //private openNodes: any = []
   //private openNodeIds: any = []
   //private nodeIds: any = []
-  private nodeIDToObjectMap: any = {} //ID to Object map (name, type, children length passed to the Vuex store)
+  private nodeIDToVuexObjectMap: any = {} //ID to Vuex Object map
+  private nodeIDToNodeObjectMap: any = {} //ID to Node Object map
   private open: any = [1]
   private active: any = []
   private forcedActive: any = []
@@ -212,7 +165,7 @@ export default class TreeView extends Vue {
   private getSelectedNodeName!: string
   private getSelectedNodeType!: string
   private getSelectedNodeId!: number
-  private getNodeIDToObjectMap!: any //maybe unecessary since we have map as variable
+  private getNodeIDToVuexObjectMap!: any //maybe unecessary since we have map as variable
   private getSelectedNodeParamLength!: number
   private getOpenNodeIds!: any
   private getForcedOpenNodeIds!: any
@@ -231,69 +184,6 @@ export default class TreeView extends Vue {
   private showMenu: boolean = false
   private x: number = 0
   private y: number = 0
-  private menuItems: any = [
-    [
-      //main sequence node
-      ['Add Sequence', 'Separator'],
-      ['Remove Unreferenced Sequences', 'No Separator'],
-      ['Resolve Unnecessary Sequences', 'Separator'],
-      ['Sort', 'No Separator'],
-    ],
-    [
-      //sequence node
-      ['Add Module', 'No Separator'],
-      ['Add Sequence', 'No Separator'],
-      ['Add Task', 'No Separator'],
-      ['Add SwitchProducer', 'Separator'],
-      ['Rename Sequence', 'No Separator'],
-      ['Clone Sequence', 'No Separator'],
-      ['Deep Clone Sequence', 'No Separator'],
-      ['Remove Sequence', 'No Separator'],
-      ['Replace Sequence', 'No Separator'],
-    ],
-    [
-      //main path node
-      ['Add Path', 'Seprator'],
-      ['Sort', 'No Seprator'],
-    ],
-    [
-      //path node
-      ['Add Module', 'No Separator'],
-      ['Add Path', 'No Separator'],
-      ['Add Sequence', 'No Separator'],
-      ['Add Task', 'No Separator'],
-      ['Add SwitchProducer', 'Separator'],
-      ['Remove Path', 'No Separator'],
-      ['Clone Path', 'Separator'],
-      ['Assign to P. Dataset', 'No Separator'],
-      ['Remove from P. Dataset', 'Separator'],
-      ['endpath', 'No Separator'],
-      ['Replace Path', 'No Separator'],
-    ],
-    [
-      //main modules node
-      ['Sort', 'No Seprator'],
-    ],
-    [
-      //module node
-      ['Rename Module', 'No Seprator'],
-      ['Replace Module', 'No Seprator'],
-    ],
-    [
-      //main PSet node
-      ['Add PSet', 'No Seprator'],
-    ],
-    [
-      //PSet node
-      ['Add PSet', 'No Seprator'],
-      ['Remove PSet', 'No Seprator'],
-    ],
-  ]
-
-  private dialog: boolean = false
-  private dialogText: string = ''
-  private dialogValue: string = ''
-  private actionCallBack!: (string, number) => void
 
   private iconTypes: any = {
     sequence: 'mdi-view-sequential',
@@ -302,7 +192,7 @@ export default class TreeView extends Vue {
     pset: 'mdi-format-list-bulleted',
   }
   //private tree: any = []
-  /* 
+  /*
   private items1: any = [
     {
       id: 1,
@@ -632,40 +522,30 @@ export default class TreeView extends Vue {
     ]
   }
 
-  get getMenuItems() {
-    //TODO CHANGE THIS INTO NORMAL MAP
-    //console.log('RIGHT CLICK NODE TYPE: ' + nodeType)
-    //console.log('this.menuItems[0]: ' + this.menuItems[0])
-    if (this.rightClickNodeType == 'seqs') return this.menuItems[0]
-    else if (this.rightClickNodeType == 'sequences') return this.menuItems[1]
-    else if (this.rightClickNodeType == 'pts') return this.menuItems[2]
-    else if (this.rightClickNodeType == 'paths') return this.menuItems[3]
-    else if (this.rightClickNodeType == 'mods') return this.menuItems[4]
-    else if (this.rightClickNodeType == 'modules') return this.menuItems[5]
-    else if (this.rightClickNodeType == 'psets') return this.menuItems[6]
-    else if (this.rightClickNodeType == 'pset') return this.menuItems[7]
-    //return this.menuItems[nodeType]
-    return []
-  }
-
   public parseSequences(sequenceData: any) {
     let sequencesObject: Object = {
       id: 1,
       name: 'Sequences',
       type: 'seqs',
       children: [],
+      parentNodeId: 0,
+      referencedByIds: [],
+      parameters: sequenceData,
     }
     //this.nodeIds.push(1)
     //console.log(sequencesObject)
     for (const [key, value] of Object.entries(sequenceData)) {
       //loop over sequnces - create new Sequence object and add it to children of the seqs
       let sequenceObject: Object = {
-        type: 'sequences',
-        name: key,
         id: ++this.idCounter,
+        name: key,
+        type: 'sequences',
+        children: [],
+        parentNodeId: 1,
+        referencedByIds: [],
+        parameters: value,
         iconType: 'sequence',
         iconColor: 'red',
-        children: [],
       }
 
       //this.nodeIds.push(this.idCounter)
@@ -681,48 +561,72 @@ export default class TreeView extends Vue {
         //console.log(`${key1}`)
         if (Object(value1)[0] === 'modules') {
           //console.log('MODULE')
-          nestedSequenceObject['type'] = 'modules'
           nestedSequenceObject['name'] = Object(value1)[1]
-          nestedSequenceObject['iconType'] = 'module'
+          nestedSequenceObject['type'] = 'modules'
           nestedSequenceObject['children'] = []
+          nestedSequenceObject['parentNodeId'] = 1
+          nestedSequenceObject['referencedByIds'] = []
+          nestedSequenceObject['parameters'] = value1
+          nestedSequenceObject['iconType'] = 'module'
 
-          this.nodeIDToObjectMap[this.idCounter] = {
+          //TODO: substitute Vuex object map with this if it works
+          this.nodeIDToNodeObjectMap[this.idCounter] = nestedSequenceObject
+
+          this.nodeIDToVuexObjectMap[this.idCounter] = {
             name: Object(value1)[1],
             type: 'modules',
             itemChildrenLength: 0,
             parentNodeId: 1,
+            referencedByIds: [],
+            parameters: value1,
           }
         } else if (Object(value1)[0] === 'sequences') {
           //console.log('SEQUENCE')
-          nestedSequenceObject['type'] = 'sequences'
           nestedSequenceObject['name'] = Object(value1)[1]
+          nestedSequenceObject['type'] = 'sequences'
+          nestedSequenceObject['children'] = []
+          nestedSequenceObject['parentNodeId'] = 1
+          nestedSequenceObject['referencedByIds'] = []
+          nestedSequenceObject['parameters'] = value1
           nestedSequenceObject['iconType'] = 'sequence'
           nestedSequenceObject['iconColor'] = 'red'
-          nestedSequenceObject['children'] = []
 
-          this.nodeIDToObjectMap[this.idCounter] = {
+          //TODO: substitute Vuex object map with this if it works
+          this.nodeIDToNodeObjectMap[this.idCounter] = nestedSequenceObject
+
+          this.nodeIDToVuexObjectMap[this.idCounter] = {
             name: Object(value1)[1],
             type: 'sequences',
             itemChildrenLength: 0,
             parentNodeId: 1,
+            referencedByIds: [],
+            parameters: value1,
           }
         }
         sequenceObject['children'].push(nestedSequenceObject)
       }
+      //TODO: substitute Vuex object map with this if it works
+      this.nodeIDToNodeObjectMap[sequenceObjectId] = sequenceObject
 
-      this.nodeIDToObjectMap[sequenceObjectId] = {
+      this.nodeIDToVuexObjectMap[sequenceObjectId] = {
         name: key,
         type: 'sequences',
         itemChildrenLength: sequenceObject['children'].length,
         parentNodeId: 1,
+        referencedByIds: [],
+        parameters: value,
       }
       sequencesObject['children'].push(sequenceObject)
     }
+    //TODO: substitute Vuex object map with this if it works
+    this.nodeIDToNodeObjectMap[1] = sequencesObject
 
-    this.nodeIDToObjectMap[1] = {
+    this.nodeIDToVuexObjectMap[1] = {
       name: 'Sequences',
       type: 'seqs',
       itemChildrenLength: sequencesObject['children'].length,
+      referencedByIds: [],
+      parameters: {},
     }
     //console.log(sequencesObject)
     //this.items = Object.values(sequencesObject)
@@ -739,22 +643,28 @@ export default class TreeView extends Vue {
       name: 'Paths',
       type: 'pts', //TODO check this
       children: [],
+      parentNodeId: 0,
+      referencedByIds: [],
+      parameters: pathData,
     }
     // this.nodeIds.push(this.idCounter)
     //remember the paths id
     let pathsIdCounter = this.idCounter
-    //this.nodeIDToObjectMap[this.idCounter] = { name: 'Paths', type: 'pts' }
+    //this.nodeIDToVuexObjectMap[this.idCounter] = { name: 'Paths', type: 'pts' }
 
     //console.log(pathsObject)
     for (const [key, value] of Object.entries(pathData)) {
       //loop over sequnces - create new Sequence object and add it to children of the seqs
       let pathObject: Object = {
-        type: 'paths',
-        name: key,
         id: ++this.idCounter,
+        name: key,
+        type: 'paths',
+        children: [],
+        parentNodeId: pathsObject['id'],
+        referencedByIds: [],
+        parameters: value,
         iconType: 'path',
         iconColor: 'green',
-        children: [],
       }
       let pathIdCounter = this.idCounter
       //this.nodeIds.push(this.idCounter)
@@ -769,47 +679,72 @@ export default class TreeView extends Vue {
         //console.log(`${key1}`)
         if (Object(value1)[0] === 'modules') {
           //console.log('MODULE')
-          nestedPathObject['type'] = 'modules'
           nestedPathObject['name'] = Object(value1)[1]
-          nestedPathObject['iconType'] = 'module'
+          nestedPathObject['type'] = 'modules'
           nestedPathObject['children'] = []
+          nestedPathObject['parentNodeId'] = pathsObject['id'] //TODO: not pathObject['id']??
+          nestedPathObject['referencedByIds'] = []
+          nestedPathObject['parameters'] = value1
+          nestedPathObject['iconType'] = 'module'
 
-          this.nodeIDToObjectMap[this.idCounter] = {
+          //TODO: substitute Vuex object map with this if it works
+          this.nodeIDToNodeObjectMap[this.idCounter] = nestedPathObject
+
+          this.nodeIDToVuexObjectMap[this.idCounter] = {
             name: Object(value1)[1],
             type: 'modules',
             itemChildrenLength: 0,
             parentNodeId: pathsIdCounter,
+            referencedByIds: [],
+            parameters: value1,
           }
         } else if (Object(value1)[0] === 'sequences') {
           //console.log('SEQUENCE')
-          nestedPathObject['type'] = 'sequences'
           nestedPathObject['name'] = Object(value1)[1]
+          nestedPathObject['type'] = 'sequences'
+          nestedPathObject['children'] = []
+          nestedPathObject['parentNodeId'] = pathsObject['id'] //TODO: not pathIdCounter??
+          nestedPathObject['referencedByIds'] = []
+          nestedPathObject['parameters'] = value1
           nestedPathObject['iconType'] = 'sequence'
           nestedPathObject['iconColor'] = 'red'
-          nestedPathObject['children'] = []
 
-          this.nodeIDToObjectMap[this.idCounter] = {
+          //TODO: substitute Vuex object map with this if it works
+          this.nodeIDToNodeObjectMap[this.idCounter] = nestedPathObject
+
+          this.nodeIDToVuexObjectMap[this.idCounter] = {
             name: Object(value1)[1],
             type: 'sequences',
             itemChildrenLength: 0,
             parentNodeId: pathsIdCounter,
+            referencedByIds: [],
+            parameters: value1,
           }
         }
         pathObject['children'].push(nestedPathObject)
       }
-      this.nodeIDToObjectMap[pathIdCounter] = {
+      //TODO: substitute Vuex object map with this if it works
+      this.nodeIDToNodeObjectMap[pathIdCounter] = pathObject
+
+      this.nodeIDToVuexObjectMap[pathIdCounter] = {
         name: key,
         type: 'paths',
         itemChildrenLength: pathObject['children'].length,
         parentNodeId: pathsIdCounter,
+        referencedByIds: [],
+        parameters: value,
       }
       pathsObject['children'].push(pathObject)
     }
+    //TODO: substitute Vuex object map with this if it works
+    this.nodeIDToNodeObjectMap[pathsObject['id']] = pathsObject
 
-    this.nodeIDToObjectMap[pathsIdCounter] = {
+    this.nodeIDToVuexObjectMap[pathsIdCounter] = {
       name: 'Paths',
       type: 'pts',
       itemChildrenLength: pathsObject['children'].length,
+      referencedByIds: [],
+      parameters: {},
     }
     //console.log(pathsObject)
     //this.items = Object.values(pathsObject)
@@ -824,9 +759,9 @@ export default class TreeView extends Vue {
     //console.log(JSON.stringify(vpSetObject))
     //console.log(body)
     //if the body has more then 0 keys it is an unnamed nested PSet
-    if (Object.entries(Object(body)).length > 1) {
-      //console.log('NESTED UNNAMED PSET')
-    }
+    //if (Object.entries(Object(body)).length > 1) {
+    //console.log('NESTED UNNAMED PSET')
+    //}
     // eslint-disable-next-line no-unused-vars
     for (const [key, value] of Object.entries(Object(body))) {
       //if (vpSetObject['name'] === 'qualityTests') {
@@ -841,12 +776,17 @@ export default class TreeView extends Vue {
       //console.log('value: ' + value)
       //}
       let nestedNoNamePSetObject: Object = {} //might or might not be used
+      //let nestedNoNamePSetObjectId = 0
       if (Object.entries(Object(body)).length > 1) {
         nestedNoNamePSetObject['id'] = ++this.idCounter
-        nestedNoNamePSetObject['globalType'] = 'parameter'
-        nestedNoNamePSetObject['type'] == 'PSet'
         nestedNoNamePSetObject['name'] = 'PSet' //no name
+        nestedNoNamePSetObject['type'] == 'PSet'
+        nestedNoNamePSetObject['globalType'] = 'parameter'
         nestedNoNamePSetObject['children'] = []
+        nestedNoNamePSetObject['parentNodeId'] = 0 //TODO: who's parent?
+        nestedNoNamePSetObject['referencedByIds'] = []
+        //nestedNoNamePSetObject['parameters'] = value1 //TODO
+        //nestedNoNamePSetObjectId = this.idCounter
       }
       //this.nodeIds.push(this.idCounter)
 
@@ -859,13 +799,13 @@ export default class TreeView extends Vue {
         //this.nodeIds.push(this.idCounter)
 
         //this is parameter loop
-        if (vpSetObject['name'] === 'regressionConfig') {
-          //console.log(JSON.stringify(key1), JSON.stringify(value1))
-        }
+        //if (vpSetObject['name'] === 'regressionConfig') {
+        //console.log(JSON.stringify(key1), JSON.stringify(value1))
+        //}
         for (const [key2, value2] of Object.entries(Object(value1))) {
-          if (vpSetObject['name'] === 'regressionConfig') {
-            //console.log(JSON.stringify(key2), JSON.stringify(value2))
-          }
+          //if (vpSetObject['name'] === 'regressionConfig') {
+          //console.log(JSON.stringify(key2), JSON.stringify(value2))
+          //}
           if (key2 === 'type') nestedVPSetObject['type'] = value2
           else if (key2 === 'value') {
             if (
@@ -886,6 +826,8 @@ export default class TreeView extends Vue {
               else nestedVPSetObject['name'] = 'PSet' */
 
               nestedVPSetObject['children'] = []
+              nestedVPSetObject['parentNodeId'] = 0 //TODO: who's parent?
+              nestedVPSetObject['referencedByIds'] = []
 
               this.buildRecursiveVPSetObject(nestedVPSetObject, value2)
             } else {
@@ -917,15 +859,24 @@ export default class TreeView extends Vue {
         //console.log('NESTED MODULE TYPE ' + nestedModuleObject['type'])
 
         //nestedModuleObject['name'] = nestedModuleObject['value']
-        if (vpSetObject['name'] === 'regressionConfig') {
-          //console.log(nestedVPSetObject)
-        }
+        //if (vpSetObject['name'] === 'regressionConfig') {
+        //console.log(nestedVPSetObject)
+        //}
+        //TODO: substitute Vuex object map with this if it works
+        this.nodeIDToNodeObjectMap[nestedVPSetObject['id']] = nestedVPSetObject
+
         if (Object.entries(Object(body)).length == 1) {
           vpSetObject['children'].push(nestedVPSetObject)
         } else {
           nestedNoNamePSetObject['children'].push(nestedVPSetObject)
         }
       }
+
+      //TODO: substitute Vuex object map with this if it works
+      this.nodeIDToNodeObjectMap[
+        nestedNoNamePSetObject['id']
+      ] = nestedNoNamePSetObject
+
       if (Object.entries(Object(body)).length > 1) {
         vpSetObject['children'].push(nestedNoNamePSetObject)
       }
@@ -939,10 +890,13 @@ export default class TreeView extends Vue {
       name: 'Modules',
       type: 'mods',
       children: [],
+      parentNodeId: 0,
+      referencedByIds: [],
+      parameters: moduleData,
     }
     //this.nodeIds.push(this.idCounter)
     let modulesIdCounter = this.idCounter
-    //this.nodeIDToObjectMap[this.idCounter] = { name: 'Modules', type: 'mods' }
+    //this.nodeIDToVuexObjectMap[this.idCounter] = { name: 'Modules', type: 'mods' }
 
     //console.log(moduleData)
     //console.log(modulesObject)
@@ -950,11 +904,14 @@ export default class TreeView extends Vue {
       //loop over sequnces - create new Sequence object and add it to children of the seqs
       //console.log('NAME: ' + key)
       let moduleObject: Object = {
-        type: 'modules',
-        name: key,
         id: ++this.idCounter,
+        name: key,
+        type: 'modules',
         iconType: 'module',
         children: [],
+        parentNodeId: modulesObject['id'],
+        referencedByIds: [],
+        parameters: value,
       }
       // this.nodeIds.push(this.idCounter)
 
@@ -1025,6 +982,13 @@ export default class TreeView extends Vue {
               //nestedModuleObject['name'] = nestedModuleObject['value']
               //console.log(nestedParameterObject)
             }
+            nestedParameterObject['parentNodeId'] = 0 //TODO: who's parent?
+            nestedParameterObject['referencedByIds'] = []
+
+            this.nodeIDToNodeObjectMap[
+              nestedParameterObject['id']
+            ] = nestedParameterObject
+
             //push parameter into module children
             moduleObject['children'].push(nestedParameterObject)
           }
@@ -1042,20 +1006,29 @@ export default class TreeView extends Vue {
       }
       modulesObject['children'].push(moduleObject)
 
-      this.nodeIDToObjectMap[moduleIdCounter] = {
+      this.nodeIDToNodeObjectMap[moduleObject['id']] = moduleObject
+
+      this.nodeIDToVuexObjectMap[moduleIdCounter] = {
         name: key,
         type: 'modules',
         itemChildrenLength: moduleObject['children'].length,
         parentNodeId: modulesIdCounter,
+        referencedByIds: [],
+        parameters: value, //TODO: check this
       }
     }
 
-    this.nodeIDToObjectMap[modulesIdCounter] = {
+    //TODO: substitute Vuex object map with this if it works
+    this.nodeIDToNodeObjectMap[modulesObject['id']] = modulesObject
+
+    this.nodeIDToVuexObjectMap[modulesIdCounter] = {
       name: 'Modules',
       type: 'mods',
       itemChildrenLength: modulesObject['children'].length,
+      referencedByIds: [],
+      parameters: {},
     }
-    //console.log(modulesObject)
+    //console.log('MODULES OBJECT' + JSON.stringify(modulesObject))
     //this.items = Object.values(modulesObject)
     //this.items[0] = modulesObject
     //console.log(this.items[0])
@@ -1071,6 +1044,9 @@ export default class TreeView extends Vue {
       name: 'PSets',
       type: 'psets',
       children: [],
+      parentNodeId: 0,
+      referencedByIds: [],
+      parameters: psetData,
     }
     //this.nodeIds.push(this.idCounter)
 
@@ -1085,6 +1061,9 @@ export default class TreeView extends Vue {
         id: ++this.idCounter,
         iconType: 'pset',
         children: [],
+        parentNodeId: psetsObject['id'],
+        referencedByIds: [],
+        parameters: value,
       }
       // this.nodeIds.push(this.idCounter)
 
@@ -1094,9 +1073,9 @@ export default class TreeView extends Vue {
       // eslint-disable-next-line no-unused-vars
       for (const [key1, value1] of Object.entries(Object(value))) {
         //loop over pset entries
-        if (key == 'HLTPSetPixelLessStepTrajectoryFilter') {
-          //console.log(`${key1}, ${value1}`)
-        }
+        //if (key == 'HLTPSetPixelLessStepTrajectoryFilter') {
+        //console.log(`${key1}, ${value1}`)
+        //}
         let nestedPSetObject: Object = { id: ++this.idCounter }
         //this.nodeIds.push(this.idCounter)
 
@@ -1155,23 +1134,35 @@ export default class TreeView extends Vue {
             cmsTypeLenght
           )
           nestedPSetObject['cmsType'] = cmsType
+          nestedPSetObject['parentNodeId'] = 0 //TODO: who's parent?
+          nestedPSetObject['referencedByIds'] = []
+
+          this.nodeIDToNodeObjectMap[nestedPSetObject['id']] = nestedPSetObject
           //nestedModuleObject['name'] = nestedModuleObject['value']
           psetObject['children'].push(nestedPSetObject)
         }
       }
       psetsObject['children'].push(psetObject)
 
-      this.nodeIDToObjectMap[psetIdCounter] = {
+      this.nodeIDToNodeObjectMap[psetObject['id']] = psetObject
+
+      this.nodeIDToVuexObjectMap[psetIdCounter] = {
         name: key,
         type: 'pset',
         itemChildrenLength: psetObject['children'].length,
         parentNodeId: psetsIdCounter,
+        referencedByIds: [],
+        parameters: value, //TODO: check this
       }
     }
-    this.nodeIDToObjectMap[psetsIdCounter] = {
+    this.nodeIDToNodeObjectMap[psetsObject['id']] = psetsObject
+
+    this.nodeIDToVuexObjectMap[psetsIdCounter] = {
       name: 'PSets',
       type: 'psets',
       itemChildrenLength: psetsObject['children'].length,
+      referencedByIds: [],
+      parameters: {},
     }
     //console.log(psetsObject)
     //this.items = Object.values(psetsObject)
@@ -1211,14 +1202,14 @@ export default class TreeView extends Vue {
       //initilaize node id object map so all components can get name fast from the node id
       await this.$store.dispatch(
         'createNodeIDToObjectMap',
-        this.nodeIDToObjectMap
+        this.nodeIDToVuexObjectMap
       )
       //initilaize id counter in the store so other components can get/modify it
       await this.$store.dispatch('setInitialIDCounter', this.idCounter)
     }
   }
 
-  /* 
+  /*
   get selected() {
     if (!this.active.length) return undefined
 
@@ -1231,30 +1222,30 @@ export default class TreeView extends Vue {
   } */
 
   async fetchNodeById(itemId: number) {
-    /*   
+    /*
     //this.getOpen(itemType, itemName, itemId, itemChildren.length)
     //let index = this.checkOpen(itemName) //close node if it's already open
     //console.log('FETCH')
     //console.log('NODE ID: ' + itemId)
     console.log('OPEN ' + this.open)
-    console.log('ACTIVE ' + this.active) 
+    console.log('ACTIVE ' + this.active)
     //@ts-ignore
     //console.log('REF: ' + this.$refs[itemId].innerHTML)
     //console.log('FETCH 1 TRIGGERED')
 
     /*   console.log(
-      'this.getNodeIDToObjectMap:' + JSON.stringify(this.getNodeIDToObjectMap)
+      'this.getNodeIDToVuexObjectMap:' + JSON.stringify(this.getNodeIDToVuexObjectMap)
     ) */
     /* console.log(
-      'this.getNodeIDToObjectMap[itemId]' + this.getNodeIDToObjectMap[itemId]
+      'this.getNodeIDToVuexObjectMap[itemId]' + this.getNodeIDToVuexObjectMap[itemId]
     ) */
     //TODO: leaf nodes for now are not inserted in object map
-    if (this.getNodeIDToObjectMap[itemId] == undefined) return
-    //if (this.getNodeIDToObjectMap[itemId].type == undefined) return
+    if (this.getNodeIDToVuexObjectMap[itemId] == undefined) return
+    //if (this.getNodeIDToVuexObjectMap[itemId].type == undefined) return
 
-    //console.log('SELECTED NODE TYPE: ' + this.getNodeIDToObjectMap[itemId].type)
+    //console.log('SELECTED NODE TYPE: ' + this.getNodeIDToVuexObjectMap[itemId].type)
 
-    let itemType = this.getNodeIDToObjectMap[itemId].type
+    let itemType = this.getNodeIDToVuexObjectMap[itemId].type
 
     if (itemType === 'sequences') {
       //console.log('FETCH SEQUENCE ID TYPE: ' + typeof itemId)
@@ -1297,13 +1288,17 @@ export default class TreeView extends Vue {
     }
   }
 
-  public updateNode() {}
+  public updateNodeName(nodeId: number, newNodeName: string) {
+    console.log('NODE ID: ' + nodeId)
+    console.log('NEW NODE NAME: ' + newNodeName)
+    console.log('ITEM: ' + JSON.stringify(this.items[0]))
+  }
 
   public removeNode() {}
 
   public showRightClickMenu(e, itemType: string, itemId: number) {
     e.preventDefault()
-    console.log('RIGHT CLICK ITEM TYPE: ' + itemType)
+    //console.log('RIGHT CLICK ITEM TYPE: ' + itemType)
     this.rightClickNodeType = itemType
     this.rightClickNodeId = itemId
     this.showMenu = false
@@ -1336,14 +1331,16 @@ export default class TreeView extends Vue {
       console.log('VALUE: ' + value)
     } */
 
-    console.log(this.$refs.treeReference)
+    //console.log(this.$refs.treeReference)
     //@ts-ignore
-    console.log(this.$refs.treeReference.nodes[1].vnode.$el)
+    //console.log(this.$refs.treeReference.nodes[1].vnode.$el)
     //@ts-ignore
-    this.$vuetify.goTo(0, {
-      //@ts-ignore
-      container: this.$refs.treeReference.nodes[1].vnode.$el,
-    })
+    //this.$vuetify.goTo(0, {
+    //@ts-ignore
+    // container: this.$refs.treeReference.nodes[1].vnode.$el,
+    //})
+
+    this.nodeIDToNodeObjectMap[1].name = 'PERA'
 
     //console.log('OPENNNNN: ' + this.open)
   }
@@ -1358,7 +1355,7 @@ export default class TreeView extends Vue {
     )
     //console.log('DIFFERENCE:' + difference)
     //console.log('DIFFERENCE TYPE: ' + typeof difference)
-    if (Object.keys(this.getNodeIDToObjectMap).length !== 0)
+    if (Object.keys(this.getNodeIDToVuexObjectMap).length !== 0)
       this.fetchNodeById(difference)
     this.open = array
     //console.log('THIS OPEN AFTER: ' + array)
@@ -1366,7 +1363,7 @@ export default class TreeView extends Vue {
 
   public updateActiveNodes(array: any) {
     //console.log('THIS ACTIVE: ' + array)
-    if (Object.keys(this.getNodeIDToObjectMap).length !== 0)
+    if (Object.keys(this.getNodeIDToVuexObjectMap).length !== 0)
       //if map is initialized
       this.fetchNodeById(array[0])
     this.active = array
@@ -1415,27 +1412,6 @@ export default class TreeView extends Vue {
       }
     })
   }
-
-  // it has to be done this way since dialog cannot catch events otherwise
-  /*   public onKeyDown(e) {
-    if (e.key == 'Escape') {
-      if (this.dialog) {
-        this.cancelClicked()
-      }
-      // or if you have created a dialog as a custom component, emit an event
-      // this.$emit('closeDialog')
-    } else if (e.key == 'Enter') {
-      if (this.dialog) this.okClicked()
-    }
-  } */
-
-  /*   mounted() {
-    document.addEventListener('keydown', this.onKeyDown)
-  }
-
-  beforeDestroy() {
-    document.removeEventListener('keydown', this.onKeyDown)
-  } */
 }
 </script>
 

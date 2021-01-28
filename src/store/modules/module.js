@@ -128,8 +128,8 @@ export const getters = {
     return state.modules.length
   },
   getModuleById: (state, getters, rootState, rootGetters) => (id) => {
-    let nodeIDToObjectMap = rootGetters['getNodeIDToObjectMap']
-    let name = nodeIDToObjectMap[id].name
+    let nodeIDToVuexObjectMap = rootGetters['getNodeIDToVuexObjectMap']
+    let name = nodeIDToVuexObjectMap[id].name
     let paramLength = 0
 
     for (const [key, value] of Object.entries(state.modules)) {
@@ -158,7 +158,12 @@ export const getters = {
   getSelectedModuleName: (state) => {
     return state.moduleName
   },
-  getSelectedModuleSequences: (state, getters, rootState, rootGetters) => {
+  getSequencesContainingCurrentModule: (
+    state,
+    getters,
+    rootState,
+    rootGetters
+  ) => {
     let sequencesContainingModule = []
     sequencesContainingModule = rootGetters[
       'sequence/getSequencesContainingModule'
@@ -166,7 +171,7 @@ export const getters = {
     return sequencesContainingModule
     //this.$store.getters['path/getPathsContainingModule'](state.module.name)
   },
-  getSelectedModulePaths: (state, getters, rootState, rootGetters) => {
+  getPathsContainingCurrentModule: (state, getters, rootState, rootGetters) => {
     let modulePaths = {}
     let sequencesContainingModule = []
     modulePaths = rootGetters['path/getPathsContainingModule'](state.moduleName)
@@ -185,7 +190,7 @@ export const getters = {
       console.log('SEQUENCE PATHS: ' + JSON.stringify(sequencePaths))
       //modulePaths.push(sequencePaths)
       if (
-        Object.keys(sequencePaths).length != 0 &&
+        Object.keys(sequencePaths).length != 0 && //TODO: what is this??
         sequencePaths.constructor != Object
       )
         modulePaths = [...modulePaths, sequencePaths] //TODO: test (config has to change)
