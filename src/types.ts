@@ -5,6 +5,7 @@ export interface MainVuexState {
   selectedNodeParamLength: number
   selectedNodeParentId: number
   nodeIDToVuexObjectMap: Object
+  nodeIDToNodeObjectMap: Object
   openNodeIds: Array<number>
   forcedOpenNodeIds: Array<number>
   forcedActiveNodeId: number
@@ -16,11 +17,4 @@ export interface MainVuexState {
   snackBarColor: string
 }
 //TODO
-export interface SequencesVuexState {
-  sequences: Map<string, Map<string, string>>
-  sequencesTotal: number
-  sequenceParams: {} //TODO
-  sequenceName: ''
-  sequenceId: -1 //current selected module ID
-  sequenceParamLength: 0
-}
+export interface NodeObject {}

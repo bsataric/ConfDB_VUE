@@ -22,6 +22,8 @@ const state: MainVuexState = {
   selectedNodeParentId: 0,
   //node ID to Object map containing (type, name, itemChildrenLength, parentNodeId) with node id as key
   nodeIDToVuexObjectMap: {},
+  //node ID to Object map containing all information about every node in the configuration tree
+  nodeIDToNodeObjectMap: {},
   //arrays with node id's - open nodes and forced open nodes
   openNodeIds: [],
   forcedOpenNodeIds: [],
@@ -125,17 +127,23 @@ export default new Vuex.Store({
       }
       //state.openNodeIds = [1]
     },
-    SET_ID_TO_OBJECT_MAP(state, payload) {
+    SET_ID_TO_VUEX_OBJECT_MAP(state, payload) {
       state.nodeIDToVuexObjectMap = payload
       /*      console.log(
         'nodeIDToVuexObjectMap:' + JSON.stringify(state.nodeIDToVuexObjectMap)
       ) */
     },
+    SET_ID_TO_NODE_OBJECT_MAP(state, payload) {
+      state.nodeIDToNodeObjectMap = payload
+    },
     CREATE_NODE_ID_TO_OBJECT_REFERENCES(state) {
+      console.log('CREATING REFERENCES')
       //now pass through all the parameters of
-      for (const [key, value] of Object.entries(state.nodeIDToVuexObjectMap)) {
-        //console.log('KEY: ' + key)
-        //console.log('VALUE: ' + JSON.stringify(value))
+      for (const [key, value] of Object.entries(state.nodeIDToNodeObjectMap)) {
+        if (Number.parseInt(key) < 100) {
+          if (value) console.log('KEY: ' + key)
+          console.log('VALUE: ' + JSON.stringify(value))
+        }
       }
     },
     APPEND_ID_TO_OBJECT_MAP(state, payload) {
@@ -182,8 +190,11 @@ export default new Vuex.Store({
     },
   },
   actions: {
-    createNodeIDToObjectMap({ commit }, nodeIDToVuexObjectMap) {
-      commit('SET_ID_TO_OBJECT_MAP', nodeIDToVuexObjectMap)
+    createNodeIDToVuexObjectMap({ commit }, nodeIDToVuexObjectMap) {
+      commit('SET_ID_TO_VUEX_OBJECT_MAP', nodeIDToVuexObjectMap)
+    },
+    createNodeIDToNodeObjectMap({ commit }, nodeIDToNodeObjectMap) {
+      commit('SET_ID_TO_NODE_OBJECT_MAP', nodeIDToNodeObjectMap)
       commit('CREATE_NODE_ID_TO_OBJECT_REFERENCES')
     },
     createObjectReferences({ commit }) {
