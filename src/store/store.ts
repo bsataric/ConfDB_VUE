@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { MainVuexState } from '../types'
+import { MainVuexState, NodeObject } from '../types'
 import * as sequence from '@/store/modules/sequence.js'
 import * as path from '@/store/modules/path.js'
 import * as module from '@/store/modules/module.js'

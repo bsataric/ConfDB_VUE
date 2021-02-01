@@ -16,5 +16,16 @@ export interface MainVuexState {
   snackBarText: string
   snackBarColor: string
 }
-//TODO
-export interface NodeObject {}
+
+export interface NodeObject {
+  id: number
+  name: string
+  type: string
+  globalType: string
+  children: Array<Object>
+  parentNodeId: number
+  referencedByIds: Array<number>
+  iconType: string
+  iconColor: string
+  value: string
+}
