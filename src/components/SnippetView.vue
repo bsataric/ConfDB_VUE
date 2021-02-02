@@ -51,9 +51,9 @@ import { mapGetters } from 'vuex'
   },
 })
 export default class SnippetView extends Vue {
-  private activeTab: any = 3
+  private activeTab: number = 3
   //private triggered: boolean = false
-  private getSelectedNodeType!: any
+  private getSelectedNodeType!: string
   private getSelectedNodeName!: any
   //modules
   private getSelectedModuleSnippet!: any
@@ -84,14 +84,22 @@ export default class SnippetView extends Vue {
     'Contained in Paths',
   ]
 
-  private disabledTabs: any = [false, false, false, false, false, false, false]
+  private disabledTabs: boolean[] = [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+  ]
 
   public displayAreaText() {
     console.log(JSON.stringify(this.arrayOfSelectedObjects))
   }
 
   public getSelectedNodeSnippet(nodeType: string) {
-    console.log('SELECTED NODE TYPE: ' + nodeType)
+    //console.log('SELECTED NODE TYPE: ' + nodeType)
     //this.triggered = !this.triggered
     if (nodeType == 'modules') {
       return this.getSelectedModuleSnippet
@@ -131,7 +139,7 @@ export default class SnippetView extends Vue {
       return sequencesText
     } else if (nodeType == 'sequences') {
       let sequences = this.getSequencesContainingCurrentSequence
-      console.log('SEQUENCESSSSS: ' + sequences)
+      //console.log('SEQUENCESSSSS: ' + sequences)
       this.arrayOfSelectedObjects = sequences
       let sequencesText = '<ul>'
       //console.log(sequences)
@@ -198,7 +206,7 @@ export default class SnippetView extends Vue {
     return ''
   }
 
-  public getSelectedNodeDisabledTabs(nodeType: string, index: number) {
+  public getSelectedNodeDisabledTabs(nodeType: string, index: number): boolean {
     //console.log('SELECTED NODE TYPE: ' + nodeType)
     //this.triggered = !this.triggered
     if (nodeType == 'modules') {
@@ -223,7 +231,7 @@ export default class SnippetView extends Vue {
         else this.disabledTabs[i] = true
       }
     }
-    return this.disabledTabs[index]
+    return this.disabledTabs[index] as boolean
   }
   public getTextFieldValue(nodeName: string) {
     //console.log('activeTab CHANGED ' + activeTab)

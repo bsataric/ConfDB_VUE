@@ -52,22 +52,22 @@ export default new Vuex.Store({
       //console.log('SELECTED NODE ID: ' + payload.selectedNodeId)
       state.selectedNodeId = payload.selectedNodeId //get all info just via ID
       //console.log(typeof state.selectedNodeId)
-      console.log(
+      /* console.log(
         'state.nodeIDToVuexObjectMap[payload.selectedNodeId]' +
           JSON.stringify(state.nodeIDToVuexObjectMap[payload.selectedNodeId])
-      )
+      ) */
       state.selectedNodeType =
         state.nodeIDToVuexObjectMap[payload.selectedNodeId].type
       state.selectedNodeName =
         state.nodeIDToVuexObjectMap[payload.selectedNodeId].name
-      console.log('state.selectedNodeName ' + state.selectedNodeName)
+      //console.log('state.selectedNodeName ' + state.selectedNodeName)
       state.selectedNodeParamLength =
         state.nodeIDToVuexObjectMap[payload.selectedNodeId].itemChildrenLength
       state.selectedNodeParentId =
         state.nodeIDToVuexObjectMap[payload.selectedNodeId].parentNodeId
       let forceOpenNode = payload.forceOpenNode //if node is opened by foce open it's parent as well
 
-      console.log('FORCED OPEN NODE: ' + forceOpenNode)
+      //console.log('FORCED OPEN NODE: ' + forceOpenNode)
       if (forceOpenNode) {
         state.forcedActiveNodeId = state.selectedNodeId
         //console.log('FORCED NODE ID: ' + state.forcedActiveNodeId)
@@ -93,7 +93,7 @@ export default new Vuex.Store({
           let parentNodeIndex = state.openNodeIds.indexOf(
             state.selectedNodeParentId
           )
-          console.log('PARENT NODE INDEX: ' + parentNodeIndex)
+          //console.log('PARENT NODE INDEX: ' + parentNodeIndex)
           if (parentNodeIndex == -1) {
             //push parent node on array as well
             state.openNodeIds.push(state.selectedNodeParentId)
@@ -137,13 +137,59 @@ export default new Vuex.Store({
       state.nodeIDToNodeObjectMap = payload
     },
     CREATE_NODE_ID_TO_OBJECT_REFERENCES(state) {
+      //TODO
+      /*    id: number
+      name: string
+      type: string
+      globalType: string
+      children: Array<Object>
+      parentNodeId: number
+      referencedByIds: Array<number>
+      iconType: string
+      iconColor: string
+      value: string */
       console.log('CREATING REFERENCES')
       //now pass through all the parameters of
-      for (const [key, value] of Object.entries(state.nodeIDToNodeObjectMap)) {
-        if (Number.parseInt(key) < 100) {
-          if (value) console.log('KEY: ' + key)
-          console.log('VALUE: ' + JSON.stringify(value))
-        }
+      //console.log('MAP 1: ' + state.nodeIDToNodeObjectMap[1].globalType)
+      for (const [key, value] of Object.entries(
+        state.nodeIDToNodeObjectMap as Map<number, NodeObject>
+      )) {
+        /*      if (value.name == 'HLTPFClusteringForEgammaUnseeded') {
+          console.log('ID: ' + value.id)
+          console.log('NAME: ' + value.name)
+          console.log('TYPE: ' + value.type)
+          console.log('GLOBALTYPE: ' + value.globalType)
+          console.log('PARENTNODEID:' + value.parentNodeId)
+          console.log(
+            'PARENT NODE TYPE: ' +
+              state.nodeIDToNodeObjectMap[value.parentNodeId].type
+          )
+        } */
+        //parse top level sequences first
+        if (value.parentNodeId > 0)
+          if (state.nodeIDToNodeObjectMap[value.parentNodeId].type == 'seqs') {
+            //console.log('NAME: ' + value.name)
+            let sequenceName = value.name
+            for (const [key1, value1] of Object.entries(
+              //search through all nodes for references
+              state.nodeIDToNodeObjectMap as Map<number, NodeObject>
+            )) {
+              if (value1.parentNodeId > 0) {
+                let parentType: string =
+                  state.nodeIDToNodeObjectMap[value1.parentNodeId].type
+                if (
+                  (parentType == 'sequences' || parentType != 'paths') &&
+                  sequenceName == value1.name
+                ) {
+                  //nesting
+                  value.referencedByIds.push(value1.id)
+                }
+              }
+            }
+            console.log('NAME: ' + value.name)
+            console.log('REFERENCES: ' + value.referencedByIds)
+          }
+        //take each node name and iterate through all the other nodes recurcivly to find possible references
       }
     },
     APPEND_ID_TO_OBJECT_MAP(state, payload) {
@@ -161,11 +207,11 @@ export default new Vuex.Store({
       delete state.nodeIDToVuexObjectMap[payload]
     },
     SET_INITIAL_ID_COUNTER(state, payload) {
-      console.log('SETTING INITIAL ID COUNTER: ' + payload)
+      //console.log('SETTING INITIAL ID COUNTER: ' + payload)
       state.idCounter = payload
     },
     INCREMENT_ID_COUNTER(state) {
-      console.log('INCREMENTING ID COUNTER')
+      //console.log('INCREMENTING ID COUNTER')
       state.idCounter++
     },
     SET_OPEN_FILE_CONTENT(state, payload) {
@@ -178,7 +224,7 @@ export default new Vuex.Store({
     },
     SET_SNACKBAR_TEXT(state, payload) {
       state.snackBarOpen = true
-      console.log('SNACKBAR COLOR: ' + payload.snackBarColor)
+      //console.log('SNACKBAR COLOR: ' + payload.snackBarColor)
       state.snackBarText = payload.snackBarText
       state.snackBarColor = payload.snackBarColor
       Utils.sleep(4000).then(() => {
@@ -223,7 +269,7 @@ export default new Vuex.Store({
       commit('SET_SNACKBAR_TEXT', payload)
     },
     setSnackBarOpen({ commit }, payload) {
-      console.log('CLOSING SNACKBAR')
+      //console.log('CLOSING SNACKBAR')
       commit('SET_SNACKBAR_OPEN', payload)
     },
   },
@@ -285,3 +331,5 @@ export default new Vuex.Store({
     },
   },
 })
+
+function createNameReferencesRecursivly() {}
