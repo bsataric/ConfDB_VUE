@@ -154,21 +154,21 @@ export default new Vuex.Store({
       for (const [key, value] of Object.entries(
         state.nodeIDToNodeObjectMap as Map<number, NodeObject>
       )) {
-        /*      if (value.name == 'HLTPFClusteringForEgammaUnseeded') {
+        /*       if (Number.parseInt(key) == 3818) {
           console.log('ID: ' + value.id)
           console.log('NAME: ' + value.name)
           console.log('TYPE: ' + value.type)
           console.log('GLOBALTYPE: ' + value.globalType)
           console.log('PARENTNODEID:' + value.parentNodeId)
-          console.log(
-            'PARENT NODE TYPE: ' +
-              state.nodeIDToNodeObjectMap[value.parentNodeId].type
-          )
         } */
+
         //parse top level sequences first
-        if (value.parentNodeId > 0)
+        if (value.parentNodeId > 0) {
+          /*  console.log(
+            'TYPE:' + state.nodeIDToNodeObjectMap[value.parentNodeId].type
+          ) */
           if (state.nodeIDToNodeObjectMap[value.parentNodeId].type == 'seqs') {
-            //console.log('NAME: ' + value.name)
+            //TOP LEVEL SEQUENCE REFERENCES
             let sequenceName = value.name
             for (const [key1, value1] of Object.entries(
               //search through all nodes for references
@@ -178,7 +178,7 @@ export default new Vuex.Store({
                 let parentType: string =
                   state.nodeIDToNodeObjectMap[value1.parentNodeId].type
                 if (
-                  (parentType == 'sequences' || parentType != 'paths') &&
+                  (parentType == 'sequences' || parentType == 'paths') &&
                   sequenceName == value1.name
                 ) {
                   //nesting
@@ -186,9 +186,52 @@ export default new Vuex.Store({
                 }
               }
             }
-            console.log('NAME: ' + value.name)
-            console.log('REFERENCES: ' + value.referencedByIds)
-          }
+            //console.log('TOP SEQUENCE NAME: ' + value.name)
+            //console.log('REFERENCES: ' + value.referencedByIds)
+          } else if (
+            state.nodeIDToNodeObjectMap[value.parentNodeId].type == 'pts' //TOP LEVEL PATH REFERENCES
+          ) {
+            let pathName = value.name
+            for (const [key1, value1] of Object.entries(
+              //search through all nodes for references
+              state.nodeIDToNodeObjectMap as Map<number, NodeObject>
+            )) {
+              if (value1.parentNodeId > 0) {
+                let parentType: string =
+                  state.nodeIDToNodeObjectMap[value1.parentNodeId].type
+                if (parentType == 'paths' && pathName == value1.name) {
+                  //nesting
+                  value.referencedByIds.push(value1.id)
+                }
+              }
+            }
+            //console.log('TOP PATH NAME: ' + value.name)
+            //console.log('REFERENCES: ' + value.referencedByIds)
+          } else if (
+            state.nodeIDToNodeObjectMap[value.parentNodeId].type == 'mods' //TOP LEVEL MODULE REFERENCES
+          ) {
+            //console.log('AAAAAAAAAAAAAA')
+            let moduleName = value.name
+            for (const [key1, value1] of Object.entries(
+              //search through all nodes for references
+              state.nodeIDToNodeObjectMap as Map<number, NodeObject>
+            )) {
+              if (value1.parentNodeId > 0) {
+                let parentType: string =
+                  state.nodeIDToNodeObjectMap[value1.parentNodeId].type
+                if (
+                  (parentType == 'sequences' || parentType == 'paths') &&
+                  moduleName == value1.name
+                ) {
+                  //nesting
+                  value.referencedByIds.push(value1.id)
+                }
+              }
+            }
+            //console.log('TOP MODULE NAME: ' + value.name)
+            //console.log('REFERENCES: ' + value.referencedByIds)
+          } //TODO CREATE ADDITINAL MODULE AND PARAMETER REFERENCES
+        }
         //take each node name and iterate through all the other nodes recurcivly to find possible references
       }
     },
@@ -202,6 +245,18 @@ export default new Vuex.Store({
       /*   console.log(
         'nodeIDToVuexObjectMap:' + JSON.stringify(state.nodeIDToVuexObjectMap)
       ) */
+    },
+    RENAME_NODE(state, payload) {
+      state.nodeIDToNodeObjectMap[payload.nodeId].name = payload.newNodeName
+      for (
+        let i = 0;
+        i < state.nodeIDToNodeObjectMap[payload.nodeId].referencedByIds.length;
+        i++
+      ) {
+        let referenceId =
+          state.nodeIDToNodeObjectMap[payload.nodeId].referencedByIds[i]
+        state.nodeIDToNodeObjectMap[referenceId].name = payload.newNodeName
+      }
     },
     REMOVE_ID_OBJECT_FROM_MAP(state, payload) {
       delete state.nodeIDToVuexObjectMap[payload]
@@ -241,13 +296,15 @@ export default new Vuex.Store({
     },
     createNodeIDToNodeObjectMap({ commit }, nodeIDToNodeObjectMap) {
       commit('SET_ID_TO_NODE_OBJECT_MAP', nodeIDToNodeObjectMap)
-      commit('CREATE_NODE_ID_TO_OBJECT_REFERENCES')
     },
     createObjectReferences({ commit }) {
       commit('CREATE_NODE_ID_TO_OBJECT_REFERENCES')
     },
     appendNodeIDToObjectMap({ commit }, nodeIDToObject) {
       commit('APPEND_ID_TO_OBJECT_MAP', nodeIDToObject)
+    },
+    renameNode({ commit }, payload) {
+      commit('RENAME_NODE', payload)
     },
     removeNodeIDObjectFromMap({ commit }, payload) {},
     setSelectedNodeViaID({ commit }, payload) {

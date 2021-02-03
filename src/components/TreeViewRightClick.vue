@@ -311,27 +311,32 @@ export default class TreeViewRightClick extends Vue {
     console.log('TRYING TO RENAME SEQUENCE ' + newSequenceName)
     //first check if there is sequence with the same name
     //first check if there is sequence with the same name
-    /*   if (this.getSequenceByName(newSequenceName) == undefined) {
+    if (this.getSequenceByName(newSequenceName) == undefined) {
       Promise.all([
-        this.$store.dispatch('sequence/renameSequenceLocally', {
+        /*   this.$store.dispatch('sequence/renameSequenceLocally', {
           newSequenceName: newSequenceName,
           sequenceNodeId: sequenceNodeId,
+        }), */
+        this.$store.dispatch('renameNode', {
+          newNodeName: newSequenceName,
+          nodeId: sequenceNodeId,
         }),
-      ]).finally(() => { */
-    //let newSequenceId = this.getIDCounter
+      ]).finally(() => {
+        //let newSequenceId = this.getIDCounter
 
-    /*  let newSequenceObject: Object = {
+        /*   let newSequenceObject: Object = {
           type: 'sequences',
           name: sequenceName,
           id: newSequenceId,
           iconType: 'sequence',
           iconColor: 'red',
           children: [],
-        } */
+        }  */
 
-    //DONE in TreeView (send object to TreeView)
-    this.$emit('update-node-name', sequenceNodeId, newSequenceName)
-
+        //DONE in TreeView (send object to TreeView)
+        this.$emit('update-node-name', sequenceNodeId, newSequenceName)
+      })
+    }
     /*  let nodeIDToObject = {
           name: newSequenceName,
           type: 'sequences',

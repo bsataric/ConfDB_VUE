@@ -955,7 +955,7 @@ export default class TreeView extends Vue {
       value: '',
     }
     //this.nodeIds.push(this.idCounter)
-    let modulesIdCounter = this.idCounter
+    //let modulesIdCounter = this.idCounter
     //this.nodeIDToVuexObjectMap[this.idCounter] = { name: 'Modules', type: 'mods' }
 
     //console.log(moduleData)
@@ -1088,9 +1088,11 @@ export default class TreeView extends Vue {
     }
 
     //TODO: substitute Vuex object map with this if it works
+    //console.log('MODULES OBJECT ID: ' + modulesObject['id'])
+    //console.log('MODULES OBJECT: ' + JSON.stringify(modulesObject))
     this.nodeIDToNodeObjectMap[modulesObject['id']] = modulesObject
 
-    this.nodeIDToVuexObjectMap[modulesIdCounter] = {
+    this.nodeIDToVuexObjectMap[modulesObject['id']] = {
       name: 'Modules',
       type: 'mods',
       itemChildrenLength: modulesObject['children'].length,
@@ -1275,12 +1277,21 @@ export default class TreeView extends Vue {
         fileData: fileData,
       })
       this.parseModules(this.getModules)
+      //console.log('EVO GA: ' + JSON.stringify(this.nodeIDToNodeObjectMap[3818]))
     } else if (name == 'psets') {
       await this.$store.dispatch('pset/fetchPSets', {
         fromFile: fromFile,
         fileData: fileData,
       })
+      /*    console.log(
+        'EVO GA 1: ' + JSON.stringify(this.nodeIDToNodeObjectMap[3818])
+      ) */
+
       this.parsePSets(this.getPSets)
+      /*    console.log(
+        'EVO GA 2: ' + JSON.stringify(this.nodeIDToNodeObjectMap[3818])
+      ) */
+
       //console.log('AFTER PSETS: ' + this.nodeIds)
       //initilaize node id object map so all components can get name fast from the node id
       await this.$store.dispatch(
@@ -1288,10 +1299,6 @@ export default class TreeView extends Vue {
         this.nodeIDToVuexObjectMap
       )
 
-      await this.$store.dispatch(
-        'createNodeIDToNodeObjectMap',
-        this.nodeIDToNodeObjectMap
-      )
       //initilaize id counter in the store so other components can get/modify it
       await this.$store.dispatch('setInitialIDCounter', this.idCounter)
     }
@@ -1457,11 +1464,20 @@ export default class TreeView extends Vue {
     this.active = array
   }
 
-  public fetchAllGroups() {
-    this.fetchGroup('seqs', false, null)
-    this.fetchGroup('paths', false, null)
-    this.fetchGroup('mods', false, null)
-    this.fetchGroup('psets', false, null)
+  async fetchAllGroups() {
+    Promise.all([
+      //set new object into main map
+      this.fetchGroup('seqs', false, null),
+      this.fetchGroup('paths', false, null),
+      this.fetchGroup('mods', false, null),
+      this.fetchGroup('psets', false, null),
+    ]).finally(async () => {
+      await this.$store.dispatch(
+        'createNodeIDToNodeObjectMap',
+        this.nodeIDToNodeObjectMap
+      ),
+        await this.$store.dispatch('createObjectReferences')
+    })
   }
 
   public fetchAllGroupsFromFile(fileContent: any) {
