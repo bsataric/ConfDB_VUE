@@ -23,7 +23,8 @@ export interface NodeObject {
   type: string
   globalType: string
   children: Array<Object>
-  parentNodeId: number
+  parentNodeId: number //parent node ID of current node
+  rootNodeId: number //ID of the root node that references this node
   referencedByIds: Array<number>
   iconType: string
   iconColor: string

@@ -37,6 +37,17 @@
           <span class="param-value-style" v-if="item.value">
             {{ item.value }}
           </span>
+          <span v-if="item.referencedByIds && item.referencedByIds.length != 0">
+            {{ '(' + item.referencedByIds.length + ')' }}
+          </span>
+          <span v-if="item.rootNodeId != item.id">
+            {{
+              '(' +
+                getNodeIDToNodeObjectMap[item.rootNodeId].referencedByIds
+                  .length +
+                ')'
+            }}
+          </span>
         </span>
       </template>
     </v-treeview>
@@ -75,6 +86,7 @@ import { NodeObject } from '../types'
       getSelectedNodeName: 'getSelectedNodeName',
       getSelectedNodeId: 'getSelectedNodeId',
       getNodeIDToVuexObjectMap: 'getNodeIDToVuexObjectMap',
+      getNodeIDToNodeObjectMap: 'getNodeIDToNodeObjectMap',
       getSelectedNodeParamLength: 'getSelectedNodeParamLength',
       getOpenNodeIds: 'getOpenNodeIds',
       getForcedOpenNodeIds: 'getForcedOpenNodeIds',
@@ -535,6 +547,7 @@ export default class TreeView extends Vue {
       globalType: 'rootNode',
       children: [],
       parentNodeId: 0,
+      rootNodeId: 1,
       referencedByIds: [],
       //parameters: sequenceData,
       iconType: '',
@@ -552,6 +565,7 @@ export default class TreeView extends Vue {
         globalType: 'node',
         children: [],
         parentNodeId: 1,
+        rootNodeId: this.idCounter, //for the root nodes, rootNodeId = itself
         referencedByIds: [],
         //parameters: value,
         iconType: 'sequence',
@@ -578,6 +592,7 @@ export default class TreeView extends Vue {
             globalType: 'node',
             children: [],
             parentNodeId: sequenceObject['id'],
+            rootNodeId: -1, //for the leaf nodes, rootNodeId will be calculated with references
             referencedByIds: [],
             iconType: 'module',
             iconColor: '',
@@ -604,6 +619,7 @@ export default class TreeView extends Vue {
             globalType: 'node',
             children: [],
             parentNodeId: sequenceObject['id'],
+            rootNodeId: -1, //for the leaf nodes, rootNodeId will be calculated with references
             referencedByIds: [],
             iconType: 'sequence',
             iconColor: 'red',
@@ -660,10 +676,11 @@ export default class TreeView extends Vue {
     let pathsObject: NodeObject = {
       id: ++this.idCounter,
       name: 'Paths',
-      type: 'pts', //TODO check this
+      type: 'pts',
       globalType: 'rootNode',
       children: [],
       parentNodeId: 0,
+      rootNodeId: this.idCounter,
       referencedByIds: [],
       //parameters: pathData,
       iconType: '',
@@ -685,6 +702,7 @@ export default class TreeView extends Vue {
         globalType: 'node',
         children: [],
         parentNodeId: pathsObject['id'],
+        rootNodeId: this.idCounter, //for the root nodes, rootNodeId = itself
         referencedByIds: [],
         //parameters: value,
         iconType: 'path',
@@ -711,6 +729,7 @@ export default class TreeView extends Vue {
             globalType: 'node',
             children: [],
             parentNodeId: pathObject['id'],
+            rootNodeId: -1, //for the leaf nodes, rootNodeId will be calculated with references
             referencedByIds: [],
             //nestedPathObject['parameters'] = value1
             iconType: 'module',
@@ -739,6 +758,7 @@ export default class TreeView extends Vue {
             globalType: 'node',
             children: [],
             parentNodeId: pathObject['id'],
+            rootNodeId: -1, //for the leaf nodes, rootNodeId will be calculated with references
             referencedByIds: [],
             //nestedPathObject['parameters'] = value1
             iconType: 'sequence',
@@ -825,6 +845,7 @@ export default class TreeView extends Vue {
         nestedNoNamePSetObject['globalType'] = 'parameter'
         nestedNoNamePSetObject['children'] = []
         nestedNoNamePSetObject['parentNodeId'] = parentID
+        nestedNoNamePSetObject['rootNodeId'] = -1 //TODO if this can be referenced at all?
         nestedNoNamePSetObject['referencedByIds'] = []
         nestedNoNamePSetObject['iconType'] = ''
         nestedNoNamePSetObject['iconColor'] = ''
@@ -920,9 +941,11 @@ export default class TreeView extends Vue {
         this.nodeIDToNodeObjectMap[nestedVPSetObject['id']] = nestedVPSetObject
 
         if (Object.entries(Object(body)).length == 1) {
+          nestedVPSetObject['rootNodeId'] = -1 //TODO: can this bve referenced at all?
           nestedVPSetObject['parentNodeId'] = vpSetObject['id']
           vpSetObject['children'].push(nestedVPSetObject)
         } else {
+          nestedVPSetObject['rootNodeId'] = -1 //TODO: can this bve referenced at all?
           nestedVPSetObject['parentNodeId'] = nestedNoNamePSetObject['id']
           nestedNoNamePSetObject['children'].push(nestedVPSetObject)
         }
@@ -948,6 +971,7 @@ export default class TreeView extends Vue {
       globalType: 'rootNode',
       children: [],
       parentNodeId: 0,
+      rootNodeId: this.idCounter,
       referencedByIds: [],
       //parameters: moduleData,
       iconType: '',
@@ -970,6 +994,7 @@ export default class TreeView extends Vue {
         globalType: 'node',
         children: [],
         parentNodeId: modulesObject['id'],
+        rootNodeId: this.idCounter, //for the root nodes, rootNodeId = itself
         referencedByIds: [],
         //parameters: value,
         iconType: 'module',
@@ -1050,6 +1075,7 @@ export default class TreeView extends Vue {
               //console.log(nestedParameterObject)
             }
             nestedParameterObject['parentNodeId'] = moduleObject['id']
+            nestedParameterObject['rootNodeId'] = -1 //TODO: can this be referenced at all?
             nestedParameterObject['referencedByIds'] = []
             nestedParameterObject['iconType'] = ''
             nestedParameterObject['iconColor'] = ''
@@ -1117,6 +1143,7 @@ export default class TreeView extends Vue {
       globalType: 'node',
       children: [],
       parentNodeId: 0,
+      rootNodeId: this.idCounter,
       referencedByIds: [],
       //parameters: psetData,
       iconType: '',
@@ -1137,6 +1164,7 @@ export default class TreeView extends Vue {
         globalType: 'node',
         children: [],
         parentNodeId: psetsObject['id'],
+        rootNodeId: this.idCounter,
         referencedByIds: [],
         //parameters: value,
         iconType: 'pset',
@@ -1294,13 +1322,6 @@ export default class TreeView extends Vue {
 
       //console.log('AFTER PSETS: ' + this.nodeIds)
       //initilaize node id object map so all components can get name fast from the node id
-      await this.$store.dispatch(
-        'createNodeIDToVuexObjectMap',
-        this.nodeIDToVuexObjectMap
-      )
-
-      //initilaize id counter in the store so other components can get/modify it
-      await this.$store.dispatch('setInitialIDCounter', this.idCounter)
     }
   }
 
@@ -1378,15 +1399,15 @@ export default class TreeView extends Vue {
   public addNode(nodeObject: any) {
     console.log('NODE OBJECT TO ADD: ' + JSON.stringify(nodeObject))
 
-    if (nodeObject.type == 'sequences') {
+    /*     if (nodeObject.type == 'sequences') {
       this.globalSequencesObject['children'].push(nodeObject)
-    }
+    } */
   }
 
   public updateNodeName(nodeId: number, newNodeName: string) {
     console.log('NODE ID: ' + nodeId)
     console.log('NEW NODE NAME: ' + newNodeName)
-    console.log('ITEM: ' + JSON.stringify(this.items[0]))
+    //console.log('ITEM: ' + JSON.stringify(this.items[0]))
   }
 
   public removeNode() {}
@@ -1475,8 +1496,15 @@ export default class TreeView extends Vue {
       await this.$store.dispatch(
         'createNodeIDToNodeObjectMap',
         this.nodeIDToNodeObjectMap
-      ),
-        await this.$store.dispatch('createObjectReferences')
+      )
+      await this.$store.dispatch(
+        'createNodeIDToVuexObjectMap',
+        this.nodeIDToVuexObjectMap
+      )
+
+      //initilaize id counter in the store so other components can get/modify it
+      await this.$store.dispatch('setInitialIDCounter', this.idCounter)
+      await this.$store.dispatch('createObjectReferences')
     })
   }
 

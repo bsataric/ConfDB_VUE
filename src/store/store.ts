@@ -183,6 +183,7 @@ export default new Vuex.Store({
                 ) {
                   //nesting
                   value.referencedByIds.push(value1.id)
+                  value1.rootNodeId = value.id
                 }
               }
             }
@@ -202,6 +203,7 @@ export default new Vuex.Store({
                 if (parentType == 'paths' && pathName == value1.name) {
                   //nesting
                   value.referencedByIds.push(value1.id)
+                  value1.rootNodeId = value.id
                 }
               }
             }
@@ -225,6 +227,7 @@ export default new Vuex.Store({
                 ) {
                   //nesting
                   value.referencedByIds.push(value1.id)
+                  value1.rootNodeId = value.id
                 }
               }
             }
@@ -235,13 +238,19 @@ export default new Vuex.Store({
         //take each node name and iterate through all the other nodes recurcivly to find possible references
       }
     },
-    APPEND_ID_TO_OBJECT_MAP(state, payload) {
-      /* console.log('APPEND_ID_TO_OBJECT_MAP')
+    ADD_NODE(state, payload) {
+      /*      console.log('ADD_NODE')
       console.log(
         'payload.nodeIDToObject' + JSON.stringify(payload.nodeIDToObject)
       )
       console.log('payload.id ' + payload.id) */
-      state.nodeIDToVuexObjectMap[payload.id] = payload.nodeIDToObject
+      //state.nodeIDToVuexObjectMap[payload.id] = payload.nodeIDToObject
+
+      //add new node both to children of the parent and in the main map
+      state.nodeIDToNodeObjectMap[
+        payload.nodeIDToObject.parentNodeId
+      ].children.push(payload.nodeIDToObject)
+      state.nodeIDToNodeObjectMap[payload.nodeId] = payload.nodeIDToObject
       /*   console.log(
         'nodeIDToVuexObjectMap:' + JSON.stringify(state.nodeIDToVuexObjectMap)
       ) */
@@ -249,6 +258,7 @@ export default new Vuex.Store({
     RENAME_NODE(state, payload) {
       state.nodeIDToNodeObjectMap[payload.nodeId].name = payload.newNodeName
       for (
+        //go through all the node references and rename them all
         let i = 0;
         i < state.nodeIDToNodeObjectMap[payload.nodeId].referencedByIds.length;
         i++
@@ -256,6 +266,107 @@ export default new Vuex.Store({
         let referenceId =
           state.nodeIDToNodeObjectMap[payload.nodeId].referencedByIds[i]
         state.nodeIDToNodeObjectMap[referenceId].name = payload.newNodeName
+      }
+    },
+    DELETE_NODE(state, payload) {
+      let nodeToDelete = state.nodeIDToNodeObjectMap[payload.nodeId]
+      //console.log('NODE TO DELETE: ' + JSON.stringify(nodeToDelete))
+      //first delete references to node's children as well as children nodes
+      //console.log('NODE CHILDREN: ' + nodeToDelete.children)
+      for (const [key, value] of Object.entries(
+        nodeToDelete.children as NodeObject
+      )) {
+        //console.log('KEY: ' + key)
+        //console.log('VALUE: ' + JSON.stringify(value))
+        //take rootNodeId of each child, go to that node and delete reference to this child
+        let childIdToDelete = value.id
+        let rootNodeId = value.rootNodeId
+        console.log('CHILD TO DELETE: ' + childIdToDelete)
+        console.log('ROOT NODE ID: ' + rootNodeId)
+        /*         console.log(
+          'ROOT NODE REFERENCES BEFORE DELETE: ' +
+            state.nodeIDToNodeObjectMap[rootNodeId].referencedByIds
+        ) */
+        const referenceIndex = state.nodeIDToNodeObjectMap[
+          rootNodeId
+        ].referencedByIds.indexOf(childIdToDelete)
+        if (referenceIndex > -1) {
+          state.nodeIDToNodeObjectMap[rootNodeId].referencedByIds.splice(
+            referenceIndex,
+            1
+          )
+        }
+        //delete child from children array
+        /* console.log(
+          'NODE CHILDREN BEFORE: ' + JSON.stringify(nodeToDelete.children)
+        ) */
+        //const childIndex = nodeToDelete.children.indexOf(childIdToDelete)
+        //if (childIndex > -1) {
+        nodeToDelete.children.splice(0, 1) //delete one child by one child
+        //}
+        //delete child from the map as well
+        /*  console.log(
+          'CHILD NODE BEFORE DELETE FROM MAP: ' +
+            state.nodeIDToNodeObjectMap[childIdToDelete]
+        ) */
+        delete state.nodeIDToNodeObjectMap[childIdToDelete]
+        /*  console.log(
+          'CHILD NODE AFTER DELETE FROM MAP: ' +
+            state.nodeIDToNodeObjectMap[childIdToDelete]
+        ) */
+
+        /* console.log(
+          'NODE CHILDREN AFTER: ' + JSON.stringify(nodeToDelete.children)
+        ) */
+
+        /*         console.log(
+          'ROOT NODE REFERENCES AFTER DELETE: ' +
+            state.nodeIDToNodeObjectMap[rootNodeId].referencedByIds
+        ) */
+      }
+      //then delete main node and all it's references (references first)
+      //we can assume that references have no children but are just a mirror of the root node (for now)
+      for (let i = 0; i < nodeToDelete.referencedByIds.length; i++) {
+        //first we have to delete node from the children of it's parent node so it reflects in gui
+        //then we have to delete the node object from the map
+        //console.log('REFERENCE NODE ID: ' + nodeToDelete.referencedByIds[i])
+        //get the parent node id of the reference
+        let referenceParentNodeId =
+          state.nodeIDToNodeObjectMap[nodeToDelete.referencedByIds[i]]
+            .parentNodeId
+        //console.log('REFERENCE PARENT NODE ID: ' + referenceParentNodeId)
+        let childIndex = 0
+        for (const [key, value] of Object.entries(
+          state.nodeIDToNodeObjectMap[referenceParentNodeId]
+            .children as NodeObject
+        )) {
+          //console.log('REFERENCE PARENT CHILD KEY: ' + key)
+          console.log('REFERENCE PARENT CHILD VALUE: ' + value)
+          //if value.id is the reference id splice that child from the parent
+          if (value.id == nodeToDelete.referencedByIds[i]) {
+            state.nodeIDToNodeObjectMap[referenceParentNodeId].children.splice(
+              childIndex,
+              1
+            )
+            //then we have to delete the node object from the map
+            delete state.nodeIDToNodeObjectMap[value.id]
+          }
+          childIndex++
+        }
+      }
+      //now we can delete the root node (first from it's parents children and then from the map)
+      let parentId = nodeToDelete.parentNodeId
+      console.log('PARENT ID: ' + parentId)
+      let childIndex = 0
+      for (const [key, value] of Object.entries(
+        state.nodeIDToNodeObjectMap[parentId].children as NodeObject
+      )) {
+        if (value.id == nodeToDelete.id) {
+          state.nodeIDToNodeObjectMap[parentId].children.splice(childIndex, 1)
+          //then we have to delete the node object from the map
+          delete state.nodeIDToNodeObjectMap[value.id]
+        }
+        childIndex++
       }
     },
     REMOVE_ID_OBJECT_FROM_MAP(state, payload) {
@@ -300,13 +411,15 @@ export default new Vuex.Store({
     createObjectReferences({ commit }) {
       commit('CREATE_NODE_ID_TO_OBJECT_REFERENCES')
     },
-    appendNodeIDToObjectMap({ commit }, nodeIDToObject) {
-      commit('APPEND_ID_TO_OBJECT_MAP', nodeIDToObject)
+    addNode({ commit }, payload) {
+      commit('ADD_NODE', payload)
     },
     renameNode({ commit }, payload) {
       commit('RENAME_NODE', payload)
     },
-    removeNodeIDObjectFromMap({ commit }, payload) {},
+    deleteNode({ commit }, payload) {
+      commit('DELETE_NODE', payload)
+    },
     setSelectedNodeViaID({ commit }, payload) {
       commit('SET_SELECTED_NODE_VIA_ID', payload)
     },
@@ -345,6 +458,9 @@ export default new Vuex.Store({
     },
     getNodeIDToVuexObjectMap(state) {
       return state.nodeIDToVuexObjectMap
+    },
+    getNodeIDToNodeObjectMap(state) {
+      return state.nodeIDToNodeObjectMap
     },
     getIDCounter(state) {
       return state.idCounter
