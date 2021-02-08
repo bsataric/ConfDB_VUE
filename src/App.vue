@@ -7,8 +7,9 @@
           v-model="file"
           label="Select config file..."
         ></v-file-input>
-        <v-btn color="primary" @click="onUpload">Open</v-btn>
-
+        <v-btn color="primary" @click="onDownload">Download Config</v-btn>
+        <!--HERE -->
+        <FileUpload />
         <v-spacer></v-spacer>
         <v-toolbar-title>ConfDB</v-toolbar-title>
 
@@ -63,6 +64,7 @@ import TreeView from './components/TreeView.vue'
 import TableView from './components/TableView.vue'
 import SnippetView from './components/SnippetView.vue'
 import NotificationSnackBar from './components/NotificationSnackBar.vue'
+import FileUpload from './components/FileUpload.vue'
 
 import { Component, Vue } from 'vue-property-decorator'
 import { mapGetters } from 'vuex'
@@ -78,18 +80,20 @@ import { mapGetters } from 'vuex'
     TableView,
     SnippetView,
     NotificationSnackBar,
+    FileUpload,
   },
 })
 export default class App extends Vue {
   private name: any = 'App'
   private file: any = null
   private fileContent: any = null
+
   //private darkMode: boolean = true
   private getDarkMode!: any[]
 
   public mounted() {}
 
-  public onUpload() {
+  public onDownload() {
     //console.log(this.file)
 
     var reader = new FileReader()
