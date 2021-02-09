@@ -10,6 +10,7 @@ export interface MainVuexState {
   forcedOpenNodeIds: Array<number>
   forcedActiveNodeId: number
   openFileContent: string
+  savedFileContent: string
   darkMode: boolean
   idCounter: number
   snackBarOpen: boolean

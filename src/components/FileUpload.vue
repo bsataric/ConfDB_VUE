@@ -5,9 +5,9 @@
       :disabled="loading3"
       color="blue-grey"
       class="ma-2 white--text"
-      @click="onUpload()"
+      @click="onSave()"
     >
-      Upload Config
+      Save Config
       <v-icon right dark>
         mdi-cloud-upload
       </v-icon>
@@ -46,7 +46,7 @@ import { mapGetters } from 'vuex'
   computed: {
     ...mapGetters({
       getDarkMode: 'getDarkMode',
-      getNodeIDToNodeObjectMap: 'getNodeIDToNodeObjectMap',
+      getSavedFileContent: 'getSavedFileContent',
     }),
   },
 })
@@ -65,7 +65,7 @@ export default class App extends Vue {
     this.loader = null
   }
 
-  private getNodeIDToNodeObjectMap!: any //maybe unecessary since we have map as variable
+  private getSavedFileContent!: any //maybe unecessary since we have map as variable
 
   private loader: any = null
   private loading3: boolean = false
@@ -76,22 +76,27 @@ export default class App extends Vue {
   private enterText: boolean = false
   private actionCallBack!: () => void
 
-  public onUpload() {
-    this.dialog = true
-    this.dialogHeader = 'Uploaded file name:'
+  public onSave() {
+    //OVERRIDE DIALOG FOR TESTING
+    /*    this.dialog = true
+    this.dialogHeader = 'Co file name:'
     this.dialogText = ''
     this.enterText = true
-    this.actionCallBack = this.uploadFile
+    this.actionCallBack = this.uploadFile */
+    this.uploadFile()
   }
 
   public uploadFile() {
     this.loader = 'loading3'
+    this.$store.dispatch('parseMapToJSONFile')
 
-    const data = JSON.stringify(this.getNodeIDToNodeObjectMap) //TODO: reparse map back to JSON
+    const data = this.getSavedFileContent //TODO: reparse map back to JSON
     const blob = new Blob([data], { type: 'text/plain' })
     const e = document.createEvent('MouseEvents'),
       a = document.createElement('a')
-    a.download = this.dialogValue + '.json'
+    //a.download = this.dialogValue + '.json'
+    a.download = 'test.json' //OVERRIDE FOR TEST
+
     a.href = window.URL.createObjectURL(blob)
     a.dataset.downloadurl = ['text/json', a.download, a.href].join(':')
     e.initEvent('click', true, false)

@@ -176,6 +176,7 @@ export const getters = {
     return state.sequences[name]
   },
   getSequences: (state) => {
+    console.log('GET SEQUENCES CALLED')
     return state.sequences
   },
 

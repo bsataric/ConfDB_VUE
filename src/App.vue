@@ -7,7 +7,7 @@
           v-model="file"
           label="Select config file..."
         ></v-file-input>
-        <v-btn color="primary" @click="onDownload">Download Config</v-btn>
+        <v-btn color="primary" @click="onOpen">Open Config</v-btn>
         <!--HERE -->
         <FileUpload />
         <v-spacer></v-spacer>
@@ -93,7 +93,7 @@ export default class App extends Vue {
 
   public mounted() {}
 
-  public onDownload() {
+  public onOpen() {
     //console.log(this.file)
 
     var reader = new FileReader()

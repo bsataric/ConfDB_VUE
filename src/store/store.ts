@@ -6,6 +6,7 @@ import * as path from '@/store/modules/path.js'
 import * as module from '@/store/modules/module.js'
 import * as pset from '@/store/modules/pset.js'
 import Utils from '@/lib/utils.ts'
+import JSONParser from '@/store/helpers/JSONParser'
 
 Vue.use(Vuex)
 
@@ -30,6 +31,8 @@ const state: MainVuexState = {
   forcedActiveNodeId: 0,
   //content of the opened JSON file
   openFileContent: '',
+  //content of the saved JSON file
+  savedFileContent: '',
   darkMode: false,
   //global node ID counter
   idCounter: 0,
@@ -385,6 +388,14 @@ export default new Vuex.Store({
       state.openFileContent = payload
       //console.log('OPEN FILE CONTENT SET:' + payload)
     },
+    PARSE_MAP_TO_JSON_FILE(state, payload) {
+      //parse the map here
+      //console.log('SEQUENCES: ' + JSON.stringify(payload))
+      state.savedFileContent = JSONParser.parseMapToJSON(
+        state.nodeIDToNodeObjectMap
+      )
+      //console.log('AFTER CALL: ' + state.savedFileContent)
+    },
     SET_DARK_MODE(state, payload) {
       state.darkMode = payload
     },
@@ -431,6 +442,10 @@ export default new Vuex.Store({
     },
     setOpenFileContent({ commit }, payload) {
       commit('SET_OPEN_FILE_CONTENT', payload)
+    },
+    parseMapToJSONFile({ commit, getters }) {
+      let payload = getters.getSequences
+      commit('PARSE_MAP_TO_JSON_FILE', payload)
     },
     setDarkMode({ commit }, payload) {
       commit('SET_DARK_MODE', payload)
@@ -489,6 +504,12 @@ export default new Vuex.Store({
       //console.log('GET OPEN FILE CONTENT: ' + state.getOpenFileContent)
       return state.openFileContent
     },
+    getSavedFileContent(state) {
+      return state.savedFileContent
+    },
+    getSequences: (state, getters, rootState, rootGetters) => {
+      return rootGetters['sequence/getSequences']
+    },
     getDarkMode(state) {
       return state.darkMode
     },
@@ -504,5 +525,3 @@ export default new Vuex.Store({
     },
   },
 })
-
-function createNameReferencesRecursivly() {}
