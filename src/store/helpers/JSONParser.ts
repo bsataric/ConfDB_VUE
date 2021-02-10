@@ -16,27 +16,35 @@ import { NodeObject } from '@/types'
 */
 export default {
   parseMapToJSON(nodeIDToNodeObjectMap: Map<number, NodeObject>): string {
-    let savedFileContentObject: Object = { seqs: {} }
+    let savedFileContentObject: Object = {
+      seqs: {},
+      paths: {},
+      mods: {},
+      psets: {},
+    }
     let sequencesObject: Object = {}
+    let pathsObject: Object = {}
+    let modulesObject: Object = {}
+    let psetsObject: Object = {}
+
     //parse the map here
     for (const [key, value] of Object.entries(
       nodeIDToNodeObjectMap as Map<number, NodeObject>
     )) {
-      if (nodeIDToNodeObjectMap[value.id].type == 'sequences') {
-        console.log('SEQUENCE: ' + nodeIDToNodeObjectMap[value.id].name)
-        /*  savedFileContent =  JSON.stringify(
-          //try to parse sequence object from sequences to see what's the difference in JSON
-          nodeIDToNodeObjectMap[value.id],
-          ['type', 'name'],
-          '\t'
-        )  */
-        // break
+      //console.log('OUTER KEY: ' + key)
+      if (
+        nodeIDToNodeObjectMap[value.id].globalType == 'sequenceNode' //main sequence node
+      ) {
+        /*     console.log('SEQUENCE NAME: ' + nodeIDToNodeObjectMap[value.id].name)
+        console.log('KEY: ' + key)
+        console.log('SEQUENCE ID: ' + nodeIDToNodeObjectMap[value.id].id) */
+
         sequencesObject[nodeIDToNodeObjectMap[value.id].name] = []
         //now go through all sequence children and add them to array
         for (const [key1, value1] of Object.entries(
           nodeIDToNodeObjectMap[value.id].children
         )) {
-          let childrenObject = Array() //TODO: fix this
+          let childrenObject = Array()
           childrenObject.push(
             nodeIDToNodeObjectMap[value.id].children[key1].type
           )
@@ -47,9 +55,91 @@ export default {
             childrenObject
           )
         }
+      } else if (
+        nodeIDToNodeObjectMap[value.id].globalType == 'pathNode' //main path node
+      ) {
+        /*       console.log('PATH NAME: ' + nodeIDToNodeObjectMap[value.id].name)
+        console.log('KEY: ' + key)
+        console.log('PATH ID: ' + nodeIDToNodeObjectMap[value.id].id) */
+
+        pathsObject[nodeIDToNodeObjectMap[value.id].name] = []
+        //now go through all sequence children and add them to array
+        for (const [key1, value1] of Object.entries(
+          nodeIDToNodeObjectMap[value.id].children
+        )) {
+          let childrenObject = Array()
+          childrenObject.push(
+            nodeIDToNodeObjectMap[value.id].children[key1].type
+          )
+          childrenObject.push(
+            nodeIDToNodeObjectMap[value.id].children[key1].name
+          )
+          pathsObject[nodeIDToNodeObjectMap[value.id].name].push(childrenObject)
+        }
+      } else if (
+        nodeIDToNodeObjectMap[value.id].globalType == 'moduleNode' //main path node
+      ) {
+        /*         console.log('MODULE NAME: ' + nodeIDToNodeObjectMap[value.id].name)
+        console.log('KEY: ' + key)
+        console.log('MODULE ID: ' + nodeIDToNodeObjectMap[value.id].id) */
+        let moduleObject: Object = { params: {}, ctype: '', pytype: '' }
+
+        console.log('MODULE NAME' + nodeIDToNodeObjectMap[value.id].name)
+        console.log(
+          'MODULE CHILDREN' +
+            JSON.stringify(nodeIDToNodeObjectMap[value.id].children)
+        )
+
+        //now go through all sequence children and add them to array
+        for (const [key1, value1] of Object.entries(
+          nodeIDToNodeObjectMap[value.id].children
+        )) {
+          let paramObject: Object = {}
+          paramObject['type'] =
+            nodeIDToNodeObjectMap[value.id].children[key1].type
+          if (
+            paramObject['type'] == 'cms.int32' ||
+            paramObject['type'] == 'cms.double'
+          )
+            paramObject['value'] = Number.parseInt(
+              nodeIDToNodeObjectMap[value.id].children[key1].value
+            )
+          else {
+            paramObject['value'] = nodeIDToNodeObjectMap[value.id].children[
+              key1
+            ].value as string
+            //console.log('PARAM OBECT VALUE: ' + paramObject['value'])
+            if (paramObject['value'] != undefined)
+              paramObject['value'] = paramObject['value'].slice(1, -1) //TODO: solve quotes problem and parese (V)PSets
+            //
+          }
+          /*   let childrenObject = Array() //TODO: fix module parameter parsing
+          childrenObject.push(
+            nodeIDToNodeObjectMap[value.id].children[key1].type
+          )
+          childrenObject.push(
+            nodeIDToNodeObjectMap[value.id].children[key1].name
+          )
+          modulesObject[nodeIDToNodeObjectMap[value.id].name].push(
+            childrenObject
+          ) */
+          let nameLength =
+            nodeIDToNodeObjectMap[value.id].children[key1].name.length
+          moduleObject['params'][
+            nodeIDToNodeObjectMap[value.id].children[key1].name.substring(
+              0,
+              nameLength - 3
+            )
+          ] = paramObject
+        }
+
+        modulesObject[nodeIDToNodeObjectMap[value.id].name] = moduleObject
       }
     }
+
     savedFileContentObject['seqs'] = sequencesObject
+    savedFileContentObject['paths'] = pathsObject
+    savedFileContentObject['mods'] = modulesObject
     let savedFileContent = JSON.stringify(savedFileContentObject, undefined, 2)
     /*   const pretty = stringifyObject(savedFileContentObject, {
       indent: '  ',

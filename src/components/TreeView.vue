@@ -553,6 +553,8 @@ export default class TreeView extends Vue {
       iconType: '',
       iconColor: '',
       value: '',
+      ctype: '',
+      ptype: '',
     }
     //this.nodeIds.push(1)
     //console.log(sequencesObject)
@@ -562,7 +564,7 @@ export default class TreeView extends Vue {
         id: ++this.idCounter,
         name: key,
         type: 'sequences',
-        globalType: 'node',
+        globalType: 'sequenceNode',
         children: [],
         parentNodeId: 1,
         rootNodeId: this.idCounter, //for the root nodes, rootNodeId = itself
@@ -571,6 +573,8 @@ export default class TreeView extends Vue {
         iconType: 'sequence',
         iconColor: 'red',
         value: '',
+        ctype: '',
+        ptype: '',
       }
 
       //this.nodeIds.push(this.idCounter)
@@ -589,7 +593,7 @@ export default class TreeView extends Vue {
             id: ++this.idCounter,
             name: Object(value1)[1],
             type: 'modules',
-            globalType: 'node',
+            globalType: 'nestedModuleNode',
             children: [],
             parentNodeId: sequenceObject['id'],
             rootNodeId: -1, //for the leaf nodes, rootNodeId will be calculated with references
@@ -597,6 +601,8 @@ export default class TreeView extends Vue {
             iconType: 'module',
             iconColor: '',
             value: '',
+            ctype: '',
+            ptype: '',
           }
           //TODO: substitute Vuex object map with this if it works
           this.nodeIDToNodeObjectMap[this.idCounter] = nestedSequenceObject
@@ -616,7 +622,7 @@ export default class TreeView extends Vue {
             id: ++this.idCounter,
             name: Object(value1)[1],
             type: 'sequences',
-            globalType: 'node',
+            globalType: 'nestedSequenceNode',
             children: [],
             parentNodeId: sequenceObject['id'],
             rootNodeId: -1, //for the leaf nodes, rootNodeId will be calculated with references
@@ -624,6 +630,8 @@ export default class TreeView extends Vue {
             iconType: 'sequence',
             iconColor: 'red',
             value: '',
+            ctype: '',
+            ptype: '',
           }
 
           //TODO: substitute Vuex object map with this if it works
@@ -686,6 +694,8 @@ export default class TreeView extends Vue {
       iconType: '',
       iconColor: '',
       value: '',
+      ctype: '',
+      ptype: '',
     }
     // this.nodeIds.push(this.idCounter)
     //remember the paths id
@@ -699,7 +709,7 @@ export default class TreeView extends Vue {
         id: ++this.idCounter,
         name: key,
         type: 'paths',
-        globalType: 'node',
+        globalType: 'pathNode',
         children: [],
         parentNodeId: pathsObject['id'],
         rootNodeId: this.idCounter, //for the root nodes, rootNodeId = itself
@@ -708,6 +718,8 @@ export default class TreeView extends Vue {
         iconType: 'path',
         iconColor: 'green',
         value: '',
+        ctype: '',
+        ptype: '',
       }
       //let pathIdCounter = this.idCounter
       //this.nodeIds.push(this.idCounter)
@@ -726,7 +738,7 @@ export default class TreeView extends Vue {
             id: ++this.idCounter,
             name: Object(value1)[1],
             type: 'modules',
-            globalType: 'node',
+            globalType: 'nestedModuleNode',
             children: [],
             parentNodeId: pathObject['id'],
             rootNodeId: -1, //for the leaf nodes, rootNodeId will be calculated with references
@@ -735,6 +747,8 @@ export default class TreeView extends Vue {
             iconType: 'module',
             iconColor: '',
             value: '',
+            ctype: '',
+            ptype: '',
           }
 
           //TODO: substitute Vuex object map with this if it works
@@ -755,7 +769,7 @@ export default class TreeView extends Vue {
             id: ++this.idCounter,
             name: Object(value1)[1],
             type: 'sequences',
-            globalType: 'node',
+            globalType: 'nestedSequenceNode',
             children: [],
             parentNodeId: pathObject['id'],
             rootNodeId: -1, //for the leaf nodes, rootNodeId will be calculated with references
@@ -764,6 +778,8 @@ export default class TreeView extends Vue {
             iconType: 'sequence',
             iconColor: 'red',
             value: '',
+            ctype: '',
+            ptype: '',
           }
           //TODO: substitute Vuex object map with this if it works
           this.nodeIDToNodeObjectMap[this.idCounter] = nestedPathObject
@@ -977,6 +993,8 @@ export default class TreeView extends Vue {
       iconType: '',
       iconColor: '',
       value: '',
+      ctype: '',
+      ptype: '',
     }
     //this.nodeIds.push(this.idCounter)
     //let modulesIdCounter = this.idCounter
@@ -991,7 +1009,7 @@ export default class TreeView extends Vue {
         id: ++this.idCounter,
         name: key,
         type: 'modules',
-        globalType: 'node',
+        globalType: 'moduleNode',
         children: [],
         parentNodeId: modulesObject['id'],
         rootNodeId: this.idCounter, //for the root nodes, rootNodeId = itself
@@ -1000,6 +1018,8 @@ export default class TreeView extends Vue {
         iconType: 'module',
         iconColor: '',
         value: '',
+        ctype: '',
+        ptype: '',
       }
       // this.nodeIds.push(this.idCounter)
 
@@ -1088,7 +1108,7 @@ export default class TreeView extends Vue {
             moduleObject['children'].push(nestedParameterObject)
           }
         } else if (key1 === 'ctype') {
-          moduleObject['ctype'] = value1
+          moduleObject['ctype'] = value1 as string
         } else if (key1 === 'pytype') {
           moduleObject['pytype'] = value1
         }
@@ -1140,7 +1160,7 @@ export default class TreeView extends Vue {
       id: ++this.idCounter,
       name: 'PSets',
       type: 'psets',
-      globalType: 'node',
+      globalType: 'rootNode',
       children: [],
       parentNodeId: 0,
       rootNodeId: this.idCounter,
@@ -1149,6 +1169,8 @@ export default class TreeView extends Vue {
       iconType: '',
       iconColor: '',
       value: '',
+      ctype: '',
+      ptype: '',
     }
     //this.nodeIds.push(this.idCounter)
 
@@ -1161,7 +1183,7 @@ export default class TreeView extends Vue {
         id: ++this.idCounter,
         name: key,
         type: 'pset',
-        globalType: 'node',
+        globalType: 'psetNode',
         children: [],
         parentNodeId: psetsObject['id'],
         rootNodeId: this.idCounter,
@@ -1170,6 +1192,8 @@ export default class TreeView extends Vue {
         iconType: 'pset',
         iconColor: '',
         value: '',
+        ctype: '',
+        ptype: '',
         //parameters: value,
       }
       // this.nodeIds.push(this.idCounter)

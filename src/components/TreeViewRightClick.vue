@@ -295,7 +295,7 @@ export default class TreeViewRightClick extends Vue {
           id: newSequenceId,
           name: sequenceName,
           type: 'sequences',
-          globalType: 'node',
+          globalType: 'sequenceNode',
           children: [],
           parentNodeId: 1,
           rootNodeId: newSequenceId, //new sequence is it's own root
@@ -304,6 +304,8 @@ export default class TreeViewRightClick extends Vue {
           iconType: 'sequence',
           iconColor: 'red',
           value: '',
+          ctype: '',
+          ptype: '',
         }
 
         //DONE in TreeView (send object to TreeView)
@@ -319,7 +321,7 @@ export default class TreeViewRightClick extends Vue {
         Promise.all([
           //set new object into main map
           this.$store.dispatch('addNode', {
-            id: newSequenceId,
+            nodeId: newSequenceId,
             nodeIDToObject: newSequenceObject,
           }),
           //Focus and open/active new node

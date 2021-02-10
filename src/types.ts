@@ -30,4 +30,6 @@ export interface NodeObject {
   iconType: string
   iconColor: string
   value: string
+  ctype: string
+  ptype: string
 }

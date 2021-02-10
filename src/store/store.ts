@@ -254,9 +254,11 @@ export default new Vuex.Store({
         payload.nodeIDToObject.parentNodeId
       ].children.push(payload.nodeIDToObject)
       state.nodeIDToNodeObjectMap[payload.nodeId] = payload.nodeIDToObject
-      /*   console.log(
-        'nodeIDToVuexObjectMap:' + JSON.stringify(state.nodeIDToVuexObjectMap)
-      ) */
+      console.log('NEW NODE ID: ' + payload.nodeId)
+      console.log(
+        'NEW nodeIDToVuexObjectMap:' +
+          JSON.stringify(state.nodeIDToNodeObjectMap[payload.nodeId])
+      )
     },
     RENAME_NODE(state, payload) {
       state.nodeIDToNodeObjectMap[payload.nodeId].name = payload.newNodeName
