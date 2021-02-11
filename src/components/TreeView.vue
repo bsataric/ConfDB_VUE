@@ -40,7 +40,9 @@
           <span v-if="item.referencedByIds && item.referencedByIds.length != 0">
             {{ '(' + item.referencedByIds.length + ')' }}
           </span>
-          <span v-if="item.rootNodeId != item.id">
+          <span
+            v-if="item.rootNodeId != item.id && item.globalType != 'parameter'"
+          >
             {{
               '(' +
                 getNodeIDToNodeObjectMap[item.rootNodeId].referencedByIds
@@ -71,6 +73,8 @@ import { Component, Vue, Watch } from 'vue-property-decorator'
 import { mapGetters } from 'vuex'
 // eslint-disable-next-line no-unused-vars
 import { NodeObject } from '../types'
+// eslint-disable-next-line no-unused-vars
+import Utils from '@/lib/utils.ts'
 
 //const axios = require('axios').default
 
@@ -208,327 +212,6 @@ export default class TreeView extends Vue {
     path: 'mdi-filmstrip',
     pset: 'mdi-format-list-bulleted',
   }
-  //private tree: any = []
-  /*
-  private items1: any = [
-    {
-      id: 1,
-      name: 'Sequences',
-      type: 'seqs',
-      children: [
-        {
-          id: 2,
-          type: 'sequences',
-          name: 'HLTPFClusteringForEgammaUnseeded',
-          iconType: 'sequence',
-          iconColor: 'red',
-          children: [
-            {
-              id: 3,
-              type: 'modules',
-              name: 'hltParticleFlowRecHitECALUnseeded',
-              iconType: 'module',
-            },
-            {
-              id: 4,
-              type: 'modules',
-              name: 'hltParticleFlowRecHitPSUnseeded',
-              iconType: 'module',
-            },
-          ],
-        },
-        {
-          id: 5,
-          type: 'sequences',
-          name: 'HLTDoLocalPixelSequence',
-          iconType: 'sequence',
-          iconColor: 'red',
-          children: [
-            {
-              id: 6,
-              type: 'modules',
-              name: 'hltSiPixelDigis',
-              iconType: 'module',
-            },
-            {
-              id: 7,
-              type: 'modules',
-              name: 'hltSiPixelClusters',
-              iconType: 'module',
-            },
-          ],
-        },
-      ],
-    },
-  ] */
-  /*     {
-      name: 'Paths',
-      type: 'paths',
-      children: [
-        {
-          type: 'paths',
-          name: 'HLTriggerFirstPath',
-          iconType: 'path',
-          iconColor: 'green',
-          children: [
-            {
-              type: 'modules',
-              name: 'hltGetConditions',
-              iconType: 'module',
-            },
-            {
-              type: 'modules',
-              name: 'hltGetRaw',
-              iconType: 'module',
-            },
-            {
-              type: 'modules',
-              name: 'hltBoolFalse',
-              iconType: 'module',
-            },
-          ],
-        },
-        {
-          type: 'paths',
-          name: 'HLT_Ele5_Open_v1',
-          iconType: 'path',
-          iconColor: 'green',
-          children: [
-            {
-              type: 'sequences',
-              name: 'HLTBeginSequence',
-              iconType: 'sequence',
-              iconColor: 'red',
-            },
-            {
-              type: 'modules',
-              name: 'hltL1sSingleEGor',
-              iconType: 'module',
-            },
-            {
-              type: 'modules',
-              name: 'hltPreEle5',
-              iconType: 'module',
-            },
-            {
-              type: 'sequences',
-              name: 'HLTEle5OpenSequence',
-              iconType: 'sequence',
-              iconColor: 'red',
-            },
-            {
-              type: 'sequences',
-              name: 'HLTEndSequence',
-              iconType: 'sequence',
-              iconColor: 'red',
-            },
-          ],
-        },
-      ],
-    }, */
-  /*     {
-      name: 'Modules',
-      type: 'mods',
-      children: [
-        {
-          type: 'modules',
-          name: 'hltIter1ClustersRefRemoval',
-          iconType: 'module',
-          children: [
-            {
-              type: 'cms.string',
-              globalType: 'parameter',
-              ctype: 'TrackClusterRemover',
-              pytype: 'EDProducer',
-              value: 'highPurity',
-              name: 'string = highPurity', //this will have to be computed (maybe coloured)
-            },
-          ],
-        },
-        {
-          type: 'modules',
-          name: 'hltParticleFlowSuperClusterECALUnseeded',
-          iconType: 'module',
-          children: [
-            {
-              type: 'cms.string',
-              globalType: 'parameter',
-              ctype: 'PFECALSuperClusterProducer',
-              pytype: 'EDProducer',
-              value: 'hltParticleFlowSuperClusterECALEndcapWithPreshower',
-              name:
-                'string = hltParticleFlowSuperClusterECALEndcapWithPreshower',
-            },
-          ],
-        },
-        {
-          type: 'modules',
-          name: 'hltDoubletRecoveryPFlowPixelSeeds',
-          iconType: 'module',
-          children: [
-            {
-              type: 'cms.double',
-              globalType: 'parameter',
-              ctype: 'SeedCreatorFromRegionConsecutiveHitsEDProducer',
-              pytype: 'EDProducer',
-              value: 1.0,
-              name: 'double = 1.0',
-            },
-          ],
-        },
-        {
-          type: 'modules',
-          name: 'hltFEDSelector',
-          iconType: 'module',
-          children: [
-            {
-              type: 'cms.vuint32',
-              globalType: 'parameter',
-              ctype: 'SiPixelClusterShapeCacheProducer',
-              pytype: 'EDProducer',
-              value: [1023, 1024],
-              name: 'vuint32 = [1023, 1024]',
-            },
-          ],
-        },
-        {
-          type: 'modules',
-          name: 'hltEgammaElectronPixelSeedsUnseeded',
-          iconType: 'module',
-          children: [
-            {
-              type: 'cms.InputTag',
-              globalType: 'parameter',
-              ctype: 'ElectronNHitSeedProducer',
-              pytype: 'EDProducer',
-              value: 'hltElePixelSeedsCombinedUnseeded',
-              name: 'InputTag = hltElePixelSeedsCombinedUnseeded',
-            },
-          ],
-        },
-        {
-          type: 'modules',
-          name: 'hltParticleFlowRecHitECALUnseeded',
-          iconType: 'module',
-          children: [
-            {
-              type: 'cms.VPSet',
-              globalType: 'parameter',
-              ctype: 'PFRecHitProducer',
-              pytype: 'EDProducer',
-              name: 'VPSet',
-              children: [
-                {
-                  type: 'cms.VPSet',
-                  globalType: 'parameter',
-                  name: 'VPSet',
-                  children: [
-                    {
-                      type: 'cms.bool',
-                      globalType: 'parameter',
-                      value: true,
-                      name: 'bool = true1',
-                    },
-                    {
-                      type: 'cms.double',
-                      globalType: 'parameter',
-                      value: 2.0,
-                      name: 'double = 2.02',
-                    },
-                  ],
-                },
-                {
-                  type: 'cms.VPSet',
-                  globalType: 'parameter',
-                  name: 'VPSet',
-                  children: [
-                    {
-                      type: 'cms.bool',
-                      globalType: 'parameter',
-                      value: true,
-                      name: 'bool = true',
-                    },
-                    {
-                      type: 'cms.double',
-                      globalType: 'parameter',
-                      value: 2.0,
-                      name: 'double = 2.0',
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-        {
-          type: 'modules',
-          name: 'hltFEDSelector',
-          iconType: 'module',
-          children: [
-            {
-              type: 'cms.vstring',
-              globalType: 'parameter',
-              ctype: 'ClassifierMerger',
-              pytype: 'EDProducer',
-              value: [
-                'hltIter1PFlowTrackCutClassifierPrompt',
-                'hltIter1PFlowTrackCutClassifierDetached',
-              ],
-              name:
-                'vstring = [hltIter1PFlowTrackCutClassifierPrompt, hltIter1PFlowTrackCutClassifierDetached]',
-            },
-          ],
-        },
-      ],
-    }, */
-  /*  {
-      name: 'PSets',
-      type: 'psets',
-      children: [
-        {
-          type: 'pset', //TODO: check this
-          name: 'HLTPSetPixelLessStepTrajectoryFilter',
-          children: [
-            {
-              type: 'cms.double',
-              globalType: 'parameter',
-              value: -1.0,
-              name: 'double = -1.0', //this will have to be computed (maybe coloured)
-            },
-          ],
-        },
-        {
-          type: 'pset', //TODO: check this
-          name: 'HLTPSetInitialStepTrajectoryFilterPreSplittingForDmesonPPOnAA',
-          children: [
-            {
-              type: 'cms.VPSet',
-              globalType: 'parameter',
-              name: 'VPSet',
-              children: [
-                {
-                  type: 'cms.string',
-                  globalType: 'parameter',
-                  value:
-                    'HLTPSetInitialStepTrajectoryFilterBasePreSplittingForDmesonPPOnAA',
-                  name:
-                    'string = HLTPSetInitialStepTrajectoryFilterBasePreSplittingForDmesonPPOnAA',
-                },
-                {
-                  type: 'cms.string',
-                  globalType: 'parameter',
-                  value:
-                    'HLTPSetInitialStepTrajectoryFilterShapePreSplittingPPOnAA',
-                  name:
-                    'string = HLTPSetInitialStepTrajectoryFilterShapePreSplittingPPOnAA',
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    }, */
-  //]
 
   get items() {
     return [
@@ -1062,22 +745,37 @@ export default class TreeView extends Vue {
                 } else {
                   nestedParameterObject['name'] = key2 + ' = '
                   //simple type
-                  nestedParameterObject['value'] = JSON.stringify(value3) //simple value
+
+                  if (value3 != '""') {
+                    if (
+                      nestedParameterObject['type'] == 'cms.int32' ||
+                      nestedParameterObject['type'] == 'cms.double'
+                    ) {
+                      //
+                      let numValue = value3 as number
+                      //numValue = 3
+                      /*       console.log('TYPE OF NV: ' + typeof numValue)
+                      let primitiveValue = numValue.valueOf()
+                      let numOfDecimals = Utils.countNumberDecimals(
+                        primitiveValue
+                      )
+                      console.log('NUMBER OF DECIMALS: ' + numOfDecimals) */
+                      /* nestedParameterObject['value'] = numValue.toFixed(
+                        numOfDecimals
+                      ) */
+                      nestedParameterObject['value'] = numValue.toString()
+                    } else {
+                      nestedParameterObject['value'] = JSON.stringify(value3)
+                    }
+                  } //do not stringify or convert empty string
+                  else {
+                    nestedParameterObject['value'] = value3 as string
+                  }
                   if (nestedParameterObject['value'].length > 70) {
                     //shorten the string and put three dots in the end
                     nestedParameterObject['value'] =
                       nestedParameterObject['value'].substring(1, 70) + '...'
                   }
-                  //if (nestedModuleObject['value'].indexOf('OR') != -1) {
-                  //probably need more operators
-                  //console.log('FOUND OR OPERATOR')
-                  //let splitString = nestedModuleObject['value'].split('OR')
-                  //console.log('SPLIT STRING: ' + splitString)
-                  /*    nestedModuleObject['value'] = ''
-                    for (let i = 0; i < splitString.length; i++) {
-                      nestedModuleObject['value'] += splitString[i] + ' \r\n'
-                    } */
-                  //}
                 }
               }
               //console.log(key3)

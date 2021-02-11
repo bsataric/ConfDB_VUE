@@ -84,11 +84,11 @@ export default {
         console.log('MODULE ID: ' + nodeIDToNodeObjectMap[value.id].id) */
         let moduleObject: Object = { params: {}, ctype: '', pytype: '' }
 
-        console.log('MODULE NAME' + nodeIDToNodeObjectMap[value.id].name)
+        /*   console.log('MODULE NAME' + nodeIDToNodeObjectMap[value.id].name)
         console.log(
           'MODULE CHILDREN' +
             JSON.stringify(nodeIDToNodeObjectMap[value.id].children)
-        )
+        ) */
 
         //now go through all sequence children and add them to array
         for (const [key1, value1] of Object.entries(
@@ -98,10 +98,22 @@ export default {
           paramObject['type'] =
             nodeIDToNodeObjectMap[value.id].children[key1].type
           if (
+            paramObject['type'] == 'cms.VPSet' ||
+            paramObject['type'] == 'cms.PSet'
+          ) {
+            paramObject['value'] = 'VPESET' //TODO
+          } else if (paramObject['type'] == 'cms.bool') {
+            console.log(
+              'BOOL VALUE: ' +
+                nodeIDToNodeObjectMap[value.id].children[key1].value
+            )
+            paramObject['value'] =
+              nodeIDToNodeObjectMap[value.id].children[key1].value == 'true'
+          } else if (
             paramObject['type'] == 'cms.int32' ||
             paramObject['type'] == 'cms.double'
           )
-            paramObject['value'] = Number.parseInt(
+            paramObject['value'] = Number.parseFloat(
               nodeIDToNodeObjectMap[value.id].children[key1].value
             )
           else {
@@ -109,10 +121,34 @@ export default {
               key1
             ].value as string
             //console.log('PARAM OBECT VALUE: ' + paramObject['value'])
-            if (paramObject['value'] != undefined)
-              paramObject['value'] = paramObject['value'].slice(1, -1) //TODO: solve quotes problem and parese (V)PSets
+
+            /*       if (
+                nodeIDToNodeObjectMap[value.id].children[key1].name ==
+                'oldClusterRemovalInfo = '
+              ) {
+                console.log(
+                  'oldClusterRemovalInfo value on SAVE: ' + paramObject['value']
+                )
+              } */
+            if (
+              paramObject['value'] != undefined &&
+              paramObject['value'] != '""' &&
+              paramObject['type'] != 'cms.bool' &&
+              paramObject['type'] != 'cms.untracked.bool'
+            )
+              paramObject['value'] = paramObject['value'].slice(1, -1)
             //
+            /*      if (
+                nodeIDToNodeObjectMap[value.id].children[key1].name ==
+                'oldClusterRemovalInfo = '
+              ) {
+                console.log(
+                  'oldClusterRemovalInfo value on SAVE after SLICE: ' +
+                    paramObject['value']
+                )
+              } */
           }
+
           /*   let childrenObject = Array() //TODO: fix module parameter parsing
           childrenObject.push(
             nodeIDToNodeObjectMap[value.id].children[key1].type
@@ -132,7 +168,8 @@ export default {
             )
           ] = paramObject
         }
-
+        moduleObject['ctype'] = nodeIDToNodeObjectMap[value.id].ctype
+        moduleObject['pytype'] = nodeIDToNodeObjectMap[value.id].pytype
         modulesObject[nodeIDToNodeObjectMap[value.id].name] = moduleObject
       }
     }
