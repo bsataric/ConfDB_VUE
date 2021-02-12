@@ -83,6 +83,7 @@ export const actions = {
       return SequenceService.getSequences()
         .then((response) => {
           commit('SET_SEQUENCES', response.data)
+          //console.log('SEQUENCE JSON DATA: ' + JSON.stringify(response.data))
         })
         .catch((error) => {
           const notification = {
@@ -94,6 +95,7 @@ export const actions = {
     } else {
       let sequenesData = SequenceService.getSequencesFromFile(payload.fileData)
       commit('SET_SEQUENCES', sequenesData)
+      //console.log('SEQUENCE FILE DATA: ' + JSON.stringify(sequenesData))
     }
   },
   fetchSequenceViaId({ commit, dispatch, getters }, payload) {

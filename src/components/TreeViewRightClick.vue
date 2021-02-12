@@ -304,6 +304,7 @@ export default class TreeViewRightClick extends Vue {
           iconType: 'sequence',
           iconColor: 'red',
           value: '',
+          intrinsicValue: {},
           ctype: '',
           ptype: '',
         }

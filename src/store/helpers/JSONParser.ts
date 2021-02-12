@@ -102,51 +102,37 @@ export default {
             paramObject['type'] == 'cms.PSet'
           ) {
             paramObject['value'] = 'VPESET' //TODO
-          } else if (paramObject['type'] == 'cms.bool') {
-            console.log(
-              'BOOL VALUE: ' +
-                nodeIDToNodeObjectMap[value.id].children[key1].value
-            )
+          } else if (
+            paramObject['type'] == 'cms.bool' ||
+            paramObject['type'] == 'cms.untracked.bool'
+          ) {
             paramObject['value'] =
               nodeIDToNodeObjectMap[value.id].children[key1].value == 'true'
           } else if (
             paramObject['type'] == 'cms.int32' ||
-            paramObject['type'] == 'cms.double'
-          )
+            paramObject['type'] == 'cms.double' ||
+            paramObject['type'] == 'cms.uint32'
+          ) {
             paramObject['value'] = Number.parseFloat(
               nodeIDToNodeObjectMap[value.id].children[key1].value
             )
-          else {
+          } else if (paramObject['type'] == 'cms.vuint32') {
+            //
+            /* console.log(
+              'VUINT32: ' + nodeIDToNodeObjectMap[value.id].children[key1].value
+            ) */
+            paramObject['value'] =
+              nodeIDToNodeObjectMap[value.id].children[key1].value
+          } else {
             paramObject['value'] = nodeIDToNodeObjectMap[value.id].children[
               key1
             ].value as string
-            //console.log('PARAM OBECT VALUE: ' + paramObject['value'])
-
-            /*       if (
-                nodeIDToNodeObjectMap[value.id].children[key1].name ==
-                'oldClusterRemovalInfo = '
-              ) {
-                console.log(
-                  'oldClusterRemovalInfo value on SAVE: ' + paramObject['value']
-                )
-              } */
             if (
               paramObject['value'] != undefined &&
-              paramObject['value'] != '""' &&
-              paramObject['type'] != 'cms.bool' &&
-              paramObject['type'] != 'cms.untracked.bool'
+              paramObject['value'] != '""'
             )
               paramObject['value'] = paramObject['value'].slice(1, -1)
             //
-            /*      if (
-                nodeIDToNodeObjectMap[value.id].children[key1].name ==
-                'oldClusterRemovalInfo = '
-              ) {
-                console.log(
-                  'oldClusterRemovalInfo value on SAVE after SLICE: ' +
-                    paramObject['value']
-                )
-              } */
           }
 
           /*   let childrenObject = Array() //TODO: fix module parameter parsing

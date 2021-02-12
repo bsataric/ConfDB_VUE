@@ -30,6 +30,7 @@ export interface NodeObject {
   iconType: string
   iconColor: string
   value: string
+  intrinsicValue: any
   ctype: string
   ptype: string
 }

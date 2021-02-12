@@ -41,7 +41,11 @@
             {{ '(' + item.referencedByIds.length + ')' }}
           </span>
           <span
-            v-if="item.rootNodeId != item.id && item.globalType != 'parameter'"
+            v-if="
+              item.rootNodeId != item.id &&
+                item.rootNodeId != -1 &&
+                item.globalType != 'parameter'
+            "
           >
             {{
               '(' +
@@ -236,6 +240,7 @@ export default class TreeView extends Vue {
       iconType: '',
       iconColor: '',
       value: '',
+      intrinsicValue: {},
       ctype: '',
       ptype: '',
     }
@@ -256,6 +261,7 @@ export default class TreeView extends Vue {
         iconType: 'sequence',
         iconColor: 'red',
         value: '',
+        intrinsicValue: {},
         ctype: '',
         ptype: '',
       }
@@ -284,6 +290,7 @@ export default class TreeView extends Vue {
             iconType: 'module',
             iconColor: '',
             value: '',
+            intrinsicValue: {},
             ctype: '',
             ptype: '',
           }
@@ -313,6 +320,7 @@ export default class TreeView extends Vue {
             iconType: 'sequence',
             iconColor: 'red',
             value: '',
+            intrinsicValue: {},
             ctype: '',
             ptype: '',
           }
@@ -377,6 +385,7 @@ export default class TreeView extends Vue {
       iconType: '',
       iconColor: '',
       value: '',
+      intrinsicValue: {},
       ctype: '',
       ptype: '',
     }
@@ -401,6 +410,7 @@ export default class TreeView extends Vue {
         iconType: 'path',
         iconColor: 'green',
         value: '',
+        intrinsicValue: {},
         ctype: '',
         ptype: '',
       }
@@ -430,6 +440,7 @@ export default class TreeView extends Vue {
             iconType: 'module',
             iconColor: '',
             value: '',
+            intrinsicValue: {},
             ctype: '',
             ptype: '',
           }
@@ -461,6 +472,7 @@ export default class TreeView extends Vue {
             iconType: 'sequence',
             iconColor: 'red',
             value: '',
+            intrinsicValue: {},
             ctype: '',
             ptype: '',
           }
@@ -605,6 +617,7 @@ export default class TreeView extends Vue {
               //console.log('type ' + nestedVPSetObject['type'])
               //}
               nestedVPSetObject['value'] = JSON.stringify(value2) //simple value
+              nestedVPSetObject['intrinsicValue'] = value2
               //nestedVPSetObject['name'] = nestedVPSetObject['value']
             }
           }
@@ -676,6 +689,7 @@ export default class TreeView extends Vue {
       iconType: '',
       iconColor: '',
       value: '',
+      intrinsicValue: {},
       ctype: '',
       ptype: '',
     }
@@ -701,6 +715,7 @@ export default class TreeView extends Vue {
         iconType: 'module',
         iconColor: '',
         value: '',
+        intrinsicValue: {},
         ctype: '',
         ptype: '',
       }
@@ -776,6 +791,9 @@ export default class TreeView extends Vue {
                     nestedParameterObject['value'] =
                       nestedParameterObject['value'].substring(1, 70) + '...'
                   }
+                  console.log('TYPE OF VALUE3: ' + typeof value3)
+                  //TODO: SEE WHY VINT32 is a STRING!!!!
+                  nestedParameterObject['intrinsicValue'] = value3
                 }
               }
               //console.log(key3)
@@ -867,6 +885,7 @@ export default class TreeView extends Vue {
       iconType: '',
       iconColor: '',
       value: '',
+      intrinsicValue: {},
       ctype: '',
       ptype: '',
     }
@@ -890,6 +909,7 @@ export default class TreeView extends Vue {
         iconType: 'pset',
         iconColor: '',
         value: '',
+        intrinsicValue: {},
         ctype: '',
         ptype: '',
         //parameters: value,
@@ -937,6 +957,7 @@ export default class TreeView extends Vue {
                 nestedPSetObject['value'] =
                   nestedPSetObject['value'].substring(1, 70) + '...'
               }
+              nestedPSetObject['intrinsicValue'] = value2
               nestedPSetObject['children'] = []
               //if (nestedPSetObject['value'].indexOf('OR') != -1) {
               //probably need more operators
@@ -1208,6 +1229,11 @@ export default class TreeView extends Vue {
   }
 
   async fetchAllGroups() {
+    //reset maps and ID counters
+    this.nodeIDToNodeObjectMap = new Map<number, NodeObject>()
+    this.nodeIDToVuexObjectMap = {}
+    this.idCounter = 1
+
     Promise.all([
       //set new object into main map
       this.fetchGroup('seqs', false, null),
@@ -1223,19 +1249,44 @@ export default class TreeView extends Vue {
         'createNodeIDToVuexObjectMap',
         this.nodeIDToVuexObjectMap
       )
-
       //initilaize id counter in the store so other components can get/modify it
       await this.$store.dispatch('setInitialIDCounter', this.idCounter)
       await this.$store.dispatch('createObjectReferences')
+      this.$store.dispatch('setSnackBarText', {
+        snackBarText: 'Configuration successfully loaded!',
+        snackBarColor: 'green',
+      })
     })
   }
 
   public fetchAllGroupsFromFile(fileContent: any) {
-    //console.log('FETCH ALL GROUPS')
-    this.fetchGroup('seqs', true, fileContent)
-    this.fetchGroup('paths', true, fileContent)
-    this.fetchGroup('mods', true, fileContent)
-    this.fetchGroup('psets', true, fileContent)
+    //reset maps and ID counters
+    this.nodeIDToNodeObjectMap = new Map<number, NodeObject>()
+    this.nodeIDToVuexObjectMap = {}
+    this.idCounter = 1
+
+    Promise.all([
+      this.fetchGroup('seqs', true, fileContent),
+      this.fetchGroup('paths', true, fileContent),
+      this.fetchGroup('mods', true, fileContent),
+      this.fetchGroup('psets', true, fileContent),
+    ]).finally(async () => {
+      await this.$store.dispatch(
+        'createNodeIDToNodeObjectMap',
+        this.nodeIDToNodeObjectMap
+      )
+      await this.$store.dispatch(
+        'createNodeIDToVuexObjectMap',
+        this.nodeIDToVuexObjectMap
+      )
+      //initilaize id counter in the store so other components can get/modify it
+      await this.$store.dispatch('setInitialIDCounter', this.idCounter)
+      await this.$store.dispatch('createObjectReferences')
+      this.$store.dispatch('setSnackBarText', {
+        snackBarText: 'Configuration successfully loaded!',
+        snackBarColor: 'green',
+      })
+    })
   }
 
   created() {
