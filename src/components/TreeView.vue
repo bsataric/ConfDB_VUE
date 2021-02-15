@@ -34,9 +34,6 @@
           >
             {{ item.name }}
           </span>
-          <!-- <span class="param-value-style" v-if="item.value">
-            {{ item.value }}
-          </span> -->
           <span
             class="param-value-style"
             v-if="
@@ -264,7 +261,6 @@ export default class TreeView extends Vue {
         parentNodeId: 1,
         rootNodeId: this.idCounter, //for the root nodes, rootNodeId = itself
         referencedByIds: [],
-        //parameters: value,
         iconType: 'sequence',
         iconColor: 'red',
         paremeterJSONValue: null,
@@ -409,7 +405,6 @@ export default class TreeView extends Vue {
         parentNodeId: pathsObject['id'],
         rootNodeId: this.idCounter, //for the root nodes, rootNodeId = itself
         referencedByIds: [],
-        //parameters: value,
         iconType: 'path',
         iconColor: 'green',
         paremeterJSONValue: null,
@@ -560,7 +555,6 @@ export default class TreeView extends Vue {
         nestedNoNamePSetObject['referencedByIds'] = []
         nestedNoNamePSetObject['iconType'] = ''
         nestedNoNamePSetObject['iconColor'] = ''
-        nestedNoNamePSetObject['value'] = ''
         nestedNoNamePSetObject['paremeterJSONValue'] = null
 
         //nestedNoNamePSetObject['parameters'] = value1 //TODO
@@ -617,9 +611,7 @@ export default class TreeView extends Vue {
               //if (vpSetObject['name'] === 'regressionConfig') {
               //console.log('type ' + nestedVPSetObject['type'])
               //}
-              nestedVPSetObject['value'] = JSON.stringify(value2) //simple value
               nestedVPSetObject['paremeterJSONValue'] = value2
-              //nestedVPSetObject['name'] = nestedVPSetObject['value']
             }
           }
           //if (vpSetObject['name'] === 'regressionConfig') {
@@ -640,7 +632,6 @@ export default class TreeView extends Vue {
         ) */
         //console.log('NESTED MODULE TYPE ' + nestedModuleObject['type'])
 
-        //nestedModuleObject['name'] = nestedModuleObject['value']
         //if (vpSetObject['name'] === 'regressionConfig') {
         //console.log(nestedVPSetObject)
         //}
@@ -711,7 +702,6 @@ export default class TreeView extends Vue {
         parentNodeId: modulesObject['id'],
         rootNodeId: this.idCounter, //for the root nodes, rootNodeId = itself
         referencedByIds: [],
-        //parameters: value,
         iconType: 'module',
         iconColor: '',
         paremeterJSONValue: null,
@@ -777,7 +767,6 @@ export default class TreeView extends Vue {
                 cmsTypeLenght
               )
               nestedParameterObject['cmsType'] = cmsType
-              //nestedModuleObject['name'] = nestedModuleObject['value']
               //console.log(nestedParameterObject)
             }
             nestedParameterObject['parentNodeId'] = moduleObject['id']
@@ -874,13 +863,11 @@ export default class TreeView extends Vue {
         parentNodeId: psetsObject['id'],
         rootNodeId: this.idCounter,
         referencedByIds: [],
-        //parameters: value,
         iconType: 'pset',
         iconColor: '',
         paremeterJSONValue: null,
         ctype: '',
         ptype: '',
-        //parameters: value,
       }
       // this.nodeIds.push(this.idCounter)
 
@@ -919,12 +906,6 @@ export default class TreeView extends Vue {
                 psetObject['id']
               )
             } else {
-              nestedPSetObject['value'] = JSON.stringify(value2) //simple value
-              if (nestedPSetObject['value'].length > 70) {
-                //shorten the string and put three dots in the end
-                nestedPSetObject['value'] =
-                  nestedPSetObject['value'].substring(1, 70) + '...'
-              }
               nestedPSetObject['paremeterJSONValue'] = value2
               nestedPSetObject['children'] = []
               //if (nestedPSetObject['value'].indexOf('OR') != -1) {
@@ -962,7 +943,6 @@ export default class TreeView extends Vue {
           nestedPSetObject['iconColor'] = ''
 
           this.nodeIDToNodeObjectMap[nestedPSetObject['id']] = nestedPSetObject
-          //nestedModuleObject['name'] = nestedModuleObject['value']
           psetObject['children'].push(nestedPSetObject)
         }
       }

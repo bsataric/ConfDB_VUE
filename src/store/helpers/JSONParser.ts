@@ -6,13 +6,15 @@ import { NodeObject } from '@/types'
   name: string
   type: string
   globalType: string
-  children: Array<Object>
+  children: Array<NodeObject>
   parentNodeId: number //parent node ID of current node
   rootNodeId: number //ID of the root node that references this node
   referencedByIds: Array<number>
   iconType: string
   iconColor: string
-  value: string
+  paremeterJSONValue: any //valid only for parameter nodes
+  ctype: string
+  ptype: string
 */
 export default {
   parseMapToJSON(nodeIDToNodeObjectMap: Map<number, NodeObject>): string {
@@ -28,107 +30,96 @@ export default {
     let psetsObject: Object = {}
 
     //parse the map here
-    for (const [key, value] of Object.entries(
+    for (const [nodeId, nodeObject] of Object.entries(
       nodeIDToNodeObjectMap as Map<number, NodeObject>
     )) {
-      //console.log('OUTER KEY: ' + key)
+      /*      console.log('OUTER KEY: ' + nodeId)
+      console.log('VALUE ID: ' + value.id) */
       if (
-        nodeIDToNodeObjectMap[value.id].globalType == 'sequenceNode' //main sequence node
+        nodeIDToNodeObjectMap[nodeId].globalType == 'sequenceNode' //main sequence node
       ) {
-        /*     console.log('SEQUENCE NAME: ' + nodeIDToNodeObjectMap[value.id].name)
+        /*     console.log('SEQUENCE NAME: ' + nodeIDToNodeObjectMap[nodeId].name)
         console.log('KEY: ' + key)
-        console.log('SEQUENCE ID: ' + nodeIDToNodeObjectMap[value.id].id) */
+        console.log('SEQUENCE ID: ' + nodeIDToNodeObjectMap[nodeId].id) */
 
-        sequencesObject[nodeIDToNodeObjectMap[value.id].name] = []
+        sequencesObject[nodeIDToNodeObjectMap[nodeId].name] = []
         //now go through all sequence children and add them to array
         for (const [key1, value1] of Object.entries(
-          nodeIDToNodeObjectMap[value.id].children
+          nodeIDToNodeObjectMap[nodeId].children
         )) {
           let childrenObject = Array()
-          childrenObject.push(
-            nodeIDToNodeObjectMap[value.id].children[key1].type
-          )
-          childrenObject.push(
-            nodeIDToNodeObjectMap[value.id].children[key1].name
-          )
-          sequencesObject[nodeIDToNodeObjectMap[value.id].name].push(
+          childrenObject.push(nodeIDToNodeObjectMap[nodeId].children[key1].type)
+          childrenObject.push(nodeIDToNodeObjectMap[nodeId].children[key1].name)
+          sequencesObject[nodeIDToNodeObjectMap[nodeId].name].push(
             childrenObject
           )
         }
       } else if (
-        nodeIDToNodeObjectMap[value.id].globalType == 'pathNode' //main path node
+        nodeIDToNodeObjectMap[nodeId].globalType == 'pathNode' //main path node
       ) {
-        /*       console.log('PATH NAME: ' + nodeIDToNodeObjectMap[value.id].name)
+        /*       console.log('PATH NAME: ' + nodeIDToNodeObjectMap[nodeId].name)
         console.log('KEY: ' + key)
-        console.log('PATH ID: ' + nodeIDToNodeObjectMap[value.id].id) */
+        console.log('PATH ID: ' + nodeIDToNodeObjectMap[nodeId].id) */
 
-        pathsObject[nodeIDToNodeObjectMap[value.id].name] = []
+        pathsObject[nodeIDToNodeObjectMap[nodeId].name] = []
         //now go through all sequence children and add them to array
         for (const [key1, value1] of Object.entries(
-          nodeIDToNodeObjectMap[value.id].children
+          nodeIDToNodeObjectMap[nodeId].children
         )) {
           let childrenObject = Array()
-          childrenObject.push(
-            nodeIDToNodeObjectMap[value.id].children[key1].type
-          )
-          childrenObject.push(
-            nodeIDToNodeObjectMap[value.id].children[key1].name
-          )
-          pathsObject[nodeIDToNodeObjectMap[value.id].name].push(childrenObject)
+          childrenObject.push(nodeIDToNodeObjectMap[nodeId].children[key1].type)
+          childrenObject.push(nodeIDToNodeObjectMap[nodeId].children[key1].name)
+          pathsObject[nodeIDToNodeObjectMap[nodeId].name].push(childrenObject)
         }
       } else if (
-        nodeIDToNodeObjectMap[value.id].globalType == 'moduleNode' //main path node
+        nodeIDToNodeObjectMap[nodeId].globalType == 'moduleNode' //main path node
       ) {
-        /*         console.log('MODULE NAME: ' + nodeIDToNodeObjectMap[value.id].name)
+        /*         console.log('MODULE NAME: ' + nodeIDToNodeObjectMap[nodeId].name)
         console.log('KEY: ' + key)
-        console.log('MODULE ID: ' + nodeIDToNodeObjectMap[value.id].id) */
+        console.log('MODULE ID: ' + nodeIDToNodeObjectMap[nodeId].id) */
         let moduleObject: Object = { params: {}, ctype: '', pytype: '' }
 
-        /*   console.log('MODULE NAME' + nodeIDToNodeObjectMap[value.id].name)
+        /*   console.log('MODULE NAME' + nodeIDToNodeObjectMap[nodeId].name)
         console.log(
           'MODULE CHILDREN' +
-            JSON.stringify(nodeIDToNodeObjectMap[value.id].children)
+            JSON.stringify(nodeIDToNodeObjectMap[nodeId].children)
         ) */
 
         //now go through all sequence children and add them to array
         for (const [key1, value1] of Object.entries(
-          nodeIDToNodeObjectMap[value.id].children
+          nodeIDToNodeObjectMap[nodeId].children
         )) {
           let paramObject: Object = {}
           paramObject['type'] =
-            nodeIDToNodeObjectMap[value.id].children[key1].type
+            nodeIDToNodeObjectMap[nodeId].children[key1].type
+
           if (
             paramObject['type'] == 'cms.VPSet' ||
             paramObject['type'] == 'cms.PSet'
           ) {
-            paramObject['value'] = 'VPESET' //TODO
-          }
-
-          paramObject['value'] =
-            nodeIDToNodeObjectMap[value.id].children[key1].paremeterJSONValue
-
-          /*   let childrenObject = Array() //TODO: fix module parameter parsing
-          childrenObject.push(
-            nodeIDToNodeObjectMap[value.id].children[key1].type
-          )
-          childrenObject.push(
-            nodeIDToNodeObjectMap[value.id].children[key1].name
-          )
-          modulesObject[nodeIDToNodeObjectMap[value.id].name].push(
-            childrenObject
-          ) */
-          let nameLength =
-            nodeIDToNodeObjectMap[value.id].children[key1].name.length
-          moduleObject['params'][
-            nodeIDToNodeObjectMap[value.id].children[key1].name.substring(
-              0,
-              nameLength - 3
+            //parse children here recursivly to elementary parameter objects
+            this.parseRecursiveVPSetObject(
+              paramObject,
+              nodeIDToNodeObjectMap[nodeId].children[key1].children
             )
-          ] = paramObject
+            moduleObject['params'][
+              nodeIDToNodeObjectMap[nodeId].children[key1].name
+            ] = paramObject
+          } else {
+            paramObject['value'] =
+              nodeIDToNodeObjectMap[nodeId].children[key1].paremeterJSONValue
+
+            moduleObject['params'][
+              nodeIDToNodeObjectMap[nodeId].children[key1].name.substring(
+                0,
+                nodeIDToNodeObjectMap[nodeId].children[key1].name.length - 3
+              )
+            ] = paramObject
+          }
         }
-        moduleObject['ctype'] = nodeIDToNodeObjectMap[value.id].ctype
-        moduleObject['pytype'] = nodeIDToNodeObjectMap[value.id].pytype
-        modulesObject[nodeIDToNodeObjectMap[value.id].name] = moduleObject
+        moduleObject['ctype'] = nodeIDToNodeObjectMap[nodeId].ctype
+        moduleObject['pytype'] = nodeIDToNodeObjectMap[nodeId].pytype
+        modulesObject[nodeIDToNodeObjectMap[nodeId].name] = moduleObject
       }
     }
 
@@ -142,5 +133,37 @@ export default {
     })
     console.log('pretty: ' + pretty) */
     return savedFileContent
+  },
+  parseRecursiveVPSetObject(
+    parameterObject: Object,
+    children: Array<NodeObject>
+  ) {
+    let vpSetObjectArray: Array<Object> = []
+
+    let vpSetObject: Object = {}
+    //console.log('children.length' + children.length)
+    for (const [key, childObject] of Object.entries(children)) {
+      //console.log('KEY:' + key)
+      //console.log('VALUE : ' + JSON.stringify(childObject))
+      let vPSetParamObject: Object = {}
+      vPSetParamObject['type'] = childObject.type
+      if (
+        vPSetParamObject['type'] == 'cms.VPSet' ||
+        vPSetParamObject['type'] == 'cms.PSet'
+      ) {
+        //TODO: VPSet has to be parsed differently
+        //vPSetParamObject['value'] = 'DUMMY'
+        this.parseRecursiveVPSetObject(vPSetParamObject, childObject.children)
+        vpSetObject[childObject.name] = vPSetParamObject
+      } else {
+        //basic types
+        vPSetParamObject['value'] = childObject.paremeterJSONValue
+        vpSetObject[
+          childObject.name.substring(0, childObject.name.length - 3)
+        ] = vPSetParamObject
+      }
+    }
+    vpSetObjectArray.push(vpSetObject)
+    parameterObject['value'] = vpSetObjectArray
   },
 }

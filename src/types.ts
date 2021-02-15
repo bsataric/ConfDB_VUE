@@ -23,13 +23,13 @@ export interface NodeObject {
   name: string
   type: string
   globalType: string
-  children: Array<Object>
+  children: Array<NodeObject>
   parentNodeId: number //parent node ID of current node
   rootNodeId: number //ID of the root node that references this node
   referencedByIds: Array<number>
   iconType: string
   iconColor: string
-  paremeterJSONValue: any
+  paremeterJSONValue: any //valid only for parameter nodes
   ctype: string
   ptype: string
 }

@@ -41,7 +41,7 @@
           >
             <TableView />
           </v-card>
-          <v-divider></v-divider>
+          <v-divider class="v-divider"></v-divider>
           <v-card
             class="pa-2, v-card-snippetview"
             ref="mainSnippetView"
@@ -152,6 +152,9 @@ export default class App extends Vue {
 .v-card-snippetview {
   overflow: auto;
   height: 50vh;
+  width: 45vw;
+}
+.v-divider {
   width: 45vw;
 }
 </style>
