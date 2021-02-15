@@ -102,38 +102,10 @@ export default {
             paramObject['type'] == 'cms.PSet'
           ) {
             paramObject['value'] = 'VPESET' //TODO
-          } else if (
-            paramObject['type'] == 'cms.bool' ||
-            paramObject['type'] == 'cms.untracked.bool'
-          ) {
-            paramObject['value'] =
-              nodeIDToNodeObjectMap[value.id].children[key1].value == 'true'
-          } else if (
-            paramObject['type'] == 'cms.int32' ||
-            paramObject['type'] == 'cms.double' ||
-            paramObject['type'] == 'cms.uint32'
-          ) {
-            paramObject['value'] = Number.parseFloat(
-              nodeIDToNodeObjectMap[value.id].children[key1].value
-            )
-          } else if (paramObject['type'] == 'cms.vuint32') {
-            //
-            /* console.log(
-              'VUINT32: ' + nodeIDToNodeObjectMap[value.id].children[key1].value
-            ) */
-            paramObject['value'] =
-              nodeIDToNodeObjectMap[value.id].children[key1].value
-          } else {
-            paramObject['value'] = nodeIDToNodeObjectMap[value.id].children[
-              key1
-            ].value as string
-            if (
-              paramObject['value'] != undefined &&
-              paramObject['value'] != '""'
-            )
-              paramObject['value'] = paramObject['value'].slice(1, -1)
-            //
           }
+
+          paramObject['value'] =
+            nodeIDToNodeObjectMap[value.id].children[key1].paremeterJSONValue
 
           /*   let childrenObject = Array() //TODO: fix module parameter parsing
           childrenObject.push(

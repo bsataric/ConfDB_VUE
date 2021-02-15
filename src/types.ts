@@ -29,8 +29,7 @@ export interface NodeObject {
   referencedByIds: Array<number>
   iconType: string
   iconColor: string
-  value: string
-  intrinsicValue: any
+  paremeterJSONValue: any
   ctype: string
   ptype: string
 }

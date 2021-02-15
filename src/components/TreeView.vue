@@ -34,8 +34,16 @@
           >
             {{ item.name }}
           </span>
-          <span class="param-value-style" v-if="item.value">
+          <!-- <span class="param-value-style" v-if="item.value">
             {{ item.value }}
+          </span> -->
+          <span
+            class="param-value-style"
+            v-if="
+              item.globalType == 'parameter' && item.paremeterJSONValue != null
+            "
+          >
+            {{ JSON.stringify(item.paremeterJSONValue) }}
           </span>
           <span v-if="item.referencedByIds && item.referencedByIds.length != 0">
             {{ '(' + item.referencedByIds.length + ')' }}
@@ -239,8 +247,7 @@ export default class TreeView extends Vue {
       //parameters: sequenceData,
       iconType: '',
       iconColor: '',
-      value: '',
-      intrinsicValue: {},
+      paremeterJSONValue: null,
       ctype: '',
       ptype: '',
     }
@@ -260,8 +267,7 @@ export default class TreeView extends Vue {
         //parameters: value,
         iconType: 'sequence',
         iconColor: 'red',
-        value: '',
-        intrinsicValue: {},
+        paremeterJSONValue: null,
         ctype: '',
         ptype: '',
       }
@@ -289,8 +295,7 @@ export default class TreeView extends Vue {
             referencedByIds: [],
             iconType: 'module',
             iconColor: '',
-            value: '',
-            intrinsicValue: {},
+            paremeterJSONValue: null,
             ctype: '',
             ptype: '',
           }
@@ -319,8 +324,7 @@ export default class TreeView extends Vue {
             referencedByIds: [],
             iconType: 'sequence',
             iconColor: 'red',
-            value: '',
-            intrinsicValue: {},
+            paremeterJSONValue: null,
             ctype: '',
             ptype: '',
           }
@@ -384,8 +388,7 @@ export default class TreeView extends Vue {
       //parameters: pathData,
       iconType: '',
       iconColor: '',
-      value: '',
-      intrinsicValue: {},
+      paremeterJSONValue: null,
       ctype: '',
       ptype: '',
     }
@@ -409,8 +412,7 @@ export default class TreeView extends Vue {
         //parameters: value,
         iconType: 'path',
         iconColor: 'green',
-        value: '',
-        intrinsicValue: {},
+        paremeterJSONValue: null,
         ctype: '',
         ptype: '',
       }
@@ -439,8 +441,7 @@ export default class TreeView extends Vue {
             //nestedPathObject['parameters'] = value1
             iconType: 'module',
             iconColor: '',
-            value: '',
-            intrinsicValue: {},
+            paremeterJSONValue: null,
             ctype: '',
             ptype: '',
           }
@@ -471,8 +472,7 @@ export default class TreeView extends Vue {
             //nestedPathObject['parameters'] = value1
             iconType: 'sequence',
             iconColor: 'red',
-            value: '',
-            intrinsicValue: {},
+            paremeterJSONValue: null,
             ctype: '',
             ptype: '',
           }
@@ -561,6 +561,7 @@ export default class TreeView extends Vue {
         nestedNoNamePSetObject['iconType'] = ''
         nestedNoNamePSetObject['iconColor'] = ''
         nestedNoNamePSetObject['value'] = ''
+        nestedNoNamePSetObject['paremeterJSONValue'] = null
 
         //nestedNoNamePSetObject['parameters'] = value1 //TODO
         //nestedNoNamePSetObjectId = this.idCounter
@@ -617,7 +618,7 @@ export default class TreeView extends Vue {
               //console.log('type ' + nestedVPSetObject['type'])
               //}
               nestedVPSetObject['value'] = JSON.stringify(value2) //simple value
-              nestedVPSetObject['intrinsicValue'] = value2
+              nestedVPSetObject['paremeterJSONValue'] = value2
               //nestedVPSetObject['name'] = nestedVPSetObject['value']
             }
           }
@@ -688,8 +689,7 @@ export default class TreeView extends Vue {
       //parameters: moduleData,
       iconType: '',
       iconColor: '',
-      value: '',
-      intrinsicValue: {},
+      paremeterJSONValue: null,
       ctype: '',
       ptype: '',
     }
@@ -714,8 +714,7 @@ export default class TreeView extends Vue {
         //parameters: value,
         iconType: 'module',
         iconColor: '',
-        value: '',
-        intrinsicValue: {},
+        paremeterJSONValue: null,
         ctype: '',
         ptype: '',
       }
@@ -761,39 +760,10 @@ export default class TreeView extends Vue {
                   nestedParameterObject['name'] = key2 + ' = '
                   //simple type
 
-                  if (value3 != '""') {
-                    if (
-                      nestedParameterObject['type'] == 'cms.int32' ||
-                      nestedParameterObject['type'] == 'cms.double'
-                    ) {
-                      //
-                      let numValue = value3 as number
-                      //numValue = 3
-                      /*       console.log('TYPE OF NV: ' + typeof numValue)
-                      let primitiveValue = numValue.valueOf()
-                      let numOfDecimals = Utils.countNumberDecimals(
-                        primitiveValue
-                      )
-                      console.log('NUMBER OF DECIMALS: ' + numOfDecimals) */
-                      /* nestedParameterObject['value'] = numValue.toFixed(
-                        numOfDecimals
-                      ) */
-                      nestedParameterObject['value'] = numValue.toString()
-                    } else {
-                      nestedParameterObject['value'] = JSON.stringify(value3)
-                    }
-                  } //do not stringify or convert empty string
-                  else {
-                    nestedParameterObject['value'] = value3 as string
-                  }
-                  if (nestedParameterObject['value'].length > 70) {
-                    //shorten the string and put three dots in the end
-                    nestedParameterObject['value'] =
-                      nestedParameterObject['value'].substring(1, 70) + '...'
-                  }
-                  console.log('TYPE OF VALUE3: ' + typeof value3)
+                  /*  if (nestedParameterObject['name'] == 'ErrorList = ')
+                    console.log('ErrorList INTRINSIC TYPE in: ' + typeof value3) */
                   //TODO: SEE WHY VINT32 is a STRING!!!!
-                  nestedParameterObject['intrinsicValue'] = value3
+                  nestedParameterObject['paremeterJSONValue'] = value3
                 }
               }
               //console.log(key3)
@@ -884,8 +854,7 @@ export default class TreeView extends Vue {
       //parameters: psetData,
       iconType: '',
       iconColor: '',
-      value: '',
-      intrinsicValue: {},
+      paremeterJSONValue: null,
       ctype: '',
       ptype: '',
     }
@@ -908,8 +877,7 @@ export default class TreeView extends Vue {
         //parameters: value,
         iconType: 'pset',
         iconColor: '',
-        value: '',
-        intrinsicValue: {},
+        paremeterJSONValue: null,
         ctype: '',
         ptype: '',
         //parameters: value,
@@ -957,7 +925,7 @@ export default class TreeView extends Vue {
                 nestedPSetObject['value'] =
                   nestedPSetObject['value'].substring(1, 70) + '...'
               }
-              nestedPSetObject['intrinsicValue'] = value2
+              nestedPSetObject['paremeterJSONValue'] = value2
               nestedPSetObject['children'] = []
               //if (nestedPSetObject['value'].indexOf('OR') != -1) {
               //probably need more operators
@@ -1328,6 +1296,7 @@ export default class TreeView extends Vue {
 .param-value-style {
   color: blue;
   font-weight: bold;
+  max-width: 500px;
 }
 .param-name-style {
   font-weight: bold;
@@ -1338,5 +1307,14 @@ export default class TreeView extends Vue {
 .center {
   display: flex;
   align-items: center;
+}
+.v-treeview-node__content,
+.v-treeview-node__label {
+  flex-shrink: 1;
+  word-break: break-all;
+}
+.v-treeview-node__root {
+  height: auto;
+  width: auto;
 }
 </style>

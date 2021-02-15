@@ -141,21 +141,17 @@ export default class App extends Vue {
 }
 .v-card-treeview {
   overflow: auto;
-  max-height: 1000px;
-  height: 1000px;
-  //max-width: 750px;
+  height: 90vh;
+  width: 45vw;
 }
 .v-card-tableview {
   overflow: auto;
-  max-height: 500px;
-  height: 500px;
-  //max-width: 750px;
+  height: 40vh;
+  width: 45vw;
 }
 .v-card-snippetview {
   overflow: auto;
-  max-height: 490px;
-  height: 490px;
-  margin-top: 10px;
-  //max-width: 750px;
+  height: 50vh;
+  width: 45vw;
 }
 </style>
