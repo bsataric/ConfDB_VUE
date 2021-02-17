@@ -103,12 +103,46 @@ export default {
         moduleObject['ctype'] = nodeIDToNodeObjectMap[nodeId].ctype
         moduleObject['pytype'] = nodeIDToNodeObjectMap[nodeId].pytype
         modulesObject[nodeIDToNodeObjectMap[nodeId].name] = moduleObject
+      } else if (
+        nodeIDToNodeObjectMap[nodeId].globalType == 'psetNode' //main module node
+      ) {
+        let psetObject: Object = {}
+        //now go through all module children and add them to array
+        for (const [key1, value1] of Object.entries(
+          nodeIDToNodeObjectMap[nodeId].children
+        )) {
+          let paramObject: Object = {}
+          paramObject['type'] =
+            nodeIDToNodeObjectMap[nodeId].children[key1].type
+          if (
+            paramObject['type'] == 'cms.VPSet' ||
+            paramObject['type'] == 'cms.PSet'
+          ) {
+            //parse children here recursivly to elementary parameter objects
+            this.parseRecursiveVPSetObject(
+              paramObject,
+              nodeIDToNodeObjectMap[nodeId].children[key1].children
+            )
+            psetObject[
+              nodeIDToNodeObjectMap[nodeId].children[key1].name
+            ] = paramObject
+          } else {
+            paramObject['value'] =
+              nodeIDToNodeObjectMap[nodeId].children[key1].paremeterJSONValue
+
+            psetObject[
+              nodeIDToNodeObjectMap[nodeId].children[key1].name
+            ] = paramObject
+          }
+        }
+        psetsObject[nodeIDToNodeObjectMap[nodeId].name] = psetObject
       }
     }
 
     savedFileContentObject['seqs'] = sequencesObject
     savedFileContentObject['paths'] = pathsObject
     savedFileContentObject['mods'] = modulesObject
+    savedFileContentObject['psets'] = psetsObject
     let savedFileContent = JSON.stringify(savedFileContentObject, undefined, 2)
     return savedFileContent
   },
