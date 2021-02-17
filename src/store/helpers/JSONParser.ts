@@ -1,4 +1,5 @@
 import { NodeObject } from '@/types'
+import Utils from '@/lib/utils'
 //const stringifyObject = require('stringify-object')
 
 /*
@@ -38,10 +39,6 @@ export default {
       if (
         nodeIDToNodeObjectMap[nodeId].globalType == 'sequenceNode' //main sequence node
       ) {
-        /*     console.log('SEQUENCE NAME: ' + nodeIDToNodeObjectMap[nodeId].name)
-        console.log('KEY: ' + key)
-        console.log('SEQUENCE ID: ' + nodeIDToNodeObjectMap[nodeId].id) */
-
         sequencesObject[nodeIDToNodeObjectMap[nodeId].name] = []
         //now go through all sequence children and add them to array
         for (const [key1, value1] of Object.entries(
@@ -57,12 +54,8 @@ export default {
       } else if (
         nodeIDToNodeObjectMap[nodeId].globalType == 'pathNode' //main path node
       ) {
-        /*       console.log('PATH NAME: ' + nodeIDToNodeObjectMap[nodeId].name)
-        console.log('KEY: ' + key)
-        console.log('PATH ID: ' + nodeIDToNodeObjectMap[nodeId].id) */
-
         pathsObject[nodeIDToNodeObjectMap[nodeId].name] = []
-        //now go through all sequence children and add them to array
+        //now go through all path children and add them to array
         for (const [key1, value1] of Object.entries(
           nodeIDToNodeObjectMap[nodeId].children
         )) {
@@ -72,27 +65,17 @@ export default {
           pathsObject[nodeIDToNodeObjectMap[nodeId].name].push(childrenObject)
         }
       } else if (
-        nodeIDToNodeObjectMap[nodeId].globalType == 'moduleNode' //main path node
+        nodeIDToNodeObjectMap[nodeId].globalType == 'moduleNode' //main module node
       ) {
-        /*         console.log('MODULE NAME: ' + nodeIDToNodeObjectMap[nodeId].name)
-        console.log('KEY: ' + key)
-        console.log('MODULE ID: ' + nodeIDToNodeObjectMap[nodeId].id) */
         let moduleObject: Object = { params: {}, ctype: '', pytype: '' }
 
-        /*   console.log('MODULE NAME' + nodeIDToNodeObjectMap[nodeId].name)
-        console.log(
-          'MODULE CHILDREN' +
-            JSON.stringify(nodeIDToNodeObjectMap[nodeId].children)
-        ) */
-
-        //now go through all sequence children and add them to array
+        //now go through all module children and add them to array
         for (const [key1, value1] of Object.entries(
           nodeIDToNodeObjectMap[nodeId].children
         )) {
           let paramObject: Object = {}
           paramObject['type'] =
             nodeIDToNodeObjectMap[nodeId].children[key1].type
-
           if (
             paramObject['type'] == 'cms.VPSet' ||
             paramObject['type'] == 'cms.PSet'
@@ -127,43 +110,54 @@ export default {
     savedFileContentObject['paths'] = pathsObject
     savedFileContentObject['mods'] = modulesObject
     let savedFileContent = JSON.stringify(savedFileContentObject, undefined, 2)
-    /*   const pretty = stringifyObject(savedFileContentObject, {
-      indent: '  ',
-      singleQuotes: false,
-    })
-    console.log('pretty: ' + pretty) */
     return savedFileContent
   },
   parseRecursiveVPSetObject(
     parameterObject: Object,
     children: Array<NodeObject>
   ) {
+    if (children.length == 0) {
+      if (parameterObject['type'] == 'cms.PSet') parameterObject['value'] = [{}]
+      else if (parameterObject['type'] == 'cms.VPSet')
+        parameterObject['value'] = []
+      return
+    }
     let vpSetObjectArray: Array<Object> = []
 
     let vpSetObject: Object = {}
     //console.log('children.length' + children.length)
+
     for (const [key, childObject] of Object.entries(children)) {
       //console.log('KEY:' + key)
       //console.log('VALUE : ' + JSON.stringify(childObject))
       let vPSetParamObject: Object = {}
-      vPSetParamObject['type'] = childObject.type
-      if (
-        vPSetParamObject['type'] == 'cms.VPSet' ||
-        vPSetParamObject['type'] == 'cms.PSet'
-      ) {
-        //TODO: VPSet has to be parsed differently
-        //vPSetParamObject['value'] = 'DUMMY'
+      if (childObject.name == 'PSet') {
+        //no named PSets
         this.parseRecursiveVPSetObject(vPSetParamObject, childObject.children)
-        vpSetObject[childObject.name] = vPSetParamObject
+        vpSetObjectArray.push(vPSetParamObject)
       } else {
-        //basic types
-        vPSetParamObject['value'] = childObject.paremeterJSONValue
-        vpSetObject[
-          childObject.name.substring(0, childObject.name.length - 3)
-        ] = vPSetParamObject
+        vPSetParamObject['type'] = childObject.type
+        if (
+          vPSetParamObject['type'] == 'cms.VPSet' ||
+          vPSetParamObject['type'] == 'cms.PSet'
+        ) {
+          this.parseRecursiveVPSetObject(vPSetParamObject, childObject.children)
+          vpSetObject[childObject.name] = vPSetParamObject
+        } else {
+          //basic types
+          vPSetParamObject['value'] = childObject.paremeterJSONValue
+          vpSetObject[
+            childObject.name.substring(0, childObject.name.length - 3)
+          ] = vPSetParamObject
+        }
       }
     }
-    vpSetObjectArray.push(vpSetObject)
-    parameterObject['value'] = vpSetObjectArray
+    if (parameterObject['type'] != undefined) {
+      //if it's not empty PSet push object in array
+      if (!Utils.isEmpty(vpSetObject)) vpSetObjectArray.push(vpSetObject)
+      parameterObject['value'] = vpSetObjectArray
+    } else {
+      parameterObject = Object.assign(parameterObject, vpSetObject) //oterwise just assign object
+    }
   },
 }
