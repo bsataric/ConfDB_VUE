@@ -31,13 +31,12 @@ import { mapGetters } from 'vuex'
     ...mapGetters({
       getSelectedNodeType: 'getSelectedNodeType',
       getSelectedNodeName: 'getSelectedNodeName',
+      getSelectedNodeSnippetText: 'getSelectedNodeSnippetText',
       //modules
-      getSelectedModuleSnippet: 'module/getSelectedModuleSnippet',
       getSequencesContainingCurrentModule:
         'module/getSequencesContainingCurrentModule',
       getPathsContainingCurrentModule: 'module/getPathsContainingCurrentModule',
       //sequences
-      getSelectedSequenceSnippet: 'sequence/getSelectedSequenceSnippet',
       getSequencesContainingCurrentSequence:
         'sequence/getSequencesContainingCurrentSequence',
       getPathsContainingCurrentSequence:
@@ -55,12 +54,11 @@ export default class SnippetView extends Vue {
   //private triggered: boolean = false
   private getSelectedNodeType!: string
   private getSelectedNodeName!: any
+  private getSelectedNodeSnippetText!: any
   //modules
-  private getSelectedModuleSnippet!: any
   private getSequencesContainingCurrentModule!: any
   private getPathsContainingCurrentModule!: any
   //sequences
-  private getSelectedSequenceSnippet!: any
   private getSequencesContainingCurrentSequence!: any
   private getPathsContainingCurrentSequence!: any
   //paths
@@ -96,21 +94,6 @@ export default class SnippetView extends Vue {
 
   public displayAreaText() {
     console.log(JSON.stringify(this.arrayOfSelectedObjects))
-  }
-
-  public getSelectedNodeSnippet(nodeType: string) {
-    //console.log('SELECTED NODE TYPE: ' + nodeType)
-    //this.triggered = !this.triggered
-    if (nodeType == 'modules') {
-      return this.getSelectedModuleSnippet
-    } else if (nodeType == 'sequences') {
-      return this.getSelectedSequenceSnippet
-    } else if (nodeType == 'paths') {
-      return this.getPathSnippet
-    } else if (nodeType == 'pset') {
-      return this.getPSetSnippet
-    }
-    return ''
   }
 
   public getSelectedNodeContainedInSequences(nodeType: string) {
@@ -244,7 +227,7 @@ export default class SnippetView extends Vue {
 
     this.previousNodeName = nodeName
     if (this.activeTab == 3) {
-      return this.getSelectedNodeSnippet(this.getSelectedNodeType)
+      return this.getSelectedNodeSnippetText
     } else if (this.activeTab == 0) {
       return this.getSelectedNodeContainedInSequences(this.getSelectedNodeType)
     } else if (this.activeTab == 6) {

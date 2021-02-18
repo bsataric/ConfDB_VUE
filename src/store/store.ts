@@ -8,6 +8,7 @@ import * as pset from '@/store/modules/pset.js'
 import Utils from '@/lib/utils.ts'
 import JSONParser from '@/store/helpers/JSONParser'
 import GlobalService from '@/services/GlobalService.ts'
+import SnippetCreator from '@/store/helpers/SnippetCreator.js'
 
 Vue.use(Vuex)
 
@@ -24,7 +25,7 @@ const state: MainVuexState = {
   selectedNodeParamLength: 0,
   selectedNodeParentId: 0,
   //node ID to Object map containing (type, name, itemChildrenLength, parentNodeId) with node id as key
-  nodeIDToVuexObjectMap: {},
+  //nodeIDToVuexObjectMap: {},
   //node ID to Object map containing all information about every node in the configuration tree
   nodeIDToNodeObjectMap: {},
   //arrays with node id's - open nodes and forced open nodes
@@ -53,7 +54,7 @@ export default new Vuex.Store({
   },
   state,
   mutations: {
-    SET_SELECTED_NODE_VIA_ID(state, payload) {
+    SET_SELECTED_NODE_VIA_ID(state: MainVuexState, payload) {
       //console.log('SELECTED NODE ID: ' + payload.selectedNodeId)
       state.selectedNodeId = payload.selectedNodeId //get all info just via ID
       //console.log(typeof state.selectedNodeId)
@@ -61,15 +62,23 @@ export default new Vuex.Store({
         'state.nodeIDToVuexObjectMap[payload.selectedNodeId]' +
           JSON.stringify(state.nodeIDToVuexObjectMap[payload.selectedNodeId])
       ) */
+      /*    state.selectedNodeType =
+        state.nodeIDToVuexObjectMap[payload.selectedNodeId].type */
       state.selectedNodeType =
-        state.nodeIDToVuexObjectMap[payload.selectedNodeId].type
+        state.nodeIDToNodeObjectMap[payload.selectedNodeId].type
+      /*       state.selectedNodeName =
+        state.nodeIDToVuexObjectMap[payload.selectedNodeId].name */
       state.selectedNodeName =
-        state.nodeIDToVuexObjectMap[payload.selectedNodeId].name
+        state.nodeIDToNodeObjectMap[payload.selectedNodeId].name
       //console.log('state.selectedNodeName ' + state.selectedNodeName)
+      /*   state.selectedNodeParamLength =
+        state.nodeIDToVuexObjectMap[payload.selectedNodeId].itemChildrenLength */
       state.selectedNodeParamLength =
-        state.nodeIDToVuexObjectMap[payload.selectedNodeId].itemChildrenLength
-      state.selectedNodeParentId =
-        state.nodeIDToVuexObjectMap[payload.selectedNodeId].parentNodeId
+        state.nodeIDToNodeObjectMap[payload.selectedNodeId].children.length
+      /*     state.selectedNodeParentId =
+        state.nodeIDToVuexObjectMap[payload.selectedNodeId].parentNodeId */
+      state.selectedNodeParamLength =
+        state.nodeIDToNodeObjectMap[payload.selectedNodeId].parentNodeId
       let forceOpenNode = payload.forceOpenNode //if node is opened by foce open it's parent as well
 
       //console.log('FORCED OPEN NODE: ' + forceOpenNode)
@@ -132,16 +141,13 @@ export default new Vuex.Store({
       }
       //state.openNodeIds = [1]
     },
-    SET_ID_TO_VUEX_OBJECT_MAP(state, payload) {
+    /*    SET_ID_TO_VUEX_OBJECT_MAP(state, payload) {
       state.nodeIDToVuexObjectMap = payload
-      /*      console.log(
-        'nodeIDToVuexObjectMap:' + JSON.stringify(state.nodeIDToVuexObjectMap)
-      ) */
-    },
-    SET_ID_TO_NODE_OBJECT_MAP(state, payload) {
+    }, */
+    SET_ID_TO_NODE_OBJECT_MAP(state: MainVuexState, payload) {
       state.nodeIDToNodeObjectMap = payload
     },
-    CREATE_NODE_ID_TO_OBJECT_REFERENCES(state) {
+    CREATE_NODE_ID_TO_OBJECT_REFERENCES(state: MainVuexState) {
       //TODO
       /*    id: number
       name: string
@@ -243,14 +249,14 @@ export default new Vuex.Store({
         //take each node name and iterate through all the other nodes recurcivly to find possible references
       }
     },
-    SET_JSON_CONFIGURATION(state, payload) {
+    SET_JSON_CONFIGURATION(state: MainVuexState, payload) {
       state.JSONconfiguration = payload
       //console.log('JSON: ' + JSON.stringify(state.JSONconfiguration))
     },
     DELETE_JSON_CONFIGURATION(state) {
       //delete state.JSONconfiguration
     },
-    ADD_NODE(state, payload) {
+    ADD_NODE(state: MainVuexState, payload) {
       /*      console.log('ADD_NODE')
       console.log(
         'payload.nodeIDToObject' + JSON.stringify(payload.nodeIDToObject)
@@ -265,11 +271,11 @@ export default new Vuex.Store({
       state.nodeIDToNodeObjectMap[payload.nodeId] = payload.nodeIDToObject
       console.log('NEW NODE ID: ' + payload.nodeId)
       console.log(
-        'NEW nodeIDToVuexObjectMap:' +
+        'NEW nodeIDToNodeObjectMap:' +
           JSON.stringify(state.nodeIDToNodeObjectMap[payload.nodeId])
       )
     },
-    RENAME_NODE(state, payload) {
+    RENAME_NODE(state: MainVuexState, payload) {
       state.nodeIDToNodeObjectMap[payload.nodeId].name = payload.newNodeName
       for (
         //go through all the node references and rename them all
@@ -282,7 +288,7 @@ export default new Vuex.Store({
         state.nodeIDToNodeObjectMap[referenceId].name = payload.newNodeName
       }
     },
-    DELETE_NODE(state, payload) {
+    DELETE_NODE(state: MainVuexState, payload) {
       let nodeToDelete = state.nodeIDToNodeObjectMap[payload.nodeId]
       //console.log('NODE TO DELETE: ' + JSON.stringify(nodeToDelete))
       //first delete references to node's children as well as children nodes
@@ -383,34 +389,32 @@ export default new Vuex.Store({
         childIndex++
       }
     },
-    REMOVE_ID_OBJECT_FROM_MAP(state, payload) {
+    /*     REMOVE_ID_OBJECT_FROM_MAP(state, payload) {
       delete state.nodeIDToVuexObjectMap[payload]
-    },
-    SET_INITIAL_ID_COUNTER(state, payload) {
+    }, */
+    SET_INITIAL_ID_COUNTER(state: MainVuexState, payload) {
       //console.log('SETTING INITIAL ID COUNTER: ' + payload)
       state.idCounter = payload
     },
-    INCREMENT_ID_COUNTER(state) {
+    INCREMENT_ID_COUNTER(state: MainVuexState) {
       //console.log('INCREMENTING ID COUNTER')
       state.idCounter++
     },
-    SET_OPEN_FILE_CONTENT(state, payload) {
+    SET_OPEN_FILE_CONTENT(state: MainVuexState, payload) {
       //console.log('SETTING OPEN FILE CONTENT:')
       state.openFileContent = payload
       //console.log('OPEN FILE CONTENT SET:' + payload)
     },
-    PARSE_MAP_TO_JSON_FILE(state, payload) {
+    PARSE_MAP_TO_JSON_FILE(state: MainVuexState) {
       //parse the map here
-      //console.log('SEQUENCES: ' + JSON.stringify(payload))
       state.savedFileContent = JSONParser.parseMapToJSON(
         state.nodeIDToNodeObjectMap
       )
-      //console.log('AFTER CALL: ' + state.savedFileContent)
     },
-    SET_DARK_MODE(state, payload) {
+    SET_DARK_MODE(state: MainVuexState, payload) {
       state.darkMode = payload
     },
-    SET_SNACKBAR_TEXT(state, payload) {
+    SET_SNACKBAR_TEXT(state: MainVuexState, payload) {
       state.snackBarOpen = true
       //console.log('SNACKBAR COLOR: ' + payload.snackBarColor)
       state.snackBarText = payload.snackBarText
@@ -419,16 +423,16 @@ export default new Vuex.Store({
         state.snackBarOpen = false
       })
     },
-    SET_SNACKBAR_OPEN(state, payload) {
+    SET_SNACKBAR_OPEN(state: MainVuexState, payload) {
       state.snackBarOpen = payload
     },
   },
   actions: {
-    createNodeIDToVuexObjectMap({ commit }, nodeIDToVuexObjectMap) {
+    /*     createNodeIDToVuexObjectMap({ commit }, nodeIDToVuexObjectMap) {
       commit('SET_ID_TO_VUEX_OBJECT_MAP', nodeIDToVuexObjectMap)
-    },
-    createNodeIDToNodeObjectMap({ commit }, nodeIDToNodeObjectMap) {
-      commit('SET_ID_TO_NODE_OBJECT_MAP', nodeIDToNodeObjectMap)
+    }, */
+    createNodeIDToNodeObjectMap({ commit }, payload) {
+      commit('SET_ID_TO_NODE_OBJECT_MAP', payload)
     },
     createObjectReferences({ commit }) {
       commit('CREATE_NODE_ID_TO_OBJECT_REFERENCES')
@@ -478,9 +482,8 @@ export default new Vuex.Store({
     setOpenFileContent({ commit }, payload) {
       commit('SET_OPEN_FILE_CONTENT', payload)
     },
-    parseMapToJSONFile({ commit, getters }) {
-      let payload = getters.getSequences
-      commit('PARSE_MAP_TO_JSON_FILE', payload)
+    parseMapToJSONFile({ commit }) {
+      commit('PARSE_MAP_TO_JSON_FILE')
     },
     setDarkMode({ commit }, payload) {
       commit('SET_DARK_MODE', payload)
@@ -494,31 +497,31 @@ export default new Vuex.Store({
     },
   },
   getters: {
-    getConfiguration(state) {
+    getConfiguration(state: MainVuexState) {
       return state.JSONconfiguration
     },
-    getSelectedNodeType(state) {
+    getSelectedNodeType(state: MainVuexState) {
       return state.selectedNodeType
     },
-    getSelectedNodeName(state) {
+    getSelectedNodeName(state: MainVuexState) {
       return state.selectedNodeName
     },
-    getSelectedNodeId(state) {
+    getSelectedNodeId(state: MainVuexState) {
       return state.selectedNodeId
     },
-    getSelectedNodeParamLength(state) {
+    getSelectedNodeParamLength(state: MainVuexState) {
       return state.selectedNodeParamLength
     },
-    getNodeIDToVuexObjectMap(state) {
+    /*     getNodeIDToVuexObjectMap(state) {
       return state.nodeIDToVuexObjectMap
-    },
-    getNodeIDToNodeObjectMap(state) {
+    }, */
+    getNodeIDToNodeObjectMap(state: MainVuexState) {
       return state.nodeIDToNodeObjectMap
     },
-    getIDCounter(state) {
+    getIDCounter(state: MainVuexState) {
       return state.idCounter
     },
-    getOpenNodeIds(state) {
+    getOpenNodeIds(state: MainVuexState) {
       //console.log('openNodeIds FIRED')
       //console.log('openNodeIds:' + state.openNodeIds)
       //sleep(2000).then(() => {
@@ -527,39 +530,54 @@ export default new Vuex.Store({
       return state.openNodeIds
       //})
     },
-    getForcedOpenNodeIds(state) {
+    getForcedOpenNodeIds(state: MainVuexState) {
       return state.forcedOpenNodeIds
     },
-    getForcedActiveNodeId(state) {
+    getForcedActiveNodeId(state: MainVuexState) {
       return state.forcedActiveNodeId
     },
-    getOpenNodeIdsLength(state) {
+    getOpenNodeIdsLength(state: MainVuexState) {
       //console.log('openNodeIds.length FIRED')
       //console.log('openNodeIds:' + state.openNodeIds)
       return state.openNodeIds.length
     },
-    getOpenFileContent(state) {
+    getOpenFileContent(state: MainVuexState) {
       //console.log('GET OPEN FILE CONTENT: ' + state.getOpenFileContent)
       return state.openFileContent
     },
-    getSavedFileContent(state) {
+    getSavedFileContent(state: MainVuexState) {
       return state.savedFileContent
     },
-    getSequences: (state, getters, rootState, rootGetters) => {
-      return rootGetters['sequence/getSequences']
-    },
-    getDarkMode(state) {
+    getDarkMode(state: MainVuexState) {
       return state.darkMode
     },
-    getSnackBarOpen(state) {
+    getSnackBarOpen(state: MainVuexState) {
       return state.snackBarOpen
     },
-    getSnackBarText(state) {
+    getSnackBarText(state: MainVuexState) {
       return state.snackBarText
     },
-    getSnackBarColor(state) {
+    getSnackBarColor(state: MainVuexState) {
       //console.log('SNACKBAR COLOR: ' + state.snackBarColor)
       return state.snackBarColor
+    },
+    getSelectedNodeSnippetText(state: MainVuexState) {
+      if (state.selectedNodeType == 'sequences') {
+        return SnippetCreator.getSequenceSnippet(
+          state.selectedNodeName,
+          state.nodeIDToNodeObjectMap[state.selectedNodeId].children
+        )
+      } else if (state.selectedNodeType == 'paths') {
+        return SnippetCreator.getPathSnippet(
+          state.selectedNodeName,
+          state.nodeIDToNodeObjectMap[state.selectedNodeId].children
+        )
+      } else if (state.selectedNodeType == 'modules') {
+        return SnippetCreator.getModuleSnippet(
+          state.selectedNodeName,
+          state.nodeIDToNodeObjectMap[state.selectedNodeId].children
+        )
+      }
     },
   },
 })

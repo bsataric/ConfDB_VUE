@@ -58,13 +58,15 @@ export default {
     vPSetParameterText += tab.repeat(level - 1) + ')' + '</br>'
     return vPSetParameterText
   },
-  getModuleSnippet(moduleName, moduleParams) {
+  getModuleSnippet(moduleName, moduleChildren) {
     let moduleSnippet = moduleName + ' = '
     let innerParameterText = ''
     let cmsType = ''
     let cType = ''
 
-    for (const [key, value] of Object.entries(moduleParams)) {
+    for (const [key, value] of Object.entries(moduleChildren)) {
+      console.log('KEY: ' + key)
+      console.log('VALUE: ' + value) //TODO: parse object
       if (key == 'pytype') {
         moduleSnippet += 'cms.' + value + '( '
       } else if (key == 'params') {
@@ -97,38 +99,40 @@ export default {
 
     return moduleSnippet
   },
-  getPathSnippet(pathName, pathParams) {
+  getPathSnippet(pathName, pathChildren) {
     //console.log(path)
-    //console.log(pathParams)
+    //console.log(pathChildren)
     //console.log('getPathSnippet CALLED!')
     let pathSnippet = pathName + ' = cms.Path('
-    pathParams.forEach((val, key, pathParams) => {
-      if (Object.is(pathParams.length - 1, key)) {
-        pathSnippet += ' ' + val[1] + ' )'
+    pathChildren.forEach((val, key, pathChildren) => {
+      if (Object.is(pathChildren.length - 1, key)) {
+        pathSnippet += ' ' + val.name + ' )'
       } else {
-        pathSnippet += ' ' + val[1] + ' + '
+        pathSnippet += ' ' + val.name + ' + '
       }
     })
     //console.log(pathSnippet)
     return pathSnippet
-    //return JSON.stringify(pathParams)
+    //return JSON.stringify(pathChildren)
   },
-  getSequenceSnippet(sequenceName, sequenceParams) {
+  getSequenceSnippet(sequenceName, sequenceChildren) {
     //console.log(sequence)
-    //console.log(sequenceParams)
+    //console.log(sequenceChildren)
     //console.log('getSequenceSnippet CALLED!')
     let sequenceSnippet = sequenceName + ' = cms.Sequence('
-    if (sequenceParams.length == 0) sequenceSnippet += ')'
+    if (sequenceChildren.length == 0) sequenceSnippet += ')'
     else
-      sequenceParams.forEach((val, key, sequenceParams) => {
-        if (Object.is(sequenceParams.length - 1, key)) {
-          sequenceSnippet += ' ' + val[1] + ' )'
+      sequenceChildren.forEach((val, key, sequenceChildren) => {
+        /*   console.log('VAL: ' + JSON.stringify(val))
+        console.log('KEY: ' + key) */
+        if (Object.is(sequenceChildren.length - 1, key)) {
+          sequenceSnippet += ' ' + val.name + ' )'
         } else {
-          sequenceSnippet += ' ' + val[1] + ' + '
+          sequenceSnippet += ' ' + val.name + ' + '
         }
       })
     return sequenceSnippet
-    //return JSON.stringify(sequenceParams)
+    //return JSON.stringify(sequenceChildren)
   },
   getPSetSnippet(psetName, psetParams) {
     //console.log(psetName)

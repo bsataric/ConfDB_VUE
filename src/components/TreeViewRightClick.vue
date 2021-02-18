@@ -67,7 +67,6 @@ import { NodeObject } from '../types'
       getSelectedNodeType: 'getSelectedNodeType',
       getSelectedNodeName: 'getSelectedNodeName',
       getSelectedNodeId: 'getSelectedNodeId',
-      getNodeIDToVuexObjectMap: 'getNodeIDToVuexObjectMap',
       getNodeIDToNodeObjectMap: 'getNodeIDToNodeObjectMap',
       getSelectedNodeParamLength: 'getSelectedNodeParamLength',
       getOpenNodeIds: 'getOpenNodeIds',
@@ -106,7 +105,6 @@ export default class TreeViewRightClick extends Vue {
   private getSelectedNodeName!: string
   private getSelectedNodeType!: string
   private getSelectedNodeId!: number
-  private getNodeIDToVuexObjectMap!: any //maybe unecessary since we have map as variable
   private getNodeIDToNodeObjectMap!: any
   private getSelectedNodeParamLength!: number
   private getOpenNodeIds!: any
