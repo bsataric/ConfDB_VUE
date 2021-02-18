@@ -7,6 +7,7 @@ import * as module from '@/store/modules/module.js'
 import * as pset from '@/store/modules/pset.js'
 import Utils from '@/lib/utils.ts'
 import JSONParser from '@/store/helpers/JSONParser'
+import GlobalService from '@/services/GlobalService.ts'
 
 Vue.use(Vuex)
 
@@ -15,6 +16,7 @@ Vue.use(Vuex)
 } */
 
 const state: MainVuexState = {
+  JSONconfiguration: {}, //JSON data from server/to save on server
   //selected node information
   selectedNodeType: '',
   selectedNodeName: '',
@@ -241,6 +243,13 @@ export default new Vuex.Store({
         //take each node name and iterate through all the other nodes recurcivly to find possible references
       }
     },
+    SET_JSON_CONFIGURATION(state, payload) {
+      state.JSONconfiguration = payload
+      //console.log('JSON: ' + JSON.stringify(state.JSONconfiguration))
+    },
+    DELETE_JSON_CONFIGURATION(state) {
+      //delete state.JSONconfiguration
+    },
     ADD_NODE(state, payload) {
       /*      console.log('ADD_NODE')
       console.log(
@@ -424,6 +433,30 @@ export default new Vuex.Store({
     createObjectReferences({ commit }) {
       commit('CREATE_NODE_ID_TO_OBJECT_REFERENCES')
     },
+    deleteJSONConfiguration({ commit }) {
+      commit('DELETE_JSON_CONFIGURATION')
+    },
+    fetchConfiguration({ commit, dispatch }, payload) {
+      if (!payload.fromFile) {
+        return GlobalService.getConfiguration()
+          .then((response) => {
+            commit('SET_JSON_CONFIGURATION', response.data)
+            //console.log('SEQUENCE JSON DATA: ' + JSON.stringify(response.data))
+          })
+          .catch((error) => {
+            const notification = {
+              type: 'error',
+              message:
+                'There was a problem fetching configuration ' + error.message,
+            }
+            dispatch('notification/add', notification, { root: true })
+          })
+      } else {
+        let configurationsData = GlobalService.getAllFromFile(payload.fileData)
+        commit('SET_JSON_CONFIGURATION', configurationsData)
+        //console.log('SEQUENCE FILE DATA: ' + JSON.stringify(sequenesData))
+      }
+    },
     addNode({ commit }, payload) {
       commit('ADD_NODE', payload)
     },
@@ -461,6 +494,9 @@ export default new Vuex.Store({
     },
   },
   getters: {
+    getConfiguration(state) {
+      return state.JSONconfiguration
+    },
     getSelectedNodeType(state) {
       return state.selectedNodeType
     },

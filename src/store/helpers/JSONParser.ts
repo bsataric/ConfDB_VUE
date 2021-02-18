@@ -20,10 +20,12 @@ import Utils from '@/lib/utils'
 export default {
   parseMapToJSON(nodeIDToNodeObjectMap: Map<number, NodeObject>): string {
     let savedFileContentObject: Object = {
-      seqs: {},
-      paths: {},
-      mods: {},
-      psets: {},
+      configuration: {
+        seqs: {},
+        paths: {},
+        mods: {},
+        psets: {},
+      },
     }
     let sequencesObject: Object = {}
     let pathsObject: Object = {}
@@ -139,10 +141,10 @@ export default {
       }
     }
 
-    savedFileContentObject['seqs'] = sequencesObject
-    savedFileContentObject['paths'] = pathsObject
-    savedFileContentObject['mods'] = modulesObject
-    savedFileContentObject['psets'] = psetsObject
+    savedFileContentObject['configuration']['seqs'] = sequencesObject
+    savedFileContentObject['configuration']['paths'] = pathsObject
+    savedFileContentObject['configuration']['mods'] = modulesObject
+    savedFileContentObject['configuration']['psets'] = psetsObject
     let savedFileContent = JSON.stringify(savedFileContentObject, undefined, 2)
     return savedFileContent
   },

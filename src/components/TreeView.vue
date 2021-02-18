@@ -95,6 +95,7 @@ import Utils from '@/lib/utils.ts'
       getSequenceById: 'sequence/getSequenceById',
       getPaths: 'path/getPaths',
       getModules: 'module/getModules',
+      getConfiguration: 'getConfiguration',
       getSelectedNodeType: 'getSelectedNodeType',
       getSelectedNodeName: 'getSelectedNodeName',
       getSelectedNodeId: 'getSelectedNodeId',
@@ -122,7 +123,7 @@ export default class TreeView extends Vue {
   onOpenFileContentChanged(val: any, oldVal: any) {
     //console.log('VAL:' + val)
     //console.log('OLDVAL: ' + oldVal)
-    this.fetchAllGroupsFromFile(val)
+    this.fetchConfigurationFromFile(val)
   }
 
   @Watch('open')
@@ -191,6 +192,7 @@ export default class TreeView extends Vue {
   private getModules!: any[]
   private getPSets!: any[]
   private getOpenFileContent!: any[]
+  private getConfiguration!: any[] // are assigned via mapState
 
   private getSelectedNodeName!: string
   private getSelectedNodeType!: string
@@ -977,45 +979,6 @@ export default class TreeView extends Vue {
     this.globalPSetsObject = psetsObject
   }
 
-  async fetchGroup(name: string, fromFile: boolean, fileData: any) {
-    if (name == 'seqs') {
-      await this.$store.dispatch('sequence/fetchSequences', {
-        fromFile: fromFile,
-        fileData: fileData,
-      }) // note the "await"
-      this.parseSequences(this.getSequences)
-    } else if (name == 'paths') {
-      await this.$store.dispatch('path/fetchPaths', {
-        fromFile: fromFile,
-        fileData: fileData,
-      })
-      this.parsePaths(this.getPaths)
-    } else if (name == 'mods') {
-      await this.$store.dispatch('module/fetchModules', {
-        fromFile: fromFile,
-        fileData: fileData,
-      })
-      this.parseModules(this.getModules)
-      //console.log('EVO GA: ' + JSON.stringify(this.nodeIDToNodeObjectMap[3818]))
-    } else if (name == 'psets') {
-      await this.$store.dispatch('pset/fetchPSets', {
-        fromFile: fromFile,
-        fileData: fileData,
-      })
-      /*    console.log(
-        'EVO GA 1: ' + JSON.stringify(this.nodeIDToNodeObjectMap[3818])
-      ) */
-
-      this.parsePSets(this.getPSets)
-      /*    console.log(
-        'EVO GA 2: ' + JSON.stringify(this.nodeIDToNodeObjectMap[3818])
-      ) */
-
-      //console.log('AFTER PSETS: ' + this.nodeIds)
-      //initilaize node id object map so all components can get name fast from the node id
-    }
-  }
-
   /*
   get selected() {
     if (!this.active.length) return undefined
@@ -1176,30 +1139,35 @@ export default class TreeView extends Vue {
     this.active = array
   }
 
-  async fetchAllGroups() {
+  async fetchConfiguration() {
     //reset maps and ID counters
     this.nodeIDToNodeObjectMap = new Map<number, NodeObject>()
     this.nodeIDToVuexObjectMap = {}
     this.idCounter = 1
-
     Promise.all([
-      //set new object into main map
-      this.fetchGroup('seqs', false, null),
-      this.fetchGroup('paths', false, null),
-      this.fetchGroup('mods', false, null),
-      this.fetchGroup('psets', false, null),
+      await this.$store.dispatch('fetchConfiguration', {
+        fromFile: false,
+        fileData: null,
+      }), // note the "await"
+
+      //TODO: parse all groups from main config
     ]).finally(async () => {
-      await this.$store.dispatch(
+      this.parseSequences(this.getConfiguration['seqs'])
+      this.parsePaths(this.getConfiguration['paths'])
+      this.parseModules(this.getConfiguration['mods'])
+      this.parsePSets(this.getConfiguration['psets'])
+
+      this.$store.dispatch(
         'createNodeIDToNodeObjectMap',
         this.nodeIDToNodeObjectMap
       )
-      await this.$store.dispatch(
+      this.$store.dispatch(
         'createNodeIDToVuexObjectMap',
         this.nodeIDToVuexObjectMap
       )
       //initilaize id counter in the store so other components can get/modify it
-      await this.$store.dispatch('setInitialIDCounter', this.idCounter)
-      await this.$store.dispatch('createObjectReferences')
+      this.$store.dispatch('setInitialIDCounter', this.idCounter)
+      this.$store.dispatch('createObjectReferences')
       this.$store.dispatch('setSnackBarText', {
         snackBarText: 'Configuration successfully loaded!',
         snackBarColor: 'green',
@@ -1207,29 +1175,34 @@ export default class TreeView extends Vue {
     })
   }
 
-  public fetchAllGroupsFromFile(fileContent: any) {
+  async fetchConfigurationFromFile(fileContent: any) {
     //reset maps and ID counters
     this.nodeIDToNodeObjectMap = new Map<number, NodeObject>()
     this.nodeIDToVuexObjectMap = {}
     this.idCounter = 1
 
     Promise.all([
-      this.fetchGroup('seqs', true, fileContent),
-      this.fetchGroup('paths', true, fileContent),
-      this.fetchGroup('mods', true, fileContent),
-      this.fetchGroup('psets', true, fileContent),
+      await this.$store.dispatch('fetchConfiguration', {
+        fromFile: true,
+        fileData: fileContent,
+      }), // note the "await"
     ]).finally(async () => {
-      await this.$store.dispatch(
+      this.parseSequences(this.getConfiguration['seqs'])
+      this.parsePaths(this.getConfiguration['paths'])
+      this.parseModules(this.getConfiguration['mods'])
+      this.parsePSets(this.getConfiguration['psets'])
+
+      this.$store.dispatch(
         'createNodeIDToNodeObjectMap',
         this.nodeIDToNodeObjectMap
       )
-      await this.$store.dispatch(
+      this.$store.dispatch(
         'createNodeIDToVuexObjectMap',
         this.nodeIDToVuexObjectMap
       )
       //initilaize id counter in the store so other components can get/modify it
-      await this.$store.dispatch('setInitialIDCounter', this.idCounter)
-      await this.$store.dispatch('createObjectReferences')
+      this.$store.dispatch('setInitialIDCounter', this.idCounter)
+      this.$store.dispatch('createObjectReferences')
       this.$store.dispatch('setSnackBarText', {
         snackBarText: 'Configuration successfully loaded!',
         snackBarColor: 'green',
@@ -1240,7 +1213,7 @@ export default class TreeView extends Vue {
   created() {
     // Make a request for config parts
     //this.nodeIds = []
-    this.fetchAllGroups()
+    this.fetchConfiguration()
 
     //this.setNodeIds()
     //this.getOpenNodeIdsWithDelay()
