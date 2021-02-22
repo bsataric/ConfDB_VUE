@@ -8,7 +8,7 @@ import * as pset from '@/store/modules/pset.js'
 import Utils from '@/lib/utils.ts'
 import JSONParser from '@/store/helpers/JSONParser'
 import GlobalService from '@/services/GlobalService.ts'
-import SnippetCreator from '@/store/helpers/SnippetCreator.js'
+import SnippetCreator from '@/store/helpers/SnippetCreator.ts'
 
 Vue.use(Vuex)
 
@@ -62,6 +62,7 @@ export default new Vuex.Store({
         'state.nodeIDToVuexObjectMap[payload.selectedNodeId]' +
           JSON.stringify(state.nodeIDToVuexObjectMap[payload.selectedNodeId])
       ) */
+      //override leaf nodes
       /*    state.selectedNodeType =
         state.nodeIDToVuexObjectMap[payload.selectedNodeId].type */
       state.selectedNodeType =
@@ -575,7 +576,11 @@ export default new Vuex.Store({
       } else if (state.selectedNodeType == 'modules') {
         return SnippetCreator.getModuleSnippet(
           state.selectedNodeName,
-          state.nodeIDToNodeObjectMap[state.selectedNodeId].children
+          state.nodeIDToNodeObjectMap[state.selectedNodeId].ctype,
+          state.nodeIDToNodeObjectMap[state.selectedNodeId].pytype,
+          state.nodeIDToNodeObjectMap[state.selectedNodeId].children as Array<
+            NodeObject
+          >
         )
       }
     },

@@ -1011,7 +1011,12 @@ export default class TreeView extends Vue {
       'this.getNodeIDToVuexObjectMap[itemId]' + this.getNodeIDToVuexObjectMap[itemId]
     ) */
     //TODO: leaf nodes for now are not inserted in object map
-    if (this.getNodeIDToNodeObjectMap[itemId] == undefined) return
+    if (
+      this.getNodeIDToNodeObjectMap[itemId] == undefined ||
+      this.getNodeIDToNodeObjectMap[itemId].globalType == 'parameter'
+    )
+      return
+
     //if (this.getNodeIDToVuexObjectMap[itemId].type == undefined) return
 
     //console.log('SELECTED NODE TYPE: ' + this.getNodeIDToVuexObjectMap[itemId].type)

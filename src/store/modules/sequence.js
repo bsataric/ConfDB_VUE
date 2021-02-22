@@ -1,5 +1,5 @@
 import SequenceService from '@/services/SequenceService.js'
-import SnippetCreator from '@/store/helpers/SnippetCreator.js'
+import SnippetCreator from '@/store/helpers/SnippetCreator.ts'
 
 export const namespaced = true
 

@@ -1,5 +1,5 @@
 import ModuleService from '@/services/ModuleService.js'
-import SnippetCreator from '@/store/helpers/SnippetCreator.js'
+import SnippetCreator from '@/store/helpers/SnippetCreator.ts'
 
 export const namespaced = true
 
