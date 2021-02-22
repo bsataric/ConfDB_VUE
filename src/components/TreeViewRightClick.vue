@@ -301,7 +301,7 @@ export default class TreeViewRightClick extends Vue {
           //parameters: value,
           iconType: 'sequence',
           iconColor: 'red',
-          paremeterJSONValue: null,
+          paremeterJSONValue: Infinity,
           ctype: '',
           ptype: '',
         }

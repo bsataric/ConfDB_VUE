@@ -213,7 +213,9 @@ export default class TableView extends Vue {
           else if (key2 === 'value') {
             if (
               nestedVPSetObject['type'] == 'cms.VPSet' ||
-              nestedVPSetObject['type'] == 'cms.PSet'
+              nestedVPSetObject['type'] == 'cms.PSet' ||
+              nestedVPSetObject['type'] == 'cms.untracked.PSet' ||
+              nestedVPSetObject['type'] == 'cms.untracked.VPSet'
             ) {
               //console.log('PSET NAME: ' + key1)
               nestedVPSetObject['name'] = key1
@@ -297,7 +299,9 @@ export default class TableView extends Vue {
         else if (key2 === 'value') {
           if (
             nestedParameterObject['type'] == 'cms.VPSet' ||
-            nestedParameterObject['type'] == 'cms.PSet'
+            nestedParameterObject['type'] == 'cms.PSet' ||
+            nestedParameterObject['type'] == 'cms.untracked.PSet' ||
+            nestedParameterObject['type'] == 'cms.untracked.VPSet'
           ) {
             nestedParameterObject['children'] = []
             // nestedParameterObject['_hasChildren'] = true

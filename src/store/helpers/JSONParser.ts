@@ -80,7 +80,9 @@ export default {
             nodeIDToNodeObjectMap[nodeId].children[key1].type
           if (
             paramObject['type'] == 'cms.VPSet' ||
-            paramObject['type'] == 'cms.PSet'
+            paramObject['type'] == 'cms.PSet' ||
+            paramObject['type'] == 'cms.untracked.PSet' ||
+            paramObject['type'] == 'cms.untracked.VPSet'
           ) {
             //parse children here recursivly to elementary parameter objects
             this.parseRecursiveVPSetObject(
@@ -118,7 +120,9 @@ export default {
             nodeIDToNodeObjectMap[nodeId].children[key1].type
           if (
             paramObject['type'] == 'cms.VPSet' ||
-            paramObject['type'] == 'cms.PSet'
+            paramObject['type'] == 'cms.PSet' ||
+            paramObject['type'] == 'cms.untracked.PSet' ||
+            paramObject['type'] == 'cms.untracked.VPSet'
           ) {
             //parse children here recursivly to elementary parameter objects
             this.parseRecursiveVPSetObject(
@@ -153,8 +157,15 @@ export default {
     children: Array<NodeObject>
   ) {
     if (children.length == 0) {
-      if (parameterObject['type'] == 'cms.PSet') parameterObject['value'] = [{}]
-      else if (parameterObject['type'] == 'cms.VPSet')
+      if (
+        parameterObject['type'] == 'cms.PSet' ||
+        parameterObject['type'] == 'cms.untracked.PSet'
+      )
+        parameterObject['value'] = [{}]
+      else if (
+        parameterObject['type'] == 'cms.VPSet' ||
+        parameterObject['type'] == 'cms.untracked.VPSet'
+      )
         parameterObject['value'] = []
       return
     }
@@ -175,7 +186,9 @@ export default {
         vPSetParamObject['type'] = childObject.type
         if (
           vPSetParamObject['type'] == 'cms.VPSet' ||
-          vPSetParamObject['type'] == 'cms.PSet'
+          vPSetParamObject['type'] == 'cms.PSet' ||
+          vPSetParamObject['type'] == 'cms.untracked.PSet' ||
+          vPSetParamObject['type'] == 'cms.untracked.VPSet'
         ) {
           this.parseRecursiveVPSetObject(vPSetParamObject, childObject.children)
           vpSetObject[childObject.name] = vPSetParamObject

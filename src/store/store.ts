@@ -582,6 +582,13 @@ export default new Vuex.Store({
             NodeObject
           >
         )
+      } else if (state.selectedNodeType == 'pset') {
+        return SnippetCreator.getPSetSnippet(
+          state.selectedNodeName,
+          state.nodeIDToNodeObjectMap[state.selectedNodeId].children as Array<
+            NodeObject
+          >
+        )
       }
     },
   },

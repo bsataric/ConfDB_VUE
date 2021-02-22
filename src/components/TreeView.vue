@@ -37,7 +37,8 @@
           <span
             class="param-value-style"
             v-if="
-              item.globalType == 'parameter' && item.paremeterJSONValue != null
+              item.globalType == 'parameter' &&
+                item.paremeterJSONValue != Infinity
             "
           >
             {{ JSON.stringify(item.paremeterJSONValue) }}
@@ -247,7 +248,7 @@ export default class TreeView extends Vue {
       //parameters: sequenceData,
       iconType: '',
       iconColor: '',
-      paremeterJSONValue: null,
+      paremeterJSONValue: Infinity,
       ctype: '',
       ptype: '',
     }
@@ -266,7 +267,7 @@ export default class TreeView extends Vue {
         referencedByIds: [],
         iconType: 'sequence',
         iconColor: 'red',
-        paremeterJSONValue: null,
+        paremeterJSONValue: Infinity,
         ctype: '',
         ptype: '',
       }
@@ -294,7 +295,7 @@ export default class TreeView extends Vue {
             referencedByIds: [],
             iconType: 'module',
             iconColor: '',
-            paremeterJSONValue: null,
+            paremeterJSONValue: Infinity,
             ctype: '',
             ptype: '',
           }
@@ -323,7 +324,7 @@ export default class TreeView extends Vue {
             referencedByIds: [],
             iconType: 'sequence',
             iconColor: 'red',
-            paremeterJSONValue: null,
+            paremeterJSONValue: Infinity,
             ctype: '',
             ptype: '',
           }
@@ -387,7 +388,7 @@ export default class TreeView extends Vue {
       //parameters: pathData,
       iconType: '',
       iconColor: '',
-      paremeterJSONValue: null,
+      paremeterJSONValue: Infinity,
       ctype: '',
       ptype: '',
     }
@@ -410,7 +411,7 @@ export default class TreeView extends Vue {
         referencedByIds: [],
         iconType: 'path',
         iconColor: 'green',
-        paremeterJSONValue: null,
+        paremeterJSONValue: Infinity,
         ctype: '',
         ptype: '',
       }
@@ -439,7 +440,7 @@ export default class TreeView extends Vue {
             //nestedPathObject['parameters'] = value1
             iconType: 'module',
             iconColor: '',
-            paremeterJSONValue: null,
+            paremeterJSONValue: Infinity,
             ctype: '',
             ptype: '',
           }
@@ -470,7 +471,7 @@ export default class TreeView extends Vue {
             //nestedPathObject['parameters'] = value1
             iconType: 'sequence',
             iconColor: 'red',
-            paremeterJSONValue: null,
+            paremeterJSONValue: Infinity,
             ctype: '',
             ptype: '',
           }
@@ -558,7 +559,7 @@ export default class TreeView extends Vue {
         nestedNoNamePSetObject['referencedByIds'] = []
         nestedNoNamePSetObject['iconType'] = ''
         nestedNoNamePSetObject['iconColor'] = ''
-        nestedNoNamePSetObject['paremeterJSONValue'] = null
+        nestedNoNamePSetObject['paremeterJSONValue'] = Infinity
 
         //nestedNoNamePSetObject['parameters'] = value1 //TODO
         //nestedNoNamePSetObjectId = this.idCounter
@@ -586,7 +587,9 @@ export default class TreeView extends Vue {
           else if (key2 === 'value') {
             if (
               nestedVPSetObject['type'] == 'cms.VPSet' ||
-              nestedVPSetObject['type'] == 'cms.PSet'
+              nestedVPSetObject['type'] == 'cms.PSet' ||
+              nestedVPSetObject['type'] == 'cms.untracked.PSet' ||
+              nestedVPSetObject['type'] == 'cms.untracked.VPSet'
             ) {
               //if (vpSetObject['name'] === 'regressionConfig') {
               //console.log('type PSET')
@@ -683,7 +686,7 @@ export default class TreeView extends Vue {
       //parameters: moduleData,
       iconType: '',
       iconColor: '',
-      paremeterJSONValue: null,
+      paremeterJSONValue: Infinity,
       ctype: '',
       ptype: '',
     }
@@ -707,7 +710,7 @@ export default class TreeView extends Vue {
         referencedByIds: [],
         iconType: 'module',
         iconColor: '',
-        paremeterJSONValue: null,
+        paremeterJSONValue: Infinity,
         ctype: '',
         ptype: '',
       }
@@ -739,7 +742,9 @@ export default class TreeView extends Vue {
               else if (key3 === 'value') {
                 if (
                   nestedParameterObject['type'] == 'cms.VPSet' ||
-                  nestedParameterObject['type'] == 'cms.PSet'
+                  nestedParameterObject['type'] == 'cms.PSet' ||
+                  nestedParameterObject['type'] == 'cms.untracked.PSet' ||
+                  nestedParameterObject['type'] == 'cms.untracked.VPSet'
                 ) {
                   nestedParameterObject['children'] = []
                   nestedParameterObject['name'] = key2
@@ -846,7 +851,7 @@ export default class TreeView extends Vue {
       //parameters: psetData,
       iconType: '',
       iconColor: '',
-      paremeterJSONValue: null,
+      paremeterJSONValue: Infinity,
       ctype: '',
       ptype: '',
     }
@@ -868,7 +873,7 @@ export default class TreeView extends Vue {
         referencedByIds: [],
         iconType: 'pset',
         iconColor: '',
-        paremeterJSONValue: null,
+        paremeterJSONValue: Infinity,
         ctype: '',
         ptype: '',
       }
@@ -897,7 +902,9 @@ export default class TreeView extends Vue {
           else if (key2 === 'value') {
             if (
               nestedPSetObject['type'] == 'cms.VPSet' ||
-              nestedPSetObject['type'] == 'cms.PSet'
+              nestedPSetObject['type'] == 'cms.PSet' ||
+              nestedPSetObject['type'] == 'cms.untracked.PSet' ||
+              nestedPSetObject['type'] == 'cms.untracked.VPSet'
             ) {
               nestedPSetObject['name'] = key1
               nestedPSetObject['globalType'] = 'parameter'
