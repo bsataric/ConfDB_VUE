@@ -89,9 +89,10 @@ export default class TreeViewRightClick extends Vue {
   @Prop(Number) readonly y!: number
 
   @Watch('getIDCounter')
+  // eslint-disable-next-line no-unused-vars
   onIDCounterChanged(val: any, oldVal: any) {
-    console.log('getIDCounter from right click VAL:' + val)
-    console.log('getIDCounter from right click OLDVAL: ' + oldVal)
+    /*    console.log('getIDCounter from right click VAL:' + val)
+    console.log('getIDCounter from right click OLDVAL: ' + oldVal) */
   }
 
   private getSequences!: any[] // are assigned via mapState

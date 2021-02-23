@@ -56,6 +56,7 @@ export default new Vuex.Store({
   mutations: {
     SET_SELECTED_NODE_VIA_ID(state: MainVuexState, payload) {
       //console.log('SELECTED NODE ID: ' + payload.selectedNodeId)
+      //console.log('state.openNodeIds: ' + state.openNodeIds)
       state.selectedNodeId = payload.selectedNodeId //get all info just via ID
       //console.log(typeof state.selectedNodeId)
       /* console.log(
@@ -78,7 +79,7 @@ export default new Vuex.Store({
         state.nodeIDToNodeObjectMap[payload.selectedNodeId].children.length
       /*     state.selectedNodeParentId =
         state.nodeIDToVuexObjectMap[payload.selectedNodeId].parentNodeId */
-      state.selectedNodeParamLength =
+      state.selectedNodeParentId =
         state.nodeIDToNodeObjectMap[payload.selectedNodeId].parentNodeId
       let forceOpenNode = payload.forceOpenNode //if node is opened by foce open it's parent as well
 
@@ -109,6 +110,7 @@ export default new Vuex.Store({
             state.selectedNodeParentId
           )
           //console.log('PARENT NODE INDEX: ' + parentNodeIndex)
+          //console.log('state.selectedNodeParentId' + state.selectedNodeParentId)
           if (parentNodeIndex == -1) {
             //push parent node on array as well
             state.openNodeIds.push(state.selectedNodeParentId)
@@ -124,7 +126,9 @@ export default new Vuex.Store({
           let parentNodeIndex = state.openNodeIds.indexOf(
             state.selectedNodeParentId
           )
-          console.log('PARENT NODE INDEX: ' + parentNodeIndex)
+          //console.log('PARENT NODE INDEX: ' + parentNodeIndex)
+          //console.log('state.selectedNodeParentId' + state.selectedNodeParentId)
+
           if (parentNodeIndex == -1) {
             //push parent node on array as well
             state.openNodeIds.push(state.selectedNodeParentId)
@@ -132,13 +136,14 @@ export default new Vuex.Store({
           //else do nothing (both nodes are already open - TODO MAYBE FOCUS OR ACTIVATE)
         }
         //console.log('SPLICE')
-        state.openNodeIds.splice(idIndex, 1) //close the node if already open
+        if (!forceOpenNode) state.openNodeIds.splice(idIndex, 1) //close the node if already open (not if forced)
       }
 
       //console.log('OPEN NODES AFTER: ' + state.openNodeIds)
       if (forceOpenNode) {
         //console.log('FORCED OPEN!')
         state.forcedOpenNodeIds = [...state.openNodeIds] //cannot assign by reference, but copy whole array
+        //console.log('FORCED ARRAY: ' + state.forcedOpenNodeIds)
       }
       //state.openNodeIds = [1]
     },
@@ -160,7 +165,7 @@ export default new Vuex.Store({
       iconType: string
       iconColor: string
       value: string */
-      console.log('CREATING REFERENCES')
+      //console.log('CREATING REFERENCES')
       //now pass through all the parameters of
       //console.log('MAP 1: ' + state.nodeIDToNodeObjectMap[1].globalType)
       for (const [key, value] of Object.entries(
@@ -498,31 +503,31 @@ export default new Vuex.Store({
     },
   },
   getters: {
-    getConfiguration(state: MainVuexState) {
+    getConfiguration(state: MainVuexState): any {
       return state.JSONconfiguration
     },
-    getSelectedNodeType(state: MainVuexState) {
+    getSelectedNodeType(state: MainVuexState): string {
       return state.selectedNodeType
     },
-    getSelectedNodeName(state: MainVuexState) {
+    getSelectedNodeName(state: MainVuexState): string {
       return state.selectedNodeName
     },
-    getSelectedNodeId(state: MainVuexState) {
+    getSelectedNodeId(state: MainVuexState): number {
       return state.selectedNodeId
     },
-    getSelectedNodeParamLength(state: MainVuexState) {
+    getSelectedNodeParamLength(state: MainVuexState): number {
       return state.selectedNodeParamLength
     },
     /*     getNodeIDToVuexObjectMap(state) {
       return state.nodeIDToVuexObjectMap
     }, */
-    getNodeIDToNodeObjectMap(state: MainVuexState) {
+    getNodeIDToNodeObjectMap(state: MainVuexState): any {
       return state.nodeIDToNodeObjectMap
     },
-    getIDCounter(state: MainVuexState) {
+    getIDCounter(state: MainVuexState): number {
       return state.idCounter
     },
-    getOpenNodeIds(state: MainVuexState) {
+    getOpenNodeIds(state: MainVuexState): Array<number> {
       //console.log('openNodeIds FIRED')
       //console.log('openNodeIds:' + state.openNodeIds)
       //sleep(2000).then(() => {
@@ -531,38 +536,38 @@ export default new Vuex.Store({
       return state.openNodeIds
       //})
     },
-    getForcedOpenNodeIds(state: MainVuexState) {
+    getForcedOpenNodeIds(state: MainVuexState): Array<number> {
       return state.forcedOpenNodeIds
     },
-    getForcedActiveNodeId(state: MainVuexState) {
+    getForcedActiveNodeId(state: MainVuexState): number {
       return state.forcedActiveNodeId
     },
-    getOpenNodeIdsLength(state: MainVuexState) {
+    getOpenNodeIdsLength(state: MainVuexState): number {
       //console.log('openNodeIds.length FIRED')
       //console.log('openNodeIds:' + state.openNodeIds)
       return state.openNodeIds.length
     },
-    getOpenFileContent(state: MainVuexState) {
+    getOpenFileContent(state: MainVuexState): string {
       //console.log('GET OPEN FILE CONTENT: ' + state.getOpenFileContent)
       return state.openFileContent
     },
-    getSavedFileContent(state: MainVuexState) {
+    getSavedFileContent(state: MainVuexState): string {
       return state.savedFileContent
     },
-    getDarkMode(state: MainVuexState) {
+    getDarkMode(state: MainVuexState): boolean {
       return state.darkMode
     },
-    getSnackBarOpen(state: MainVuexState) {
+    getSnackBarOpen(state: MainVuexState): boolean {
       return state.snackBarOpen
     },
-    getSnackBarText(state: MainVuexState) {
+    getSnackBarText(state: MainVuexState): string {
       return state.snackBarText
     },
-    getSnackBarColor(state: MainVuexState) {
+    getSnackBarColor(state: MainVuexState): string {
       //console.log('SNACKBAR COLOR: ' + state.snackBarColor)
       return state.snackBarColor
     },
-    getSelectedNodeSnippetText(state: MainVuexState) {
+    getSelectedNodeSnippetText(state: MainVuexState): string {
       if (state.selectedNodeType == 'sequences') {
         return SnippetCreator.getSequenceSnippet(
           state.selectedNodeName,
@@ -590,6 +595,107 @@ export default new Vuex.Store({
           >
         )
       }
+      return ''
+    },
+    getSequencesContainingCurrentNode(state: MainVuexState): Object {
+      let sequencesContainingNode = {}
+      /* sequencesContainingNode = rootGetters[
+        'sequence/getSequencesContainingModule'
+      ](state.moduleName) */
+      let references =
+        state.nodeIDToNodeObjectMap[state.selectedNodeId].referencedByIds
+      //console.log('REFERENCES: ' + references)
+      for (let i = 0; i < references.length; i++) {
+        let referenceParentId =
+          state.nodeIDToNodeObjectMap[references[i]].parentNodeId
+        /*     console.log(
+          'REFERENCE TYPE: ' +
+            state.nodeIDToNodeObjectMap[referenceParentId].type
+        ) */
+        if (state.nodeIDToNodeObjectMap[referenceParentId].type == 'sequences')
+          sequencesContainingNode[
+            state.nodeIDToNodeObjectMap[referenceParentId].id
+          ] = state.nodeIDToNodeObjectMap[referenceParentId].name
+      }
+      /*   console.log(
+        'sequencesContainingNode' + JSON.stringify(sequencesContainingNode)
+      ) */
+      return sequencesContainingNode
+      //this.$store.getters['path/getPathsContainingModule'](state.module.name)
+    },
+    getDirectPathsContainingCurrentNode(state: MainVuexState): Object {
+      let pathsContainingNode = {}
+      /*       modulePaths = rootGetters['path/getPathsContainingModule'](state.moduleName)
+      console.log('MODULE PATHS: ' + JSON.stringify(modulePaths))
+      sequencesContainingModule = rootGetters[
+        'sequence/getSequencesContainingModule'
+      ](state.moduleName) */
+      let references =
+        state.nodeIDToNodeObjectMap[state.selectedNodeId].referencedByIds
+      //console.log('REFERENCES: ' + references)
+      for (let i = 0; i < references.length; i++) {
+        let referenceParentId =
+          state.nodeIDToNodeObjectMap[references[i]].parentNodeId
+        /*     console.log(
+        'REFERENCE TYPE: ' +
+          state.nodeIDToNodeObjectMap[referenceParentId].type
+      ) */
+        if (state.nodeIDToNodeObjectMap[referenceParentId].type == 'paths')
+          pathsContainingNode[
+            state.nodeIDToNodeObjectMap[referenceParentId].id
+          ] = state.nodeIDToNodeObjectMap[referenceParentId].name
+      }
+      return pathsContainingNode
+    },
+    getPathsContainingCurrentNode(state: MainVuexState, getters) {
+      let pathsContainingNode = {}
+      let sequencesContainingNode = {}
+      let pathsContianingSequence = {}
+
+      pathsContainingNode = getters.getDirectPathsContainingCurrentNode
+      /*       console.log(
+        'PATHS CONTAINING MODULE: ' + JSON.stringify(pathsContainingNode)
+      ) */
+
+      sequencesContainingNode = getters.getSequencesContainingCurrentNode
+      // eslint-disable-next-line no-unused-vars
+      for (const [nodeId, nodeName] of Object.entries(
+        sequencesContainingNode
+      )) {
+        //console.log('sequencesContainingModule[i] ' + value)
+        /*   let sequencePaths = rootGetters['path/getPathsContainingSequence'](
+          value
+        ) */
+        let references = state.nodeIDToNodeObjectMap[nodeId].referencedByIds
+        //console.log('REFERENCES: ' + references)
+        for (let i = 0; i < references.length; i++) {
+          let referenceParentId =
+            state.nodeIDToNodeObjectMap[references[i]].parentNodeId
+          /*     console.log(
+        'REFERENCE TYPE: ' +
+          state.nodeIDToNodeObjectMap[referenceParentId].type
+      ) */
+          if (state.nodeIDToNodeObjectMap[referenceParentId].type == 'paths')
+            pathsContianingSequence[
+              state.nodeIDToNodeObjectMap[referenceParentId].id
+            ] = state.nodeIDToNodeObjectMap[referenceParentId].name
+        }
+        /*    console.log(
+          'SEQUENCE PATHS: ' + JSON.stringify(pathsContianingSequence)
+        ) */
+        //modulePaths.push(sequencePaths)
+        if (
+          Object.keys(pathsContianingSequence).length != 0 && //TODO: what is this??
+          pathsContianingSequence.constructor != Object
+        )
+          pathsContainingNode = {
+            ...pathsContainingNode,
+            pathsContianingSequence,
+          } //TODO: test (config has to change)
+      }
+      //console.log('ALL MODULE PATHS: ' + JSON.stringify(pathsContainingNode))
+      return pathsContainingNode
+      //this.$store.getters['path/getPathsContainingModule'](state.module.name)
     },
   },
 })

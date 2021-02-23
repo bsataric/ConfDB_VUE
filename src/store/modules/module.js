@@ -159,6 +159,7 @@ export const getters = {
     return state.moduleName
   },
   getSequencesContainingCurrentModule: (
+    //TODO: get contained in sequences, paths etc...
     state,
     getters,
     rootState,
@@ -179,10 +180,10 @@ export const getters = {
     sequencesContainingModule = rootGetters[
       'sequence/getSequencesContainingModule'
     ](state.moduleName)
-    console.log(
+    /*     console.log(
       'SEQUENCES CONTAINING MODULE: ' +
         JSON.stringify(sequencesContainingModule)
-    )
+    ) */
     // eslint-disable-next-line no-unused-vars
     for (const [key, value] of Object.entries(sequencesContainingModule)) {
       //console.log('sequencesContainingModule[i] ' + value)
@@ -195,7 +196,7 @@ export const getters = {
       )
         modulePaths = [...modulePaths, sequencePaths] //TODO: test (config has to change)
     }
-    console.log('ALL MODULE PATHS: ' + JSON.stringify(modulePaths))
+    //console.log('ALL MODULE PATHS: ' + JSON.stringify(modulePaths))
     return modulePaths
     //this.$store.getters['path/getPathsContainingModule'](state.module.name)
   },

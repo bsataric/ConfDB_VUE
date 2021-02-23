@@ -35,7 +35,9 @@ import { mapGetters } from 'vuex'
       //modules
       getSequencesContainingCurrentModule:
         'module/getSequencesContainingCurrentModule',
+      getSequencesContainingCurrentNode: 'getSequencesContainingCurrentNode',
       getPathsContainingCurrentModule: 'module/getPathsContainingCurrentModule',
+      getPathsContainingCurrentNode: 'getPathsContainingCurrentNode',
       //sequences
       getSequencesContainingCurrentSequence:
         'sequence/getSequencesContainingCurrentSequence',
@@ -57,7 +59,9 @@ export default class SnippetView extends Vue {
   private getSelectedNodeSnippetText!: any
   //modules
   private getSequencesContainingCurrentModule!: any
+  private getSequencesContainingCurrentNode!: any
   private getPathsContainingCurrentModule!: any
+  private getPathsContainingCurrentNode!: any
   //sequences
   private getSequencesContainingCurrentSequence!: any
   private getPathsContainingCurrentSequence!: any
@@ -96,97 +100,53 @@ export default class SnippetView extends Vue {
     console.log(JSON.stringify(this.arrayOfSelectedObjects))
   }
 
-  public getSelectedNodeContainedInSequences(nodeType: string) {
+  public getSelectedNodeContainedInSequences() {
     //console.log('SELECTED NODE TYPE: ' + nodeType)
     //this.triggered = !this.triggered
-    if (nodeType == 'modules') {
-      let sequences = this.getSequencesContainingCurrentModule
-      this.arrayOfSelectedObjects = sequences
-      let sequencesText = '<ul>'
-      //console.log(sequences)
-      // eslint-disable-next-line no-unused-vars
-      for (const [key, value] of Object.entries(sequences)) {
-        //console.log('KEY: ' + key)
-        //console.log('VALUE: ' + value)
-        sequencesText +=
-          '<li><a id=Sequences.' +
-          key +
-          '.' +
-          value +
-          '>' +
-          value +
-          '</a>' +
-          '</li>'
-      }
-      sequencesText += '</ul>'
-      return sequencesText
-    } else if (nodeType == 'sequences') {
-      let sequences = this.getSequencesContainingCurrentSequence
-      //console.log('SEQUENCESSSSS: ' + sequences)
-      this.arrayOfSelectedObjects = sequences
-      let sequencesText = '<ul>'
-      //console.log(sequences)
-      // eslint-disable-next-line no-unused-vars
-      for (const [key, value] of Object.entries(sequences)) {
-        //console.log('KEY: ' + key)
-        //console.log('VALUE: ' + value)
-        sequencesText +=
-          '<li><a id=Sequences.' +
-          key +
-          '.' +
-          value +
-          '>' +
-          value +
-          '</a>' +
-          '</li>'
-      }
-      sequencesText += '</ul>'
-      return sequencesText
-    } else if (nodeType == 'paths') {
-      return this.getPathSnippet
-    } else if (nodeType == 'pset') {
-      return this.getPSetSnippet
+    let sequences = this.getSequencesContainingCurrentNode
+    this.arrayOfSelectedObjects = sequences
+    let sequencesText = '<ul>'
+    //console.log(sequences)
+    // eslint-disable-next-line no-unused-vars
+    for (const [nodeId, nodeName] of Object.entries(sequences)) {
+      //console.log('KEY: ' + nodeId)
+      //console.log('VALUE: ' + nodeName)
+      sequencesText +=
+        '<li><a id=Sequences.' +
+        nodeId +
+        '.' +
+        nodeName +
+        '>' +
+        nodeName +
+        '</a>' +
+        '</li>'
     }
-    return ''
+    sequencesText += '</ul>'
+    return sequencesText
   }
 
-  public getSelectedNodeContainedInPaths(nodeType: string) {
+  public getSelectedNodeContainedInPaths() {
     //console.log('SELECTED NODE TYPE: ' + nodeType)
     //this.triggered = !this.triggered
-    if (nodeType == 'modules') {
-      let paths = this.getPathsContainingCurrentModule
-      this.arrayOfSelectedObjects = paths
-      let pathsText = '<ul>'
-      //console.log(paths)
-      // eslint-disable-next-line no-unused-vars
-      for (const [key, value] of Object.entries(paths)) {
-        //console.log('KEY: ' + key)
-        //console.log('VALUE: ' + value)
-        pathsText += //fix new line
-          '<li><a id=Paths.' + key + '.' + value + ' >' + value + '</a></li>'
-      }
-      pathsText += '</ul>'
-      return pathsText
-    } else if (nodeType == 'sequences') {
-      let paths = this.getPathsContainingCurrentSequence
-      this.arrayOfSelectedObjects = paths
-      let pathsText = '<ul>'
-      //console.log(paths)
-      // eslint-disable-next-line no-unused-vars
-      for (const [key, value] of Object.entries(paths)) {
-        //console.log('KEY: ' + key)
-        //console.log('VALUE: ' + value)
-        pathsText += //fix new line
-          '<li><a id=Paths.' + key + '.' + value + ' >' + value + '</a></li>'
-      }
-      pathsText += '</ul>'
-      return pathsText
-    } else if (nodeType == 'paths') {
-      return this.getPathSnippet
-    } else if (nodeType == 'pset') {
-      return this.getPSetSnippet
+    let paths = this.getPathsContainingCurrentNode
+    this.arrayOfSelectedObjects = paths
+    let pathsText = '<ul>'
+    //console.log(paths)
+    // eslint-disable-next-line no-unused-vars
+    for (const [pathId, pathName] of Object.entries(paths)) {
+      //console.log('KEY: ' + pathId)
+      //console.log('VALUE: ' + pathName)
+      pathsText += //fix new line
+        '<li><a id=Paths.' +
+        pathId +
+        '.' +
+        pathName +
+        ' >' +
+        pathName +
+        '</a></li>'
     }
-    return ''
+    pathsText += '</ul>'
+    return pathsText
   }
 
   public getSelectedNodeDisabledTabs(nodeType: string, index: number): boolean {
@@ -229,10 +189,10 @@ export default class SnippetView extends Vue {
     if (this.activeTab == 3) {
       return this.getSelectedNodeSnippetText
     } else if (this.activeTab == 0) {
-      return this.getSelectedNodeContainedInSequences(this.getSelectedNodeType)
+      return this.getSelectedNodeContainedInSequences()
     } else if (this.activeTab == 6) {
       //console.log('ACTIVE TAB 6')
-      return this.getSelectedNodeContainedInPaths(this.getSelectedNodeType)
+      return this.getSelectedNodeContainedInPaths()
     }
     return ''
   }
@@ -244,7 +204,7 @@ export default class SnippetView extends Vue {
   }
 
   async openContainedInNode(nodeType: string, itemId: number) {
-    if (nodeType == 'Sequences') {
+    /*    if (nodeType == 'Sequences') {
       //console.log('FORCEEEEEED: ' + itemId)
       await this.$store.dispatch('sequence/fetchSequenceViaId', {
         itemId: itemId,
@@ -254,12 +214,13 @@ export default class SnippetView extends Vue {
       await this.$store.dispatch('path/fetchPathViaId', {
         itemId: itemId,
         forceOpenNode: true,
-      })
-    } /* else if (nodeType === 'tasks') { //TODO: THIS PROBABLY WONT HAPPEN
+      }) */
 
-    } else if (nodeType === 'switchProducers') {
-
-    } */
+    //
+    await this.$store.dispatch('setSelectedNodeViaID', {
+      selectedNodeId: itemId,
+      forceOpenNode: true,
+    })
   }
 }
 </script>
