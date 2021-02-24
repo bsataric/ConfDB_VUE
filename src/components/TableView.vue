@@ -81,6 +81,9 @@
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import { mapGetters } from 'vuex'
+// eslint-disable-next-line no-unused-vars
+import { NodeObject } from '../types'
+
 import ZkTable from 'vue-table-with-tree-grid'
 
 @Component({
@@ -89,7 +92,11 @@ import ZkTable from 'vue-table-with-tree-grid'
       getSelectedNodeType: 'getSelectedNodeType',
       getSelectedModuleParams: 'module/getSelectedModuleParams',
       getSelectedModuleName: 'module/getSelectedModuleName',
+      getSelectedNodeName: 'getSelectedNodeName',
+      getSelectedNodeCType: 'getSelectedNodeCType',
+      getSelectedNodeChildren: 'getSelectedNodeChildren',
       getPathsContainingCurrentModule: 'module/getPathsContainingCurrentModule',
+      getPathsContainingCurrentNode: 'getPathsContainingCurrentNode',
       getSelectedPSetParams: 'pset/getSelectedPSetParams',
       getSelectedPSetName: 'pset/getSelectedPSetName',
       getDarkMode: 'getDarkMode',
@@ -119,7 +126,11 @@ export default class TableView extends Vue {
   private getSelectedNodeType!: any
   private getSelectedModuleParams!: any[]
   private getSelectedModuleName!: any[]
+  private getSelectedNodeName!: string
+  private getSelectedNodeCType!: string
+  private getSelectedNodeChildren!: Array<NodeObject>
   private getPathsContainingCurrentModule!: any[]
+  private getPathsContainingCurrentNode!: any[]
   private getSelectedPSetParams!: any[]
   private getSelectedPSetName!: any[]
   private getDarkMode!: any[]
@@ -180,16 +191,21 @@ export default class TableView extends Vue {
     console.log('BLABLA')
   }
 
-  public buildRecursiveVPSetObject(vpSetObject: Object, body: any) {
+  public buildRecursiveVPSetObject(
+    vpSetObject: Object,
+    children: Array<NodeObject>
+  ) {
     //console.log('BUILDING RECURSIVE VPSET')
-    //if the body has more then 0 keys it is an unnamed nested PSet
-    if (Object.entries(Object(body)).length > 1) {
+    //if the children has more then 0 keys it is an unnamed nested PSet
+    if (Object.entries(Object(children)).length > 1) {
       //console.log('NESTED UNNAMED PSET')
     }
     // eslint-disable-next-line no-unused-vars
-    for (const [key, value] of Object.entries(Object(body))) {
+    for (const [key, childObject] of Object.entries(children)) {
       let nestedNoNamePSetObject: Object = {} //might or might not be used
-      if (Object.entries(Object(body)).length > 1) {
+      if (childObject.name == 'PSet') {
+        //console.log('NESTED UNNAMED PSET')
+        //console.log('UNNAMED PSET OBJECT TYPE: ' + childObject.type)
         //nestedNoNamePSetObject['id'] = this.idCounter++
         nestedNoNamePSetObject['type'] == 'PSet'
         nestedNoNamePSetObject['name'] = 'PSet' //no name
@@ -197,56 +213,67 @@ export default class TableView extends Vue {
         nestedNoNamePSetObject['trkd'] = true
         nestedNoNamePSetObject['children'] = []
       }
-      //console.log(JSON.stringify(key), JSON.stringify(value))
+      //console.log(JSON.stringify(key), JSON.stringify(childObject))
       // eslint-disable-next-line no-unused-vars
-      for (const [key1, value1] of Object.entries(Object(value))) {
-        let nestedVPSetObject: Object = {
-          /*  id: this.idCounter++ */
-          value: '',
-          trkd: true,
-          dft: true,
-        }
-        //console.log('KEY1: ' + key1 + ' VALUE1: ' + value1)
-        //this is parameter loop
-        for (const [key2, value2] of Object.entries(Object(value1))) {
-          if (key2 === 'type') nestedVPSetObject['type'] = value2
-          else if (key2 === 'value') {
-            if (
-              nestedVPSetObject['type'] == 'cms.VPSet' ||
-              nestedVPSetObject['type'] == 'cms.PSet' ||
-              nestedVPSetObject['type'] == 'cms.untracked.PSet' ||
-              nestedVPSetObject['type'] == 'cms.untracked.VPSet'
-            ) {
-              //console.log('PSET NAME: ' + key1)
-              nestedVPSetObject['name'] = key1
-              nestedVPSetObject['children'] = []
-
-              this.buildRecursiveVPSetObject(nestedVPSetObject, value2)
-            } else {
-              nestedVPSetObject['name'] = key1
-
-              nestedVPSetObject['value'] = JSON.stringify(value2) //simple value
-              //nestedVPSetObject['name'] = nestedVPSetObject['value']
-            }
-          }
-        }
-        if (nestedVPSetObject['type'] != undefined) {
-          let cmsTypeLenght = nestedVPSetObject['type'].length
-          let cmsType = nestedVPSetObject['type'].substring(
-            //cmsType is necessary for printing out in tree
-            nestedVPSetObject['type'].indexOf('.') + 1,
-            cmsTypeLenght
-          )
-          nestedVPSetObject['type'] = cmsType
-        }
-        //nestedModuleObject['name'] = nestedModuleObject['value']
-        if (Object.entries(Object(body)).length == 1) {
-          vpSetObject['children'].push(nestedVPSetObject)
-        } else {
-          nestedNoNamePSetObject['children'].push(nestedVPSetObject)
-        }
+      //for (const [key1, value1] of Object.entries(Object(childObject))) {
+      let nestedVPSetObject: Object = {
+        /*  id: this.idCounter++ */
+        value: '',
+        trkd: true,
+        dft: true,
       }
-      if (Object.entries(Object(body)).length > 1) {
+      //console.log('KEY1: ' + key1 + ' VALUE1: ' + value1)
+      //this is parameter loop
+      //for (const [key2, value2] of Object.entries(Object(value1))) {
+      //if (key2 === 'type')
+      nestedVPSetObject['type'] = childObject.type
+      //else if (key2 === 'value') {
+      if (childObject.name == 'PSet') {
+        this.buildRecursiveVPSetObject(
+          nestedNoNamePSetObject,
+          childObject.children
+        )
+      } else if (
+        nestedVPSetObject['type'] == 'cms.VPSet' ||
+        nestedVPSetObject['type'] == 'cms.PSet' ||
+        nestedVPSetObject['type'] == 'cms.untracked.PSet' ||
+        nestedVPSetObject['type'] == 'cms.untracked.VPSet'
+      ) {
+        //console.log('PSET NAME: ' + key1)
+        nestedVPSetObject['name'] = childObject.name
+        nestedVPSetObject['children'] = []
+
+        this.buildRecursiveVPSetObject(nestedVPSetObject, childObject.children)
+      } else {
+        nestedVPSetObject['name'] = childObject.name.substring(
+          0,
+          childObject.name.indexOf(' ')
+        )
+
+        nestedVPSetObject['value'] = JSON.stringify(
+          childObject.paremeterJSONValue
+        ) //simple value
+        //nestedVPSetObject['name'] = nestedVPSetObject['value']
+      }
+      //}
+      //}
+      if (nestedVPSetObject['type'] != undefined) {
+        let cmsTypeLenght = nestedVPSetObject['type'].length
+        let cmsType = nestedVPSetObject['type'].substring(
+          //cmsType is necessary for printing out in tree
+          nestedVPSetObject['type'].indexOf('.') + 1,
+          cmsTypeLenght
+        )
+        nestedVPSetObject['type'] = cmsType
+      }
+      //nestedModuleObject['name'] = nestedModuleObject['value']
+      if (childObject.name != 'PSet') {
+        vpSetObject['children'].push(nestedVPSetObject)
+      } /* else {
+        nestedNoNamePSetObject['children'].push(nestedVPSetObject)
+      } */
+      //}
+      if (childObject.name == 'PSet') {
         vpSetObject['children'].push(nestedNoNamePSetObject)
       }
       /*     console.log(
@@ -255,8 +282,8 @@ export default class TableView extends Vue {
     }
   }
 
-  public parseParams(params: any, nodeType: string) {
-    //console.log('MODULE/PSET PARAMS: ' + JSON.stringify(params))
+  public parseChildren(children: Array<NodeObject>, nodeType: string) {
+    //console.log('MODULE/PSET PARAMS: ' + JSON.stringify(children)) //TODO: parse children
     //console.log('NODETYPE: ' + nodeType)
     let paramsArray: any = []
     //paramsArray.length = 0
@@ -264,104 +291,117 @@ export default class TableView extends Vue {
     //console.log(moduleData)
     //console.log(modulesObject)
     if (nodeType == 'modules') {
-      for (const [key, value] of Object.entries(params)) {
+      // eslint-disable-next-line no-unused-vars
+      for (const [key, childObject] of Object.entries(children)) {
         //loop over sequnces - create new Sequence object and add it to children of the seqs
-        /*   console.log('KEY: ' + key)
-      console.log('VALUE: ' + value) */
+        //console.log('KEY: ' + key)
+        //console.log('VALUE: ' + JSON.stringify(childObject))
 
-        if (key === 'params') {
-          // eslint-disable-next-line no-unused-vars
-          this.parseInnerParams(value, paramsArray)
-        }
+        //if (key === 'children') {
+        // eslint-disable-next-line no-unused-vars
+        this.parseInnerParams(childObject, paramsArray)
+        //}
       }
     } else if (nodeType == 'pset') {
-      this.parseInnerParams(params, paramsArray)
+      //this.parseInnerParams(children, paramsArray)
+      // eslint-disable-next-line no-unused-vars
+      for (const [key, childObject] of Object.entries(children)) {
+        this.parseInnerParams(childObject, paramsArray)
+      }
     }
     //console.log('paramsArray:' + JSON.stringify(paramsArray))
     return paramsArray
   }
 
-  public parseInnerParams(params: any, paramsArray: any) {
-    for (const [key1, value1] of Object.entries(Object(params))) {
-      //console.log('KEY1: ' + key1)
-      //console.log('VALUE1: ' + value1)
+  public parseInnerParams(childObject: NodeObject, paramsArray: any) {
+    //for (const [key1, value1] of Object.entries(Object(childObject))) {
+    //console.log('KEY1: ' + key1)
+    //console.log('VALUE1: ' + value1)
 
-      let nestedParameterObject: Object = {
-        //id: this.idCounter++,
-        //children: [],
-        dft: true,
-        trkd: true,
-        children: [],
-      }
+    let nestedParameterObject: Object = {
+      //id: this.idCounter++,
+      //children: [],
+      dft: true,
+      trkd: true,
+      children: [],
+    }
 
-      for (const [key2, value2] of Object.entries(Object(value1))) {
-        if (key2 === 'type') nestedParameterObject['type'] = value2
-        else if (key2 === 'value') {
-          if (
-            nestedParameterObject['type'] == 'cms.VPSet' ||
-            nestedParameterObject['type'] == 'cms.PSet' ||
-            nestedParameterObject['type'] == 'cms.untracked.PSet' ||
-            nestedParameterObject['type'] == 'cms.untracked.VPSet'
-          ) {
-            nestedParameterObject['children'] = []
-            // nestedParameterObject['_hasChildren'] = true
-            //console.log(JSON.stringify(nestedParameterObject))
-            nestedParameterObject['name'] = key1
-            nestedParameterObject['value'] = ''
+    //for (const [key2, value2] of Object.entries(Object(value1))) {
+    nestedParameterObject['type'] = childObject.type
+    //else if (key2 === 'value') {
+    if (
+      nestedParameterObject['type'] == 'cms.VPSet' ||
+      nestedParameterObject['type'] == 'cms.PSet' ||
+      nestedParameterObject['type'] == 'cms.untracked.PSet' ||
+      nestedParameterObject['type'] == 'cms.untracked.VPSet'
+    ) {
+      nestedParameterObject['children'] = []
+      // nestedParameterObject['_hasChildren'] = true
+      //console.log(JSON.stringify(nestedParameterObject))
+      nestedParameterObject['name'] = childObject.name
+      nestedParameterObject['value'] = ''
 
-            this.buildRecursiveVPSetObject(nestedParameterObject, value2)
+      this.buildRecursiveVPSetObject(
+        nestedParameterObject,
+        childObject.children
+      )
 
-            /*      console.log(
+      /*      console.log(
                   'VPSET BUILD: ' + JSON.stringify(nestedParameterObject)
                 ) */
-          } else {
-            nestedParameterObject['name'] = key1
-            //simple type
-            nestedParameterObject['value'] = JSON.stringify(value2) //simple value
-            if (nestedParameterObject['value'].length > 70) {
-              //shorten the string and put three dots in the end
-              nestedParameterObject['value'] =
-                nestedParameterObject['value'].substring(1, 70) + '...'
-            }
-          }
-        }
-        //console.log(key3)
+    } else {
+      nestedParameterObject['name'] = childObject.name.substring(
+        0,
+        childObject.name.indexOf(' ')
+      )
+      //simple type
+      nestedParameterObject['value'] = JSON.stringify(
+        childObject.paremeterJSONValue
+      ) //simple value
+      if (nestedParameterObject['value'].length > 70) {
+        //shorten the string and put three dots in the end
+        nestedParameterObject['value'] =
+          nestedParameterObject['value'].substring(1, 70) + '...'
       }
-
-      if (nestedParameterObject['type'] != undefined) {
-        //console.log('AAAA')
-        let cmsTypeLenght = nestedParameterObject['type'].length
-        let cmsType = nestedParameterObject['type'].substring(
-          //cmsType is necessary for printing out in tree
-          nestedParameterObject['type'].indexOf('.') + 1,
-          cmsTypeLenght
-        )
-        nestedParameterObject['type'] = cmsType
-        //nestedModuleObject['name'] = nestedModuleObject['value']
-        //console.log(nestedParameterObject)
-      }
-      //push parameter into module children
-      paramsArray.push(nestedParameterObject)
     }
+    //}
+    //console.log(key3)
+    //}
+
+    if (nestedParameterObject['type'] != undefined) {
+      //console.log('AAAA')
+      let cmsTypeLenght = nestedParameterObject['type'].length
+      let cmsType = nestedParameterObject['type'].substring(
+        //cmsType is necessary for printing out in tree
+        nestedParameterObject['type'].indexOf('.') + 1,
+        cmsTypeLenght
+      )
+      nestedParameterObject['type'] = cmsType
+      //nestedModuleObject['name'] = nestedModuleObject['value']
+      //console.log(nestedParameterObject)
+    }
+    //push parameter into module children
+    paramsArray.push(nestedParameterObject)
+    //}
 
     return paramsArray
   }
 
   /*   get rows() {
-    let rows = this.parseParams(this.getSelectedModuleParams)
+    let rows = this.parseChildren(this.getSelectedModuleParams)
     return rows
   } */
 
   public getSelectedNodeParams(nodeType: string) {
     //console.log('SELECTED NODE TYPE: ' + nodeType)
     if (nodeType == 'modules') {
-      return this.parseParams(this.getSelectedModuleParams, nodeType)
+      return this.parseChildren(this.getSelectedNodeChildren, nodeType)
     } else if (nodeType == 'sequences') {
       return []
     } else if (nodeType == 'paths') {
       return []
     } else if (nodeType == 'pset') {
-      return this.parseParams(this.getSelectedPSetParams, nodeType)
+      return this.parseChildren(this.getSelectedNodeChildren, nodeType)
     }
     return []
   }
@@ -381,7 +421,8 @@ export default class TableView extends Vue {
 
   public getSelectedNodeEDProducerValue(nodeType: string) {
     if (nodeType == 'modules') {
-      return this.getSelectedModuleName
+      //return this.getSelectedModuleName
+      return this.getSelectedNodeCType
     } else if (nodeType == 'sequences') {
       return ''
     } else if (nodeType == 'paths') {
@@ -394,7 +435,8 @@ export default class TableView extends Vue {
 
   public getSelectedNodeLabel(nodeType: string) {
     if (nodeType == 'modules') {
-      return this.getSelectedModuleName
+      //return this.getSelectedModuleName
+      return this.getSelectedNodeName
     } else if (nodeType == 'sequences') {
       return ''
     } else if (nodeType == 'paths') {
@@ -424,7 +466,8 @@ export default class TableView extends Vue {
       let values: Array<string> = []
       // eslint-disable-next-line no-unused-vars
       for (const [key, value] of Object.entries(
-        this.getPathsContainingCurrentModule
+        //this.getPathsContainingCurrentModule
+        this.getPathsContainingCurrentNode
       )) {
         values.push(value)
       }

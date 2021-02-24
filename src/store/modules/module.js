@@ -176,7 +176,7 @@ export const getters = {
     let modulePaths = {}
     let sequencesContainingModule = []
     modulePaths = rootGetters['path/getPathsContainingModule'](state.moduleName)
-    console.log('MODULE PATHS: ' + JSON.stringify(modulePaths))
+    //console.log('MODULE PATHS: ' + JSON.stringify(modulePaths))
     sequencesContainingModule = rootGetters[
       'sequence/getSequencesContainingModule'
     ](state.moduleName)

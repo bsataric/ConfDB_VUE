@@ -1099,14 +1099,14 @@ export default class TreeView extends Vue {
 
   public updateActiveNodes(array: any) {
     //console.log('THIS ACTIVE: ' + this.active)
-    let difference: number = parseInt(
+    /*    let difference: number = parseInt(
       this.active
         .filter((x) => !array.includes(x))
         .concat(array.filter((x) => !this.active.includes(x)))
-    )
+    ) */
     if (Object.keys(this.getNodeIDToNodeObjectMap).length !== 0)
       //if map is initialized
-      this.fetchNodeById(difference)
+      this.fetchNodeById(array[0])
     this.active = array
   }
 

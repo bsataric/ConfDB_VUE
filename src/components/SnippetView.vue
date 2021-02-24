@@ -101,7 +101,6 @@ export default class SnippetView extends Vue {
   }
 
   public getSelectedNodeContainedInSequences() {
-    //console.log('SELECTED NODE TYPE: ' + nodeType)
     //this.triggered = !this.triggered
     let sequences = this.getSequencesContainingCurrentNode
     this.arrayOfSelectedObjects = sequences
@@ -126,7 +125,6 @@ export default class SnippetView extends Vue {
   }
 
   public getSelectedNodeContainedInPaths() {
-    //console.log('SELECTED NODE TYPE: ' + nodeType)
     //this.triggered = !this.triggered
     let paths = this.getPathsContainingCurrentNode
     this.arrayOfSelectedObjects = paths

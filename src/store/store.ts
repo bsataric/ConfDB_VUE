@@ -21,6 +21,7 @@ const state: MainVuexState = {
   //selected node information
   selectedNodeType: '',
   selectedNodeName: '',
+  selectedNodeCType: '',
   selectedNodeId: -1,
   selectedNodeParamLength: 0,
   selectedNodeParentId: 0,
@@ -73,6 +74,8 @@ export default new Vuex.Store({
       state.selectedNodeName =
         state.nodeIDToNodeObjectMap[payload.selectedNodeId].name
       //console.log('state.selectedNodeName ' + state.selectedNodeName)
+      state.selectedNodeCType =
+        state.nodeIDToNodeObjectMap[payload.selectedNodeId].ctype
       /*   state.selectedNodeParamLength =
         state.nodeIDToVuexObjectMap[payload.selectedNodeId].itemChildrenLength */
       state.selectedNodeParamLength =
@@ -512,6 +515,9 @@ export default new Vuex.Store({
     getSelectedNodeName(state: MainVuexState): string {
       return state.selectedNodeName
     },
+    getSelectedNodeCType(state: MainVuexState): string {
+      return state.selectedNodeCType
+    },
     getSelectedNodeId(state: MainVuexState): number {
       return state.selectedNodeId
     },
@@ -696,6 +702,9 @@ export default new Vuex.Store({
       //console.log('ALL MODULE PATHS: ' + JSON.stringify(pathsContainingNode))
       return pathsContainingNode
       //this.$store.getters['path/getPathsContainingModule'](state.module.name)
+    },
+    getSelectedNodeChildren(state: MainVuexState): Array<NodeObject> {
+      return state.nodeIDToNodeObjectMap[state.selectedNodeId].children
     },
   },
 })

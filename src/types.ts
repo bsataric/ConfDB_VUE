@@ -2,6 +2,7 @@ export interface MainVuexState {
   JSONconfiguration: any
   selectedNodeType: string
   selectedNodeName: string
+  selectedNodeCType: string
   selectedNodeId: number
   selectedNodeParamLength: number
   selectedNodeParentId: number
