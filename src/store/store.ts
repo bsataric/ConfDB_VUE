@@ -172,8 +172,36 @@ export default new Vuex.Store({
                 let parentType: string =
                   state.nodeIDToNodeObjectMap[value1.parentNodeId].type
                 if (
-                  (parentType == 'sequences' || parentType == 'paths') &&
+                  (parentType == 'sequences' ||
+                    parentType == 'paths' ||
+                    parentType == 'tasks') &&
                   sequenceName == value1.name
+                ) {
+                  //nesting
+                  value.referencedByIds.push(value1.id)
+                  value1.rootNodeId = value.id
+                }
+              }
+            }
+            //console.log('TOP SEQUENCE NAME: ' + value.name)
+            //console.log('REFERENCES: ' + value.referencedByIds)
+          } else if (
+            state.nodeIDToNodeObjectMap[value.parentNodeId].type == 'tsks'
+          ) {
+            //TOP LEVEL SEQUENCE REFERENCES
+            let taskName = value.name
+            for (const [key1, value1] of Object.entries(
+              //search through all nodes for references
+              state.nodeIDToNodeObjectMap as Map<number, NodeObject>
+            )) {
+              if (value1.parentNodeId > 0) {
+                //console.log('PARENT NODE ID: ' + value1.parentNodeId)
+
+                let parentType: string =
+                  state.nodeIDToNodeObjectMap[value1.parentNodeId].type
+                if (
+                  (parentType == 'tasks' || parentType == 'paths') &&
+                  taskName == value1.name
                 ) {
                   //nesting
                   value.referencedByIds.push(value1.id)
@@ -216,7 +244,9 @@ export default new Vuex.Store({
                 let parentType: string =
                   state.nodeIDToNodeObjectMap[value1.parentNodeId].type
                 if (
-                  (parentType == 'sequences' || parentType == 'paths') &&
+                  (parentType == 'sequences' ||
+                    parentType == 'paths' ||
+                    parentType == 'tasks') &&
                   moduleName == value1.name
                 ) {
                   //nesting
@@ -680,7 +710,7 @@ export default new Vuex.Store({
       return state.nodeIDToNodeObjectMap[state.selectedNodeId].children
     },
     getConfigLoaded(state: MainVuexState): boolean {
-      console.log('CONFIG LOADED: ' + state.configLoaded)
+      //console.log('CONFIG LOADED: ' + state.configLoaded)
       return state.configLoaded
     },
   },

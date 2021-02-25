@@ -192,6 +192,7 @@ export default class TreeView extends Vue {
   private globalPathsObject: Object = {}
   private globalModulesObject: Object = {}
   private globalPSetsObject: Object = {}
+  private globalTasksObject: Object = {}
 
   private idCounter = 1 //TODO: this is dummy this has to be provided from the server
 
@@ -207,6 +208,7 @@ export default class TreeView extends Vue {
     module: 'mdi-view-module',
     path: 'mdi-filmstrip',
     pset: 'mdi-format-list-bulleted',
+    task: 'mdi-sort-reverse-variant',
   }
 
   get items() {
@@ -215,6 +217,7 @@ export default class TreeView extends Vue {
       this.globalPathsObject,
       this.globalModulesObject,
       this.globalPSetsObject,
+      this.globalTasksObject,
     ]
   }
 
@@ -752,7 +755,7 @@ export default class TreeView extends Vue {
         rootNodeId: this.idCounter,
         referencedByIds: [],
         iconType: 'pset',
-        iconColor: '',
+        iconColor: 'orange',
         paremeterJSONValue: Infinity,
         ctype: '',
         ptype: '',
@@ -847,6 +850,128 @@ export default class TreeView extends Vue {
     //console.log(this.pera)
     //this.items = JSON.stringify(psetsObject)
     this.globalPSetsObject = psetsObject
+  }
+
+  public parseTasks(taskData: any) {
+    let tasksObject: NodeObject = {
+      id: ++this.idCounter, //TODO: continue
+      name: 'Tasks',
+      type: 'tsks',
+      globalType: 'rootNode',
+      children: [],
+      parentNodeId: 0,
+      rootNodeId: this.idCounter,
+      referencedByIds: [],
+      iconType: '',
+      iconColor: '',
+      paremeterJSONValue: Infinity,
+      ctype: '',
+      ptype: '',
+    }
+    //console.log(tasksObject)
+    for (const [key, value] of Object.entries(taskData)) {
+      //loop over sequnces - create new Sequence object and add it to children of the seqs
+      let taskObject: NodeObject = {
+        id: ++this.idCounter,
+        name: key,
+        type: 'tasks',
+        globalType: 'taskNode',
+        children: [],
+        parentNodeId: tasksObject['id'],
+        rootNodeId: this.idCounter, //for the root nodes, rootNodeId = itself
+        referencedByIds: [],
+        iconType: 'task',
+        iconColor: 'blue',
+        paremeterJSONValue: Infinity,
+        ctype: '',
+        ptype: '',
+      }
+
+      //let sequenceObjectId = this.idCounter //remember counter to use it after children are populated
+
+      //console.log(`${key}`)
+      // eslint-disable-next-line no-unused-vars
+      for (const [key1, value1] of Object.entries(Object(value))) {
+        //loop over sequence entries
+
+        //console.log(`${key1}`)
+        if (Object(value1)[0] === 'modules') {
+          //console.log('MODULE')
+          let nestedTaskObject: NodeObject = {
+            id: ++this.idCounter,
+            name: Object(value1)[1],
+            type: 'modules',
+            globalType: 'nestedModuleNode',
+            children: [],
+            parentNodeId: taskObject['id'],
+            rootNodeId: -1, //for the leaf nodes, rootNodeId will be calculated with references
+            referencedByIds: [],
+            iconType: 'module',
+            iconColor: '',
+            paremeterJSONValue: Infinity,
+            ctype: '',
+            ptype: '',
+          }
+          //TODO: substitute Vuex object map with this if it works
+          this.nodeIDToNodeObjectMap[this.idCounter] = nestedTaskObject
+          taskObject['children'].push(nestedTaskObject)
+        } else if (Object(value1)[0] === 'sequences') {
+          //console.log('SEQUENCE')
+          let nestedTaskObject: NodeObject = {
+            id: ++this.idCounter,
+            name: Object(value1)[1],
+            type: 'sequences',
+            globalType: 'nestedSequenceNode',
+            children: [],
+            parentNodeId: taskObject['id'],
+            rootNodeId: -1, //for the leaf nodes, rootNodeId will be calculated with references
+            referencedByIds: [],
+            iconType: 'sequence',
+            iconColor: 'red',
+            paremeterJSONValue: Infinity,
+            ctype: '',
+            ptype: '',
+          }
+
+          this.nodeIDToNodeObjectMap[this.idCounter] = nestedTaskObject
+          taskObject['children'].push(nestedTaskObject)
+        } else if (Object(value1)[0] === 'tasks') {
+          //console.log('SEQUENCE')
+          let nestedTaskObject: NodeObject = {
+            id: ++this.idCounter,
+            name: Object(value1)[1],
+            type: 'tasks',
+            globalType: 'nestedTaskNode',
+            children: [],
+            parentNodeId: taskObject['id'],
+            rootNodeId: -1, //for the leaf nodes, rootNodeId will be calculated with references
+            referencedByIds: [],
+            iconType: 'task',
+            iconColor: 'blue',
+            paremeterJSONValue: Infinity,
+            ctype: '',
+            ptype: '',
+          }
+
+          this.nodeIDToNodeObjectMap[this.idCounter] = nestedTaskObject
+          taskObject['children'].push(nestedTaskObject)
+        }
+      }
+      //TODO: substitute Vuex object map with this if it works
+      this.nodeIDToNodeObjectMap[taskObject['id']] = taskObject
+
+      tasksObject['children'].push(taskObject)
+    }
+    //TODO: substitute Vuex object map with this if it works
+    this.nodeIDToNodeObjectMap[tasksObject['id']] = tasksObject
+
+    //console.log(tasksObject)
+    //this.items = Object.values(tasksObject)
+    //this.items[0] = tasksObject
+    //console.log(this.items[0])
+    //console.log(this.pera)
+    //this.items = JSON.stringify(tasksObject)
+    this.globalTasksObject = tasksObject
   }
 
   /*
@@ -992,6 +1117,7 @@ export default class TreeView extends Vue {
       this.parsePaths(this.getConfiguration['paths'])
       this.parseModules(this.getConfiguration['mods'])
       this.parsePSets(this.getConfiguration['psets'])
+      this.parseTasks(this.getConfiguration['tasks'])
 
       this.$store.dispatch(
         'createNodeIDToNodeObjectMap',
@@ -1026,6 +1152,7 @@ export default class TreeView extends Vue {
       this.parsePaths(this.getConfiguration['paths'])
       this.parseModules(this.getConfiguration['mods'])
       this.parsePSets(this.getConfiguration['psets'])
+      this.parseTasks(this.getConfiguration['tasks'])
 
       this.$store.dispatch(
         'createNodeIDToNodeObjectMap',
