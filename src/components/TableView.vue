@@ -90,14 +90,10 @@ import ZkTable from 'vue-table-with-tree-grid'
   computed: {
     ...mapGetters({
       getSelectedNodeType: 'getSelectedNodeType',
-      getSelectedModuleParams: 'module/getSelectedModuleParams',
-      getSelectedModuleName: 'module/getSelectedModuleName',
       getSelectedNodeName: 'getSelectedNodeName',
       getSelectedNodeCType: 'getSelectedNodeCType',
       getSelectedNodeChildren: 'getSelectedNodeChildren',
-      getPathsContainingCurrentModule: 'module/getPathsContainingCurrentModule',
       getPathsContainingCurrentNode: 'getPathsContainingCurrentNode',
-      getSelectedPSetParams: 'pset/getSelectedPSetParams',
       getSelectedPSetName: 'pset/getSelectedPSetName',
       getDarkMode: 'getDarkMode',
     }),
@@ -124,14 +120,10 @@ export default class TableView extends Vue {
   }
 
   private getSelectedNodeType!: any
-  private getSelectedModuleParams!: any[]
-  private getSelectedModuleName!: any[]
   private getSelectedNodeName!: string
   private getSelectedNodeCType!: string
   private getSelectedNodeChildren!: Array<NodeObject>
-  private getPathsContainingCurrentModule!: any[]
   private getPathsContainingCurrentNode!: any[]
-  private getSelectedPSetParams!: any[]
   private getSelectedPSetName!: any[]
   private getDarkMode!: any[]
 
@@ -195,18 +187,12 @@ export default class TableView extends Vue {
     vpSetObject: Object,
     children: Array<NodeObject>
   ) {
-    //console.log('BUILDING RECURSIVE VPSET')
-    //if the children has more then 0 keys it is an unnamed nested PSet
-    if (Object.entries(Object(children)).length > 1) {
-      //console.log('NESTED UNNAMED PSET')
-    }
     // eslint-disable-next-line no-unused-vars
     for (const [key, childObject] of Object.entries(children)) {
       let nestedNoNamePSetObject: Object = {} //might or might not be used
       if (childObject.name == 'PSet') {
         //console.log('NESTED UNNAMED PSET')
         //console.log('UNNAMED PSET OBJECT TYPE: ' + childObject.type)
-        //nestedNoNamePSetObject['id'] = this.idCounter++
         nestedNoNamePSetObject['type'] == 'PSet'
         nestedNoNamePSetObject['name'] = 'PSet' //no name
         nestedNoNamePSetObject['dft'] = false
@@ -215,19 +201,13 @@ export default class TableView extends Vue {
       }
       //console.log(JSON.stringify(key), JSON.stringify(childObject))
       // eslint-disable-next-line no-unused-vars
-      //for (const [key1, value1] of Object.entries(Object(childObject))) {
       let nestedVPSetObject: Object = {
-        /*  id: this.idCounter++ */
         value: '',
         trkd: true,
         dft: true,
       }
-      //console.log('KEY1: ' + key1 + ' VALUE1: ' + value1)
-      //this is parameter loop
-      //for (const [key2, value2] of Object.entries(Object(value1))) {
-      //if (key2 === 'type')
+
       nestedVPSetObject['type'] = childObject.type
-      //else if (key2 === 'value') {
       if (childObject.name == 'PSet') {
         this.buildRecursiveVPSetObject(
           nestedNoNamePSetObject,
@@ -253,10 +233,8 @@ export default class TableView extends Vue {
         nestedVPSetObject['value'] = JSON.stringify(
           childObject.paremeterJSONValue
         ) //simple value
-        //nestedVPSetObject['name'] = nestedVPSetObject['value']
       }
-      //}
-      //}
+
       if (nestedVPSetObject['type'] != undefined) {
         let cmsTypeLenght = nestedVPSetObject['type'].length
         let cmsType = nestedVPSetObject['type'].substring(
@@ -269,16 +247,9 @@ export default class TableView extends Vue {
       //nestedModuleObject['name'] = nestedModuleObject['value']
       if (childObject.name != 'PSet') {
         vpSetObject['children'].push(nestedVPSetObject)
-      } /* else {
-        nestedNoNamePSetObject['children'].push(nestedVPSetObject)
-      } */
-      //}
-      if (childObject.name == 'PSet') {
+      } else if (childObject.name == 'PSet') {
         vpSetObject['children'].push(nestedNoNamePSetObject)
       }
-      /*     console.log(
-        'VPSET CHILDREN: ' + JSON.stringify(vpSetObject['children'][0])
-      ) */
     }
   }
 
@@ -286,24 +257,17 @@ export default class TableView extends Vue {
     //console.log('MODULE/PSET PARAMS: ' + JSON.stringify(children)) //TODO: parse children
     //console.log('NODETYPE: ' + nodeType)
     let paramsArray: any = []
-    //paramsArray.length = 0
 
-    //console.log(moduleData)
-    //console.log(modulesObject)
     if (nodeType == 'modules') {
       // eslint-disable-next-line no-unused-vars
       for (const [key, childObject] of Object.entries(children)) {
-        //loop over sequnces - create new Sequence object and add it to children of the seqs
         //console.log('KEY: ' + key)
         //console.log('VALUE: ' + JSON.stringify(childObject))
 
-        //if (key === 'children') {
         // eslint-disable-next-line no-unused-vars
         this.parseInnerParams(childObject, paramsArray)
-        //}
       }
     } else if (nodeType == 'pset') {
-      //this.parseInnerParams(children, paramsArray)
       // eslint-disable-next-line no-unused-vars
       for (const [key, childObject] of Object.entries(children)) {
         this.parseInnerParams(childObject, paramsArray)
@@ -314,10 +278,6 @@ export default class TableView extends Vue {
   }
 
   public parseInnerParams(childObject: NodeObject, paramsArray: any) {
-    //for (const [key1, value1] of Object.entries(Object(childObject))) {
-    //console.log('KEY1: ' + key1)
-    //console.log('VALUE1: ' + value1)
-
     let nestedParameterObject: Object = {
       //id: this.idCounter++,
       //children: [],
@@ -326,9 +286,7 @@ export default class TableView extends Vue {
       children: [],
     }
 
-    //for (const [key2, value2] of Object.entries(Object(value1))) {
     nestedParameterObject['type'] = childObject.type
-    //else if (key2 === 'value') {
     if (
       nestedParameterObject['type'] == 'cms.VPSet' ||
       nestedParameterObject['type'] == 'cms.PSet' ||
@@ -336,8 +294,6 @@ export default class TableView extends Vue {
       nestedParameterObject['type'] == 'cms.untracked.VPSet'
     ) {
       nestedParameterObject['children'] = []
-      // nestedParameterObject['_hasChildren'] = true
-      //console.log(JSON.stringify(nestedParameterObject))
       nestedParameterObject['name'] = childObject.name
       nestedParameterObject['value'] = ''
 
@@ -345,10 +301,6 @@ export default class TableView extends Vue {
         nestedParameterObject,
         childObject.children
       )
-
-      /*      console.log(
-                  'VPSET BUILD: ' + JSON.stringify(nestedParameterObject)
-                ) */
     } else {
       nestedParameterObject['name'] = childObject.name.substring(
         0,
@@ -364,12 +316,8 @@ export default class TableView extends Vue {
           nestedParameterObject['value'].substring(1, 70) + '...'
       }
     }
-    //}
-    //console.log(key3)
-    //}
 
     if (nestedParameterObject['type'] != undefined) {
-      //console.log('AAAA')
       let cmsTypeLenght = nestedParameterObject['type'].length
       let cmsType = nestedParameterObject['type'].substring(
         //cmsType is necessary for printing out in tree
@@ -377,20 +325,13 @@ export default class TableView extends Vue {
         cmsTypeLenght
       )
       nestedParameterObject['type'] = cmsType
-      //nestedModuleObject['name'] = nestedModuleObject['value']
       //console.log(nestedParameterObject)
     }
     //push parameter into module children
     paramsArray.push(nestedParameterObject)
-    //}
 
     return paramsArray
   }
-
-  /*   get rows() {
-    let rows = this.parseChildren(this.getSelectedModuleParams)
-    return rows
-  } */
 
   public getSelectedNodeParams(nodeType: string) {
     //console.log('SELECTED NODE TYPE: ' + nodeType)
@@ -421,7 +362,6 @@ export default class TableView extends Vue {
 
   public getSelectedNodeEDProducerValue(nodeType: string) {
     if (nodeType == 'modules') {
-      //return this.getSelectedModuleName
       return this.getSelectedNodeCType
     } else if (nodeType == 'sequences') {
       return ''
@@ -435,14 +375,13 @@ export default class TableView extends Vue {
 
   public getSelectedNodeLabel(nodeType: string) {
     if (nodeType == 'modules') {
-      //return this.getSelectedModuleName
       return this.getSelectedNodeName
     } else if (nodeType == 'sequences') {
       return ''
     } else if (nodeType == 'paths') {
       return ''
     } else if (nodeType == 'pset') {
-      return this.getSelectedPSetName
+      return this.getSelectedNodeName
     }
     return ''
   }
@@ -462,11 +401,9 @@ export default class TableView extends Vue {
 
   public getPaths(nodeType: string) {
     if (nodeType == 'modules') {
-      //console.log('PATHS!: ' + this.getPathsContainingCurrentModule)
       let values: Array<string> = []
       // eslint-disable-next-line no-unused-vars
       for (const [key, value] of Object.entries(
-        //this.getPathsContainingCurrentModule
         this.getPathsContainingCurrentNode
       )) {
         values.push(value)
@@ -480,14 +417,6 @@ export default class TableView extends Vue {
       return []
     }
     return []
-  }
-
-  get paths() {
-    let selectedModulePath = this.getPathsContainingCurrentModule
-    // eslint-disable-next-line no-unused-vars
-    //console.log(selectedModulePath)
-    //console.log(pathContainngModule)
-    return selectedModulePath
   }
 
   //Table header BG color has to be changed this way

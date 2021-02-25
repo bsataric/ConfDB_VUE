@@ -1,10 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { MainVuexState, NodeObject } from '../types'
-import * as sequence from '@/store/modules/sequence.js'
-import * as path from '@/store/modules/path.js'
-import * as module from '@/store/modules/module.js'
-import * as pset from '@/store/modules/pset.js'
 import Utils from '@/lib/utils.ts'
 import JSONParser from '@/store/helpers/JSONParser'
 import GlobalService from '@/services/GlobalService.ts'
@@ -25,8 +21,6 @@ const state: MainVuexState = {
   selectedNodeId: -1,
   selectedNodeParamLength: 0,
   selectedNodeParentId: 0,
-  //node ID to Object map containing (type, name, itemChildrenLength, parentNodeId) with node id as key
-  //nodeIDToVuexObjectMap: {},
   //node ID to Object map containing all information about every node in the configuration tree
   nodeIDToNodeObjectMap: {},
   //arrays with node id's - open nodes and forced open nodes
@@ -47,12 +41,6 @@ const state: MainVuexState = {
 }
 
 export default new Vuex.Store({
-  modules: {
-    sequence,
-    path,
-    module,
-    pset,
-  },
   state,
   mutations: {
     SET_SELECTED_NODE_VIA_ID(state: MainVuexState, payload) {
@@ -60,28 +48,16 @@ export default new Vuex.Store({
       //console.log('state.openNodeIds: ' + state.openNodeIds)
       state.selectedNodeId = payload.selectedNodeId //get all info just via ID
       //console.log(typeof state.selectedNodeId)
-      /* console.log(
-        'state.nodeIDToVuexObjectMap[payload.selectedNodeId]' +
-          JSON.stringify(state.nodeIDToVuexObjectMap[payload.selectedNodeId])
-      ) */
       //override leaf nodes
-      /*    state.selectedNodeType =
-        state.nodeIDToVuexObjectMap[payload.selectedNodeId].type */
       state.selectedNodeType =
         state.nodeIDToNodeObjectMap[payload.selectedNodeId].type
-      /*       state.selectedNodeName =
-        state.nodeIDToVuexObjectMap[payload.selectedNodeId].name */
       state.selectedNodeName =
         state.nodeIDToNodeObjectMap[payload.selectedNodeId].name
       //console.log('state.selectedNodeName ' + state.selectedNodeName)
       state.selectedNodeCType =
         state.nodeIDToNodeObjectMap[payload.selectedNodeId].ctype
-      /*   state.selectedNodeParamLength =
-        state.nodeIDToVuexObjectMap[payload.selectedNodeId].itemChildrenLength */
       state.selectedNodeParamLength =
         state.nodeIDToNodeObjectMap[payload.selectedNodeId].children.length
-      /*     state.selectedNodeParentId =
-        state.nodeIDToVuexObjectMap[payload.selectedNodeId].parentNodeId */
       state.selectedNodeParentId =
         state.nodeIDToNodeObjectMap[payload.selectedNodeId].parentNodeId
       let forceOpenNode = payload.forceOpenNode //if node is opened by foce open it's parent as well
@@ -150,9 +126,6 @@ export default new Vuex.Store({
       }
       //state.openNodeIds = [1]
     },
-    /*    SET_ID_TO_VUEX_OBJECT_MAP(state, payload) {
-      state.nodeIDToVuexObjectMap = payload
-    }, */
     SET_ID_TO_NODE_OBJECT_MAP(state: MainVuexState, payload) {
       state.nodeIDToNodeObjectMap = payload
     },
@@ -271,7 +244,6 @@ export default new Vuex.Store({
         'payload.nodeIDToObject' + JSON.stringify(payload.nodeIDToObject)
       )
       console.log('payload.id ' + payload.id) */
-      //state.nodeIDToVuexObjectMap[payload.id] = payload.nodeIDToObject
 
       //add new node both to children of the parent and in the main map
       state.nodeIDToNodeObjectMap[
@@ -398,9 +370,6 @@ export default new Vuex.Store({
         childIndex++
       }
     },
-    /*     REMOVE_ID_OBJECT_FROM_MAP(state, payload) {
-      delete state.nodeIDToVuexObjectMap[payload]
-    }, */
     SET_INITIAL_ID_COUNTER(state: MainVuexState, payload) {
       //console.log('SETTING INITIAL ID COUNTER: ' + payload)
       state.idCounter = payload
@@ -437,9 +406,6 @@ export default new Vuex.Store({
     },
   },
   actions: {
-    /*     createNodeIDToVuexObjectMap({ commit }, nodeIDToVuexObjectMap) {
-      commit('SET_ID_TO_VUEX_OBJECT_MAP', nodeIDToVuexObjectMap)
-    }, */
     createNodeIDToNodeObjectMap({ commit }, payload) {
       commit('SET_ID_TO_NODE_OBJECT_MAP', payload)
     },
@@ -524,9 +490,18 @@ export default new Vuex.Store({
     getSelectedNodeParamLength(state: MainVuexState): number {
       return state.selectedNodeParamLength
     },
-    /*     getNodeIDToVuexObjectMap(state) {
-      return state.nodeIDToVuexObjectMap
-    }, */
+    getNodeByName: (state: MainVuexState) => (
+      nodeType: string,
+      nodeName: string
+    ) => {
+      for (let i = 0; state.nodeIDToNodeObjectMap.length; i++) {
+        if (state.nodeIDToNodeObjectMap[i].type == nodeType) {
+          if (state.nodeIDToNodeObjectMap[i].name == nodeName)
+            return state.nodeIDToNodeObjectMap[i]
+        }
+      }
+      return undefined
+    },
     getNodeIDToNodeObjectMap(state: MainVuexState): any {
       return state.nodeIDToNodeObjectMap
     },
@@ -605,9 +580,7 @@ export default new Vuex.Store({
     },
     getSequencesContainingCurrentNode(state: MainVuexState): Object {
       let sequencesContainingNode = {}
-      /* sequencesContainingNode = rootGetters[
-        'sequence/getSequencesContainingModule'
-      ](state.moduleName) */
+
       let references =
         state.nodeIDToNodeObjectMap[state.selectedNodeId].referencedByIds
       //console.log('REFERENCES: ' + references)
@@ -627,15 +600,10 @@ export default new Vuex.Store({
         'sequencesContainingNode' + JSON.stringify(sequencesContainingNode)
       ) */
       return sequencesContainingNode
-      //this.$store.getters['path/getPathsContainingModule'](state.module.name)
     },
     getDirectPathsContainingCurrentNode(state: MainVuexState): Object {
       let pathsContainingNode = {}
-      /*       modulePaths = rootGetters['path/getPathsContainingModule'](state.moduleName)
-      console.log('MODULE PATHS: ' + JSON.stringify(modulePaths))
-      sequencesContainingModule = rootGetters[
-        'sequence/getSequencesContainingModule'
-      ](state.moduleName) */
+
       let references =
         state.nodeIDToNodeObjectMap[state.selectedNodeId].referencedByIds
       //console.log('REFERENCES: ' + references)
@@ -669,9 +637,6 @@ export default new Vuex.Store({
         sequencesContainingNode
       )) {
         //console.log('sequencesContainingModule[i] ' + value)
-        /*   let sequencePaths = rootGetters['path/getPathsContainingSequence'](
-          value
-        ) */
         let references = state.nodeIDToNodeObjectMap[nodeId].referencedByIds
         //console.log('REFERENCES: ' + references)
         for (let i = 0; i < references.length; i++) {
@@ -701,7 +666,6 @@ export default new Vuex.Store({
       }
       //console.log('ALL MODULE PATHS: ' + JSON.stringify(pathsContainingNode))
       return pathsContainingNode
-      //this.$store.getters['path/getPathsContainingModule'](state.module.name)
     },
     getSelectedNodeChildren(state: MainVuexState): Array<NodeObject> {
       return state.nodeIDToNodeObjectMap[state.selectedNodeId].children

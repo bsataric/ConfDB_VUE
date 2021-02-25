@@ -91,23 +91,14 @@ import Utils from '@/lib/utils.ts'
 @Component({
   computed: {
     ...mapGetters({
-      getSequences: 'sequence/getSequences',
-      getSequenceByName: 'sequence/getSequenceByName',
-      getSequenceById: 'sequence/getSequenceById',
-      getPaths: 'path/getPaths',
-      getModules: 'module/getModules',
       getConfiguration: 'getConfiguration',
       getSelectedNodeType: 'getSelectedNodeType',
       getSelectedNodeName: 'getSelectedNodeName',
       getSelectedNodeId: 'getSelectedNodeId',
-      //getNodeIDToVuexObjectMap: 'getNodeIDToVuexObjectMap',
       getNodeIDToNodeObjectMap: 'getNodeIDToNodeObjectMap',
-      getSelectedNodeParamLength: 'getSelectedNodeParamLength',
       getOpenNodeIds: 'getOpenNodeIds',
       getForcedOpenNodeIds: 'getForcedOpenNodeIds',
       getForcedActiveNodeId: 'getForcedActiveNodeId',
-      getOpenNodeIdsLength: 'getOpenNodeIdsLength',
-      getPSets: 'pset/getPSets',
       getOpenFileContent: 'getOpenFileContent',
       getDarkMode: 'getDarkMode',
       getIDCounter: 'getIDCounter',
@@ -171,11 +162,6 @@ export default class TreeView extends Vue {
     /*    console.log('getIDCounter VAL:' + val)
     console.log('getIDCounter OLDVAL: ' + oldVal) */
   }
-
-  //private openNodes: any = []
-  //private openNodeIds: any = []
-  //private nodeIds: any = []
-  //private nodeIDToVuexObjectMap: any = {} //ID to Vuex Object map
   private nodeIDToNodeObjectMap: Map<number, NodeObject> = new Map<
     number,
     NodeObject
@@ -183,16 +169,7 @@ export default class TreeView extends Vue {
   private open: any = [1]
   private active: any = []
   private forcedActive: any = []
-  //private configLoaded: boolean = false
 
-  //private openSequencesList: any = []
-  //private openModulesList: any = []
-  private getSequences!: any[] // are assigned via mapState
-  private getSequenceByName!: any
-  private getSequenceById!: any
-  private getPaths!: any[]
-  private getModules!: any[]
-  private getPSets!: any[]
   private getOpenFileContent!: any[]
   private getConfiguration!: any[] // are assigned via mapState
 
@@ -200,11 +177,9 @@ export default class TreeView extends Vue {
   private getSelectedNodeType!: string
   private getSelectedNodeId!: number
   private getNodeIDToNodeObjectMap!: any
-  //private getNodeIDToVuexObjectMap!: any //maybe unecessary since we have map as variable
-  private getSelectedNodeParamLength!: number
+
   private getOpenNodeIds!: any
   private getForcedOpenNodeIds!: any
-  private getOpenNodeIdsLength!: any
 
   private globalSequencesObject: Object = {}
   private globalPathsObject: Object = {}
@@ -246,14 +221,12 @@ export default class TreeView extends Vue {
       parentNodeId: 0,
       rootNodeId: 1,
       referencedByIds: [],
-      //parameters: sequenceData,
       iconType: '',
       iconColor: '',
       paremeterJSONValue: Infinity,
       ctype: '',
       ptype: '',
     }
-    //this.nodeIds.push(1)
     //console.log(sequencesObject)
     for (const [key, value] of Object.entries(sequenceData)) {
       //loop over sequnces - create new Sequence object and add it to children of the seqs
@@ -273,14 +246,12 @@ export default class TreeView extends Vue {
         ptype: '',
       }
 
-      //this.nodeIds.push(this.idCounter)
       //let sequenceObjectId = this.idCounter //remember counter to use it after children are populated
 
       //console.log(`${key}`)
       // eslint-disable-next-line no-unused-vars
       for (const [key1, value1] of Object.entries(Object(value))) {
         //loop over sequence entries
-        //this.nodeIds.push(this.idCounter)
 
         //console.log(`${key1}`)
         if (Object(value1)[0] === 'modules') {
@@ -303,15 +274,6 @@ export default class TreeView extends Vue {
           //TODO: substitute Vuex object map with this if it works
           this.nodeIDToNodeObjectMap[this.idCounter] = nestedSequenceObject
           sequenceObject['children'].push(nestedSequenceObject)
-
-          /*   this.nodeIDToVuexObjectMap[this.idCounter] = {
-            name: Object(value1)[1],
-            type: 'modules',
-            itemChildrenLength: 0,
-            parentNodeId: sequenceObject['id'],
-            referencedByIds: [],
-            parameters: value1,
-          } */
         } else if (Object(value1)[0] === 'sequences') {
           //console.log('SEQUENCE')
           let nestedSequenceObject: NodeObject = {
@@ -333,40 +295,16 @@ export default class TreeView extends Vue {
           //TODO: substitute Vuex object map with this if it works
           this.nodeIDToNodeObjectMap[this.idCounter] = nestedSequenceObject
           sequenceObject['children'].push(nestedSequenceObject)
-
-          /*           this.nodeIDToVuexObjectMap[this.idCounter] = {
-            name: Object(value1)[1],
-            type: 'sequences',
-            itemChildrenLength: 0,
-            parentNodeId: sequenceObject['id'],
-            referencedByIds: [],
-            parameters: value1,
-          } */
         }
       }
       //TODO: substitute Vuex object map with this if it works
       this.nodeIDToNodeObjectMap[sequenceObject['id']] = sequenceObject
 
-      /*       this.nodeIDToVuexObjectMap[sequenceObject['id']] = {
-        name: key,
-        type: 'sequences',
-        itemChildrenLength: sequenceObject['children'].length,
-        parentNodeId: 1,
-        referencedByIds: [],
-        parameters: value,
-      } */
       sequencesObject['children'].push(sequenceObject)
     }
     //TODO: substitute Vuex object map with this if it works
     this.nodeIDToNodeObjectMap[1] = sequencesObject
 
-    /*     this.nodeIDToVuexObjectMap[1] = {
-      name: 'Sequences',
-      type: 'seqs',
-      itemChildrenLength: sequencesObject['children'].length,
-      referencedByIds: [],
-      parameters: {},
-    } */
     //console.log(sequencesObject)
     //this.items = Object.values(sequencesObject)
     //this.items[0] = sequencesObject
@@ -386,17 +324,14 @@ export default class TreeView extends Vue {
       parentNodeId: 0,
       rootNodeId: this.idCounter,
       referencedByIds: [],
-      //parameters: pathData,
       iconType: '',
       iconColor: '',
       paremeterJSONValue: Infinity,
       ctype: '',
       ptype: '',
     }
-    // this.nodeIds.push(this.idCounter)
     //remember the paths id
     //let pathsIdCounter = this.idCounter
-    //this.nodeIDToVuexObjectMap[this.idCounter] = { name: 'Paths', type: 'pts' }
 
     //console.log(pathsObject)
     for (const [key, value] of Object.entries(pathData)) {
@@ -417,14 +352,12 @@ export default class TreeView extends Vue {
         ptype: '',
       }
       //let pathIdCounter = this.idCounter
-      //this.nodeIds.push(this.idCounter)
 
       //console.log(`${key}`)
       // eslint-disable-next-line no-unused-vars
       for (const [key1, value1] of Object.entries(Object(value))) {
         //loop over path entries
         //let nestedPathObject: Object = { id: ++this.idCounter }
-        // this.nodeIds.push(this.idCounter)
 
         //console.log(`${key1}`)
         if (Object(value1)[0] === 'modules') {
@@ -438,7 +371,6 @@ export default class TreeView extends Vue {
             parentNodeId: pathObject['id'],
             rootNodeId: -1, //for the leaf nodes, rootNodeId will be calculated with references
             referencedByIds: [],
-            //nestedPathObject['parameters'] = value1
             iconType: 'module',
             iconColor: '',
             paremeterJSONValue: Infinity,
@@ -449,15 +381,6 @@ export default class TreeView extends Vue {
           //TODO: substitute Vuex object map with this if it works
           this.nodeIDToNodeObjectMap[this.idCounter] = nestedPathObject
           pathObject['children'].push(nestedPathObject)
-
-          /*          this.nodeIDToVuexObjectMap[this.idCounter] = {
-            name: Object(value1)[1],
-            type: 'modules',
-            itemChildrenLength: 0,
-            parentNodeId: pathObject['id'],
-            referencedByIds: [],
-            parameters: value1,
-          } */
         } else if (Object(value1)[0] === 'sequences') {
           //console.log('SEQUENCE')
           let nestedPathObject: NodeObject = {
@@ -469,7 +392,6 @@ export default class TreeView extends Vue {
             parentNodeId: pathObject['id'],
             rootNodeId: -1, //for the leaf nodes, rootNodeId will be calculated with references
             referencedByIds: [],
-            //nestedPathObject['parameters'] = value1
             iconType: 'sequence',
             iconColor: 'red',
             paremeterJSONValue: Infinity,
@@ -479,40 +401,16 @@ export default class TreeView extends Vue {
           //TODO: substitute Vuex object map with this if it works
           this.nodeIDToNodeObjectMap[this.idCounter] = nestedPathObject
           pathObject['children'].push(nestedPathObject)
-
-          /*           this.nodeIDToVuexObjectMap[this.idCounter] = {
-            name: Object(value1)[1],
-            type: 'sequences',
-            itemChildrenLength: 0,
-            parentNodeId: pathObject['id'],
-            referencedByIds: [],
-            parameters: value1,
-          } */
         }
       }
       //TODO: substitute Vuex object map with this if it works
       this.nodeIDToNodeObjectMap[pathObject['id']] = pathObject
 
-      /*       this.nodeIDToVuexObjectMap[pathObject['id']] = {
-        name: key,
-        type: 'paths',
-        itemChildrenLength: pathObject['children'].length,
-        parentNodeId: pathsObject['id'],
-        referencedByIds: [],
-        parameters: value,
-      } */
       pathsObject['children'].push(pathObject)
     }
     //TODO: substitute Vuex object map with this if it works
     this.nodeIDToNodeObjectMap[pathsObject['id']] = pathsObject
 
-    /*     this.nodeIDToVuexObjectMap[pathsObject['id']] = {
-      name: 'Paths',
-      type: 'pts',
-      itemChildrenLength: pathsObject['children'].length,
-      referencedByIds: [],
-      parameters: {},
-    } */
     //console.log(pathsObject)
     //this.items = Object.values(pathsObject)
     //this.items[0] = pathsObject
@@ -565,7 +463,6 @@ export default class TreeView extends Vue {
         //nestedNoNamePSetObject['parameters'] = value1 //TODO
         //nestedNoNamePSetObjectId = this.idCounter
       }
-      //this.nodeIds.push(this.idCounter)
 
       //console.log(JSON.stringify(key), JSON.stringify(value))
       // eslint-disable-next-line no-unused-vars
@@ -573,8 +470,6 @@ export default class TreeView extends Vue {
         let nestedVPSetObject: NodeObject = {} as NodeObject
         nestedVPSetObject['id'] = ++this.idCounter
         nestedVPSetObject['globalType'] = 'parameter'
-
-        //this.nodeIds.push(this.idCounter)
 
         //this is parameter loop
         //if (vpSetObject['name'] === 'regressionConfig') {
@@ -684,16 +579,13 @@ export default class TreeView extends Vue {
       parentNodeId: 0,
       rootNodeId: this.idCounter,
       referencedByIds: [],
-      //parameters: moduleData,
       iconType: '',
       iconColor: '',
       paremeterJSONValue: Infinity,
       ctype: '',
       ptype: '',
     }
-    //this.nodeIds.push(this.idCounter)
     //let modulesIdCounter = this.idCounter
-    //this.nodeIDToVuexObjectMap[this.idCounter] = { name: 'Modules', type: 'mods' }
 
     //console.log(moduleData)
     //console.log(modulesObject)
@@ -715,7 +607,6 @@ export default class TreeView extends Vue {
         ctype: '',
         ptype: '',
       }
-      // this.nodeIds.push(this.idCounter)
 
       //let moduleIdCounter = this.idCounter
       //console.log(`${key}`)
@@ -735,7 +626,6 @@ export default class TreeView extends Vue {
             nestedParameterObject['id'] = ++this.idCounter
             nestedParameterObject['children'] = []
             nestedParameterObject['globalType'] = 'parameter'
-            //this.nodeIds.push(this.idCounter)
 
             for (const [key3, value3] of Object.entries(Object(value2))) {
               if (key3 === 'type')
@@ -806,15 +696,6 @@ export default class TreeView extends Vue {
       modulesObject['children'].push(moduleObject)
 
       this.nodeIDToNodeObjectMap[moduleObject['id']] = moduleObject
-
-      /*      this.nodeIDToVuexObjectMap[moduleObject['id']] = {
-        name: key,
-        type: 'modules',
-        itemChildrenLength: moduleObject['children'].length,
-        parentNodeId: moduleObject['id'],
-        referencedByIds: [],
-        parameters: value, //TODO: check this
-      } */
     }
 
     //TODO: substitute Vuex object map with this if it works
@@ -822,13 +703,6 @@ export default class TreeView extends Vue {
     //console.log('MODULES OBJECT: ' + JSON.stringify(modulesObject))
     this.nodeIDToNodeObjectMap[modulesObject['id']] = modulesObject
 
-    /*     this.nodeIDToVuexObjectMap[modulesObject['id']] = {
-      name: 'Modules',
-      type: 'mods',
-      itemChildrenLength: modulesObject['children'].length,
-      referencedByIds: [],
-      parameters: {},
-    } */
     //console.log('MODULES OBJECT' + JSON.stringify(modulesObject))
     //this.items = Object.values(modulesObject)
     //this.items[0] = modulesObject
@@ -849,14 +723,12 @@ export default class TreeView extends Vue {
       parentNodeId: 0,
       rootNodeId: this.idCounter,
       referencedByIds: [],
-      //parameters: psetData,
       iconType: '',
       iconColor: '',
       paremeterJSONValue: Infinity,
       ctype: '',
       ptype: '',
     }
-    //this.nodeIds.push(this.idCounter)
 
     //let psetsIdCounter = this.idCounter
 
@@ -878,7 +750,6 @@ export default class TreeView extends Vue {
         ctype: '',
         ptype: '',
       }
-      // this.nodeIds.push(this.idCounter)
 
       //let psetIdCounter = this.idCounter
 
@@ -890,7 +761,6 @@ export default class TreeView extends Vue {
         //console.log(`${key1}, ${value1}`)
         //}
         let nestedPSetObject: NodeObject = {} as NodeObject
-        //this.nodeIds.push(this.idCounter)
         nestedPSetObject['id'] = ++this.idCounter
         //console.log(`${key1}, ${value1}`)
         //if (key1 === 'para_name') {
@@ -960,25 +830,9 @@ export default class TreeView extends Vue {
       psetsObject['children'].push(psetObject)
 
       this.nodeIDToNodeObjectMap[psetObject['id']] = psetObject
-
-      /*       this.nodeIDToVuexObjectMap[psetObject['id']] = {
-        name: key,
-        type: 'pset',
-        itemChildrenLength: psetObject['children'].length,
-        parentNodeId: psetObject['id'],
-        referencedByIds: [],
-        parameters: value, //TODO: check this
-      } */
     }
     this.nodeIDToNodeObjectMap[psetsObject['id']] = psetsObject
 
-    /*     this.nodeIDToVuexObjectMap[psetsObject['id']] = {
-      name: 'PSets',
-      type: 'psets',
-      itemChildrenLength: psetsObject['children'].length,
-      referencedByIds: [],
-      parameters: {},
-    } */
     //console.log(psetsObject)
     //this.items = Object.values(psetsObject)
     //this.items[0] = psetsObject
@@ -1113,7 +967,6 @@ export default class TreeView extends Vue {
   async fetchConfiguration() {
     //reset maps and ID counters
     this.nodeIDToNodeObjectMap = new Map<number, NodeObject>()
-    //this.nodeIDToVuexObjectMap = {}
     this.idCounter = 1
     Promise.all([
       await this.$store.dispatch('fetchConfiguration', {
@@ -1132,10 +985,6 @@ export default class TreeView extends Vue {
         'createNodeIDToNodeObjectMap',
         this.nodeIDToNodeObjectMap
       )
-      /*    this.$store.dispatch(
-        'createNodeIDToVuexObjectMap',
-        this.nodeIDToVuexObjectMap
-      ) */
       //initilaize id counter in the store so other components can get/modify it
       this.$store.dispatch('setInitialIDCounter', this.idCounter)
       this.$store.dispatch('createObjectReferences')
@@ -1149,7 +998,6 @@ export default class TreeView extends Vue {
   async fetchConfigurationFromFile(fileContent: any) {
     //reset maps and ID counters
     this.nodeIDToNodeObjectMap = new Map<number, NodeObject>()
-    //this.nodeIDToVuexObjectMap = {}
     this.idCounter = 1
 
     Promise.all([
@@ -1167,10 +1015,6 @@ export default class TreeView extends Vue {
         'createNodeIDToNodeObjectMap',
         this.nodeIDToNodeObjectMap
       )
-      /*    this.$store.dispatch(
-        'createNodeIDToVuexObjectMap',
-        this.nodeIDToVuexObjectMap
-      ) */
       //initilaize id counter in the store so other components can get/modify it
       this.$store.dispatch('setInitialIDCounter', this.idCounter)
       this.$store.dispatch('createObjectReferences')
@@ -1183,7 +1027,6 @@ export default class TreeView extends Vue {
 
   created() {
     // Make a request for config parts
-    //this.nodeIds = []
     this.fetchConfiguration()
 
     //this.setNodeIds()

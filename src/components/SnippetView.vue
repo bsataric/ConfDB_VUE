@@ -32,21 +32,8 @@ import { mapGetters } from 'vuex'
       getSelectedNodeType: 'getSelectedNodeType',
       getSelectedNodeName: 'getSelectedNodeName',
       getSelectedNodeSnippetText: 'getSelectedNodeSnippetText',
-      //modules
-      getSequencesContainingCurrentModule:
-        'module/getSequencesContainingCurrentModule',
       getSequencesContainingCurrentNode: 'getSequencesContainingCurrentNode',
-      getPathsContainingCurrentModule: 'module/getPathsContainingCurrentModule',
       getPathsContainingCurrentNode: 'getPathsContainingCurrentNode',
-      //sequences
-      getSequencesContainingCurrentSequence:
-        'sequence/getSequencesContainingCurrentSequence',
-      getPathsContainingCurrentSequence:
-        'sequence/getPathsContainingCurrentSequence',
-      //paths
-      getPathSnippet: 'path/getSelectedPathSnippet',
-      //psets
-      getPSetSnippet: 'pset/getSelectedPSetSnippet',
     }),
     // ...mapState('sequence', ['sequences']),
   },
@@ -57,18 +44,8 @@ export default class SnippetView extends Vue {
   private getSelectedNodeType!: string
   private getSelectedNodeName!: any
   private getSelectedNodeSnippetText!: any
-  //modules
-  private getSequencesContainingCurrentModule!: any
   private getSequencesContainingCurrentNode!: any
-  private getPathsContainingCurrentModule!: any
   private getPathsContainingCurrentNode!: any
-  //sequences
-  private getSequencesContainingCurrentSequence!: any
-  private getPathsContainingCurrentSequence!: any
-  //paths
-  private getPathSnippet!: any
-  //psets
-  private getPSetSnippet!: any
   private previousNodeName: string = ''
   private areaText: any = '<br>aaaa</br>'
 
@@ -202,19 +179,6 @@ export default class SnippetView extends Vue {
   }
 
   async openContainedInNode(nodeType: string, itemId: number) {
-    /*    if (nodeType == 'Sequences') {
-      //console.log('FORCEEEEEED: ' + itemId)
-      await this.$store.dispatch('sequence/fetchSequenceViaId', {
-        itemId: itemId,
-        forceOpenNode: true,
-      })
-    } else if (nodeType === 'Paths') {
-      await this.$store.dispatch('path/fetchPathViaId', {
-        itemId: itemId,
-        forceOpenNode: true,
-      }) */
-
-    //
     await this.$store.dispatch('setSelectedNodeViaID', {
       selectedNodeId: itemId,
       forceOpenNode: true,

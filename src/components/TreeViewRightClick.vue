@@ -59,22 +59,8 @@ import { NodeObject } from '../types'
 @Component({
   computed: {
     ...mapGetters({
-      getSequences: 'sequence/getSequences',
-      getSequenceByName: 'sequence/getSequenceByName',
-      getSequenceById: 'sequence/getSequenceById',
-      getPaths: 'path/getPaths',
-      getModules: 'module/getModules',
-      getSelectedNodeType: 'getSelectedNodeType',
-      getSelectedNodeName: 'getSelectedNodeName',
-      getSelectedNodeId: 'getSelectedNodeId',
+      getNodeByName: 'getNodeByName',
       getNodeIDToNodeObjectMap: 'getNodeIDToNodeObjectMap',
-      getSelectedNodeParamLength: 'getSelectedNodeParamLength',
-      getOpenNodeIds: 'getOpenNodeIds',
-      getForcedOpenNodeIds: 'getForcedOpenNodeIds',
-      getForcedActiveNodeId: 'getForcedActiveNodeId',
-      getOpenNodeIdsLength: 'getOpenNodeIdsLength',
-      getPSets: 'pset/getPSets',
-      getOpenFileContent: 'getOpenFileContent',
       getDarkMode: 'getDarkMode',
       getIDCounter: 'getIDCounter',
     }),
@@ -95,22 +81,9 @@ export default class TreeViewRightClick extends Vue {
     console.log('getIDCounter from right click OLDVAL: ' + oldVal) */
   }
 
-  private getSequences!: any[] // are assigned via mapState
-  private getSequenceByName!: any
-  private getSequenceById!: any
-  private getPaths!: any[]
-  private getModules!: any[]
-  private getPSets!: any[]
-  private getOpenFileContent!: any[]
+  private getNodeByName!: any
 
-  private getSelectedNodeName!: string
-  private getSelectedNodeType!: string
-  private getSelectedNodeId!: number
   private getNodeIDToNodeObjectMap!: any
-  private getSelectedNodeParamLength!: number
-  private getOpenNodeIds!: any
-  private getForcedOpenNodeIds!: any
-  private getOpenNodeIdsLength!: any
   private getIDCounter!: any
 
   private menuItems: any = [
@@ -278,15 +251,8 @@ export default class TreeViewRightClick extends Vue {
     console.log('TRYING TO INSERT SEQUENCE ' + sequenceName)
 
     //first check if there is sequence with the same name
-    if (this.getSequenceByName(sequenceName) == undefined) {
-      Promise.all([
-        /*       this.$store.dispatch('sequence/createSequenceLocally', {
-          sequenceName: sequenceName,
-          sequenceParams: [],
-        }), */
-
-        this.$store.dispatch('incrementIDCounter'),
-      ]).finally(() => {
+    if (this.getNodeByName('sequences', sequenceName) == undefined) {
+      Promise.all([this.$store.dispatch('incrementIDCounter')]).finally(() => {
         let newSequenceId = this.getIDCounter
         console.log('NEW SEQUENCE ID: ' + newSequenceId)
 
@@ -324,11 +290,6 @@ export default class TreeViewRightClick extends Vue {
             nodeIDToObject: newSequenceObject,
           }),
           //Focus and open/active new node
-          /* this.$store.dispatch('sequence/fetchSequenceViaId', {
-            //TODO: FIX THIS SO IT GOES THROUGH MAP
-            itemId: newSequenceId,
-            forceOpenNode: true,
-          }), */
         ]).finally(() => {
           //Display snackbar success
           this.$store.dispatch('setSnackBarText', {
@@ -349,12 +310,8 @@ export default class TreeViewRightClick extends Vue {
   async renameSequence(newSequenceName: string, sequenceNodeId: number) {
     console.log('TRYING TO RENAME SEQUENCE ' + newSequenceName)
     //first check if there is sequence with the same name TODO: refractor
-    if (this.getSequenceByName(newSequenceName) == undefined) {
+    if (this.getNodeByName('sequences', newSequenceName) == undefined) {
       Promise.all([
-        /*   this.$store.dispatch('sequence/renameSequenceLocally', {
-          newSequenceName: newSequenceName,
-          sequenceNodeId: sequenceNodeId,
-        }), */
         this.$store.dispatch('renameNode', {
           newNodeName: newSequenceName,
           nodeId: sequenceNodeId,
