@@ -1,5 +1,11 @@
 <template>
-  <div>
+  <v-skeleton-loader
+    v-if="!getConfigLoaded"
+    :boilerplate="false"
+    :dark="getDarkMode"
+    type="table-thead, image@2"
+  ></v-skeleton-loader>
+  <div v-else>
     <v-tabs center-active v-model="activeTab" show-arrows>
       <v-tab
         v-for="(item, index) in items"
@@ -34,6 +40,8 @@ import { mapGetters } from 'vuex'
       getSelectedNodeSnippetText: 'getSelectedNodeSnippetText',
       getSequencesContainingCurrentNode: 'getSequencesContainingCurrentNode',
       getPathsContainingCurrentNode: 'getPathsContainingCurrentNode',
+      getDarkMode: 'getDarkMode',
+      getConfigLoaded: 'getConfigLoaded',
     }),
     // ...mapState('sequence', ['sequences']),
   },

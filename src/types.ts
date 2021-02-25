@@ -17,6 +17,7 @@ export interface MainVuexState {
   snackBarOpen: boolean
   snackBarText: string
   snackBarColor: string
+  configLoaded: boolean
 }
 
 export interface NodeObject {

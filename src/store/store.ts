@@ -38,6 +38,7 @@ const state: MainVuexState = {
   snackBarOpen: false,
   snackBarText: '',
   snackBarColor: '',
+  configLoaded: false,
 }
 
 export default new Vuex.Store({
@@ -401,8 +402,12 @@ export default new Vuex.Store({
         state.snackBarOpen = false
       })
     },
-    SET_SNACKBAR_OPEN(state: MainVuexState, payload) {
+    SET_SNACKBAR_OPEN(state: MainVuexState, payload: boolean) {
       state.snackBarOpen = payload
+    },
+    SET_CONFIG_LOADED(state: MainVuexState, payload: boolean) {
+      console.log('CONFIG LOADED: ' + payload)
+      state.configLoaded = payload
     },
   },
   actions: {
@@ -469,6 +474,10 @@ export default new Vuex.Store({
     setSnackBarOpen({ commit }, payload) {
       //console.log('CLOSING SNACKBAR')
       commit('SET_SNACKBAR_OPEN', payload)
+    },
+    setConfigLoaded({ commit }, payload) {
+      console.log('setConfigLoaded: ' + payload)
+      commit('SET_CONFIG_LOADED', payload)
     },
   },
   getters: {
@@ -669,6 +678,10 @@ export default new Vuex.Store({
     },
     getSelectedNodeChildren(state: MainVuexState): Array<NodeObject> {
       return state.nodeIDToNodeObjectMap[state.selectedNodeId].children
+    },
+    getConfigLoaded(state: MainVuexState): boolean {
+      console.log('CONFIG LOADED: ' + state.configLoaded)
+      return state.configLoaded
     },
   },
 })

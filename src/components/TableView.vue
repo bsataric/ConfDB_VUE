@@ -1,5 +1,11 @@
 <template>
-  <div class="mb-6">
+  <v-skeleton-loader
+    v-if="!getConfigLoaded"
+    :boilerplate="false"
+    :dark="getDarkMode"
+    type="table"
+  ></v-skeleton-loader>
+  <div v-else class="mb-6">
     <span class="flex">
       <v-text-field
         value="Dummy package"
@@ -94,8 +100,8 @@ import ZkTable from 'vue-table-with-tree-grid'
       getSelectedNodeCType: 'getSelectedNodeCType',
       getSelectedNodeChildren: 'getSelectedNodeChildren',
       getPathsContainingCurrentNode: 'getPathsContainingCurrentNode',
-      getSelectedPSetName: 'pset/getSelectedPSetName',
       getDarkMode: 'getDarkMode',
+      getConfigLoaded: 'getConfigLoaded',
     }),
     // ...mapState('sequence', ['sequences']),
   },
@@ -124,7 +130,6 @@ export default class TableView extends Vue {
   private getSelectedNodeCType!: string
   private getSelectedNodeChildren!: Array<NodeObject>
   private getPathsContainingCurrentNode!: any[]
-  private getSelectedPSetName!: any[]
   private getDarkMode!: any[]
 
   @Prop({ default: false }) readonly stripe!: boolean

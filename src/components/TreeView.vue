@@ -1,5 +1,11 @@
 <template>
-  <div>
+  <v-skeleton-loader
+    v-if="!getConfigLoaded"
+    :boilerplate="false"
+    :dark="getDarkMode"
+    type="avatar, card-heading@10"
+  ></v-skeleton-loader>
+  <div v-else>
     <v-btn small @click="testFunction()">Test function</v-btn>
     <v-treeview
       :items="items"
@@ -102,6 +108,7 @@ import Utils from '@/lib/utils.ts'
       getOpenFileContent: 'getOpenFileContent',
       getDarkMode: 'getDarkMode',
       getIDCounter: 'getIDCounter',
+      getConfigLoaded: 'getConfigLoaded',
     }),
     // ...mapState('sequence', ['sequences']),
   },
@@ -952,15 +959,17 @@ export default class TreeView extends Vue {
   }
 
   public updateActiveNodes(array: any) {
-    //console.log('THIS ACTIVE: ' + this.active)
-    /*    let difference: number = parseInt(
+    //console.log('THIS ACTIVE: ' + array)
+    let difference: number = parseInt(
       this.active
         .filter((x) => !array.includes(x))
         .concat(array.filter((x) => !this.active.includes(x)))
-    ) */
+    )
+    if (array.length != 0) difference = array[0]
+    //console.log('DIFFERENCE: ' + difference)
     if (Object.keys(this.getNodeIDToNodeObjectMap).length !== 0)
       //if map is initialized
-      this.fetchNodeById(array[0])
+      this.fetchNodeById(difference)
     this.active = array
   }
 
@@ -968,6 +977,9 @@ export default class TreeView extends Vue {
     //reset maps and ID counters
     this.nodeIDToNodeObjectMap = new Map<number, NodeObject>()
     this.idCounter = 1
+
+    this.$store.dispatch('setConfigLoaded', false)
+
     Promise.all([
       await this.$store.dispatch('fetchConfiguration', {
         fromFile: false,
@@ -985,9 +997,11 @@ export default class TreeView extends Vue {
         'createNodeIDToNodeObjectMap',
         this.nodeIDToNodeObjectMap
       )
+
       //initilaize id counter in the store so other components can get/modify it
       this.$store.dispatch('setInitialIDCounter', this.idCounter)
       this.$store.dispatch('createObjectReferences')
+      this.$store.dispatch('setConfigLoaded', true)
       this.$store.dispatch('setSnackBarText', {
         snackBarText: 'Configuration successfully loaded!',
         snackBarColor: 'green',
@@ -999,6 +1013,8 @@ export default class TreeView extends Vue {
     //reset maps and ID counters
     this.nodeIDToNodeObjectMap = new Map<number, NodeObject>()
     this.idCounter = 1
+
+    this.$store.dispatch('setConfigLoaded', false)
 
     Promise.all([
       await this.$store.dispatch('fetchConfiguration', {
@@ -1015,9 +1031,11 @@ export default class TreeView extends Vue {
         'createNodeIDToNodeObjectMap',
         this.nodeIDToNodeObjectMap
       )
+
       //initilaize id counter in the store so other components can get/modify it
       this.$store.dispatch('setInitialIDCounter', this.idCounter)
       this.$store.dispatch('createObjectReferences')
+      this.$store.dispatch('setConfigLoaded', true)
       this.$store.dispatch('setSnackBarText', {
         snackBarText: 'Configuration successfully loaded!',
         snackBarColor: 'green',
