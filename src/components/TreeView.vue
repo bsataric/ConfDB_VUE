@@ -91,6 +91,7 @@ import { mapGetters } from 'vuex'
 import { NodeObject } from '../types'
 // eslint-disable-next-line no-unused-vars
 import Utils from '@/lib/utils.ts'
+import TreeParser from '@/components/helpers/TreeParser.ts'
 
 //const axios = require('axios').default
 
@@ -219,780 +220,6 @@ export default class TreeView extends Vue {
       this.globalPSetsObject,
       this.globalTasksObject,
     ]
-  }
-
-  public parseSequences(sequenceData: any) {
-    let sequencesObject: NodeObject = {
-      id: 1,
-      name: 'Sequences',
-      type: 'seqs',
-      globalType: 'rootNode',
-      children: [],
-      parentNodeId: 0,
-      rootNodeId: 1,
-      referencedByIds: [],
-      iconType: '',
-      iconColor: '',
-      paremeterJSONValue: Infinity,
-      ctype: '',
-      ptype: '',
-    }
-    //console.log(sequencesObject)
-    for (const [key, value] of Object.entries(sequenceData)) {
-      //loop over sequnces - create new Sequence object and add it to children of the seqs
-      let sequenceObject: NodeObject = {
-        id: ++this.idCounter,
-        name: key,
-        type: 'sequences',
-        globalType: 'sequenceNode',
-        children: [],
-        parentNodeId: 1,
-        rootNodeId: this.idCounter, //for the root nodes, rootNodeId = itself
-        referencedByIds: [],
-        iconType: 'sequence',
-        iconColor: 'red',
-        paremeterJSONValue: Infinity,
-        ctype: '',
-        ptype: '',
-      }
-
-      //let sequenceObjectId = this.idCounter //remember counter to use it after children are populated
-
-      //console.log(`${key}`)
-      // eslint-disable-next-line no-unused-vars
-      for (const [key1, value1] of Object.entries(Object(value))) {
-        //loop over sequence entries
-
-        //console.log(`${key1}`)
-        if (Object(value1)[0] === 'modules') {
-          //console.log('MODULE')
-          let nestedSequenceObject: NodeObject = {
-            id: ++this.idCounter,
-            name: Object(value1)[1],
-            type: 'modules',
-            globalType: 'nestedModuleNode',
-            children: [],
-            parentNodeId: sequenceObject['id'],
-            rootNodeId: -1, //for the leaf nodes, rootNodeId will be calculated with references
-            referencedByIds: [],
-            iconType: 'module',
-            iconColor: '',
-            paremeterJSONValue: Infinity,
-            ctype: '',
-            ptype: '',
-          }
-          //TODO: substitute Vuex object map with this if it works
-          this.nodeIDToNodeObjectMap[this.idCounter] = nestedSequenceObject
-          sequenceObject['children'].push(nestedSequenceObject)
-        } else if (Object(value1)[0] === 'sequences') {
-          //console.log('SEQUENCE')
-          let nestedSequenceObject: NodeObject = {
-            id: ++this.idCounter,
-            name: Object(value1)[1],
-            type: 'sequences',
-            globalType: 'nestedSequenceNode',
-            children: [],
-            parentNodeId: sequenceObject['id'],
-            rootNodeId: -1, //for the leaf nodes, rootNodeId will be calculated with references
-            referencedByIds: [],
-            iconType: 'sequence',
-            iconColor: 'red',
-            paremeterJSONValue: Infinity,
-            ctype: '',
-            ptype: '',
-          }
-
-          //TODO: substitute Vuex object map with this if it works
-          this.nodeIDToNodeObjectMap[this.idCounter] = nestedSequenceObject
-          sequenceObject['children'].push(nestedSequenceObject)
-        } else if (Object(value1)[0] === 'tasks') {
-          //console.log('SEQUENCE')
-          let nestedSequenceObject: NodeObject = {
-            id: ++this.idCounter,
-            name: Object(value1)[1],
-            type: 'tasks',
-            globalType: 'nestedTaskNode',
-            children: [],
-            parentNodeId: sequenceObject['id'],
-            rootNodeId: -1, //for the leaf nodes, rootNodeId will be calculated with references
-            referencedByIds: [],
-            iconType: 'task',
-            iconColor: 'blue',
-            paremeterJSONValue: Infinity,
-            ctype: '',
-            ptype: '',
-          }
-
-          //TODO: substitute Vuex object map with this if it works
-          this.nodeIDToNodeObjectMap[this.idCounter] = nestedSequenceObject
-          sequenceObject['children'].push(nestedSequenceObject)
-        }
-      }
-      //TODO: substitute Vuex object map with this if it works
-      this.nodeIDToNodeObjectMap[sequenceObject['id']] = sequenceObject
-
-      sequencesObject['children'].push(sequenceObject)
-    }
-    //TODO: substitute Vuex object map with this if it works
-    this.nodeIDToNodeObjectMap[1] = sequencesObject
-
-    //console.log(sequencesObject)
-    //this.items = Object.values(sequencesObject)
-    //this.items[0] = sequencesObject
-    //console.log(this.items[0])
-    //console.log(this.pera)
-    //this.items = JSON.stringify(sequencesObject)
-    this.globalSequencesObject = sequencesObject
-  }
-
-  public parsePaths(pathData: any) {
-    let pathsObject: NodeObject = {
-      id: ++this.idCounter,
-      name: 'Paths',
-      type: 'pts',
-      globalType: 'rootNode',
-      children: [],
-      parentNodeId: 0,
-      rootNodeId: this.idCounter,
-      referencedByIds: [],
-      iconType: '',
-      iconColor: '',
-      paremeterJSONValue: Infinity,
-      ctype: '',
-      ptype: '',
-    }
-    //remember the paths id
-    //let pathsIdCounter = this.idCounter
-
-    //console.log(pathsObject)
-    for (const [key, value] of Object.entries(pathData)) {
-      //loop over sequnces - create new Sequence object and add it to children of the seqs
-      let pathObject: NodeObject = {
-        id: ++this.idCounter,
-        name: key,
-        type: 'paths',
-        globalType: 'pathNode',
-        children: [],
-        parentNodeId: pathsObject['id'],
-        rootNodeId: this.idCounter, //for the root nodes, rootNodeId = itself
-        referencedByIds: [],
-        iconType: 'path',
-        iconColor: 'green',
-        paremeterJSONValue: Infinity,
-        ctype: '',
-        ptype: '',
-      }
-      //let pathIdCounter = this.idCounter
-
-      //console.log(`${key}`)
-      // eslint-disable-next-line no-unused-vars
-      for (const [key1, value1] of Object.entries(Object(value))) {
-        //loop over path entries
-        //let nestedPathObject: Object = { id: ++this.idCounter }
-
-        //console.log(`${key1}`)
-        if (Object(value1)[0] === 'modules') {
-          //console.log('MODULE')
-          let nestedPathObject: NodeObject = {
-            id: ++this.idCounter,
-            name: Object(value1)[1],
-            type: 'modules',
-            globalType: 'nestedModuleNode',
-            children: [],
-            parentNodeId: pathObject['id'],
-            rootNodeId: -1, //for the leaf nodes, rootNodeId will be calculated with references
-            referencedByIds: [],
-            iconType: 'module',
-            iconColor: '',
-            paremeterJSONValue: Infinity,
-            ctype: '',
-            ptype: '',
-          }
-
-          //TODO: substitute Vuex object map with this if it works
-          this.nodeIDToNodeObjectMap[this.idCounter] = nestedPathObject
-          pathObject['children'].push(nestedPathObject)
-        } else if (Object(value1)[0] === 'sequences') {
-          //console.log('SEQUENCE')
-          let nestedPathObject: NodeObject = {
-            id: ++this.idCounter,
-            name: Object(value1)[1],
-            type: 'sequences',
-            globalType: 'nestedSequenceNode',
-            children: [],
-            parentNodeId: pathObject['id'],
-            rootNodeId: -1, //for the leaf nodes, rootNodeId will be calculated with references
-            referencedByIds: [],
-            iconType: 'sequence',
-            iconColor: 'red',
-            paremeterJSONValue: Infinity,
-            ctype: '',
-            ptype: '',
-          }
-          //TODO: substitute Vuex object map with this if it works
-          this.nodeIDToNodeObjectMap[this.idCounter] = nestedPathObject
-          pathObject['children'].push(nestedPathObject)
-        }
-      }
-      //TODO: substitute Vuex object map with this if it works
-      this.nodeIDToNodeObjectMap[pathObject['id']] = pathObject
-
-      pathsObject['children'].push(pathObject)
-    }
-    //TODO: substitute Vuex object map with this if it works
-    this.nodeIDToNodeObjectMap[pathsObject['id']] = pathsObject
-
-    //console.log(pathsObject)
-    //this.items = Object.values(pathsObject)
-    //this.items[0] = pathsObject
-    //console.log(this.items[0])
-    //console.log(this.pera)
-    //this.items = JSON.stringify(pathsObject)
-    this.globalPathsObject = pathsObject
-  }
-
-  public buildRecursiveVPSetObject(
-    vpSetObject: NodeObject,
-    body: any,
-    parentID: number
-  ) {
-    //console.log(JSON.stringify(vpSetObject))
-    //console.log(body)
-    //console.log('PARENT ID: ' + parentID)
-    //if the body has more then 0 keys it is an unnamed nested PSet
-    //if (Object.entries(Object(body)).length > 1) {
-    //console.log('NESTED UNNAMED PSET')
-    //}
-    // eslint-disable-next-line no-unused-vars
-    for (const [key, value] of Object.entries(Object(body))) {
-      //if (vpSetObject['name'] === 'qualityTests') {
-      //console.log('LOOPING 1')
-      //console.log('key: ' + key)
-      //}
-      //loop over VPSet entries
-      //if (vpSetObject['name'] === 'regressionConfig') {
-      //console.log(JSON.stringify(key))
-      //console.log(JSON.stringify(value))
-      //console.log('key: ' + key)
-      //console.log('value: ' + value)
-      //}
-      let nestedNoNamePSetObject: NodeObject = {} as NodeObject //might or might not be used
-      //let nestedNoNamePSetObjectId = 0
-      if (Object.entries(Object(body)).length > 1) {
-        nestedNoNamePSetObject['id'] = ++this.idCounter
-        nestedNoNamePSetObject['name'] = 'PSet' //no name
-        nestedNoNamePSetObject['type'] == 'PSet'
-        nestedNoNamePSetObject['globalType'] = 'parameter'
-        nestedNoNamePSetObject['children'] = []
-        nestedNoNamePSetObject['parentNodeId'] = parentID
-        nestedNoNamePSetObject['rootNodeId'] = -1 //TODO if this can be referenced at all?
-        nestedNoNamePSetObject['referencedByIds'] = []
-        nestedNoNamePSetObject['iconType'] = ''
-        nestedNoNamePSetObject['iconColor'] = ''
-        nestedNoNamePSetObject['paremeterJSONValue'] = Infinity
-
-        //nestedNoNamePSetObject['parameters'] = value1 //TODO
-        //nestedNoNamePSetObjectId = this.idCounter
-      }
-
-      //console.log(JSON.stringify(key), JSON.stringify(value))
-      // eslint-disable-next-line no-unused-vars
-      for (const [key1, value1] of Object.entries(Object(value))) {
-        let nestedVPSetObject: NodeObject = {} as NodeObject
-        nestedVPSetObject['id'] = ++this.idCounter
-        nestedVPSetObject['globalType'] = 'parameter'
-
-        //this is parameter loop
-        //if (vpSetObject['name'] === 'regressionConfig') {
-        //console.log(JSON.stringify(key1), JSON.stringify(value1))
-        //}
-        for (const [key2, value2] of Object.entries(Object(value1))) {
-          //if (vpSetObject['name'] === 'regressionConfig') {
-          //console.log(JSON.stringify(key2), JSON.stringify(value2))
-          //}
-          if (key2 === 'type') nestedVPSetObject['type'] = value2 as string
-          else if (key2 === 'value') {
-            if (
-              nestedVPSetObject['type'] == 'cms.VPSet' ||
-              nestedVPSetObject['type'] == 'cms.PSet' ||
-              nestedVPSetObject['type'] == 'cms.untracked.PSet' ||
-              nestedVPSetObject['type'] == 'cms.untracked.VPSet'
-            ) {
-              //if (vpSetObject['name'] === 'regressionConfig') {
-              //console.log('type PSET')
-              //}
-              nestedVPSetObject['name'] = key1
-              //if (key1 === 'qualityTests') {
-              //console.log('AAAAA')
-              //console.log('value2: ' + JSON.stringify(value2))
-              //}
-
-              /*     if (nestedVPSetObject['type'] == 'cms.VPSet')
-                nestedVPSetObject['name'] = 'VPSet'
-              else nestedVPSetObject['name'] = 'PSet' */
-
-              nestedVPSetObject['children'] = []
-              this.buildRecursiveVPSetObject(
-                nestedVPSetObject,
-                value2,
-                nestedVPSetObject['id']
-              ) //TODO: is parent ID ok?
-            } else {
-              nestedVPSetObject['name'] = key1 + ' = '
-              nestedVPSetObject['children'] = []
-
-              //if (vpSetObject['name'] === 'regressionConfig') {
-              //console.log('type ' + nestedVPSetObject['type'])
-              //}
-              nestedVPSetObject['paremeterJSONValue'] = value2
-            }
-          }
-          //if (vpSetObject['name'] === 'regressionConfig') {
-          //console.log(JSON.stringify(nestedVPSetObject))
-          //}
-        }
-        if (nestedVPSetObject['type'] != undefined) {
-          let cmsTypeLenght = nestedVPSetObject['type'].length
-          let cmsType = nestedVPSetObject['type'].substring(
-            //cmsType is necessary for printing out in tree
-            nestedVPSetObject['type'].indexOf('.') + 1,
-            cmsTypeLenght
-          )
-          nestedVPSetObject['cmsType'] = cmsType
-        }
-        /*    console.log(
-          'NESTED MODULE OBJECT: ' + JSON.stringify(nestedModuleObject)
-        ) */
-        //console.log('NESTED MODULE TYPE ' + nestedModuleObject['type'])
-
-        //if (vpSetObject['name'] === 'regressionConfig') {
-        //console.log(nestedVPSetObject)
-        //}
-
-        //nestedVPSetObject['parentNodeId'] = 0 //TODO: who's parent?
-        nestedVPSetObject['referencedByIds'] = []
-        nestedVPSetObject['iconType'] = ''
-        nestedVPSetObject['iconColor'] = ''
-
-        //TODO: substitute Vuex object map with this if it works
-        this.nodeIDToNodeObjectMap[nestedVPSetObject['id']] = nestedVPSetObject
-
-        if (Object.entries(Object(body)).length == 1) {
-          nestedVPSetObject['rootNodeId'] = -1 //TODO: can this bve referenced at all?
-          nestedVPSetObject['parentNodeId'] = vpSetObject['id']
-          vpSetObject['children'].push(nestedVPSetObject)
-        } else {
-          nestedVPSetObject['rootNodeId'] = -1 //TODO: can this bve referenced at all?
-          nestedVPSetObject['parentNodeId'] = nestedNoNamePSetObject['id']
-          nestedNoNamePSetObject['children'].push(nestedVPSetObject)
-        }
-      }
-
-      //TODO: substitute Vuex object map with this if it works
-      this.nodeIDToNodeObjectMap[
-        nestedNoNamePSetObject['id']
-      ] = nestedNoNamePSetObject
-
-      if (Object.entries(Object(body)).length > 1) {
-        vpSetObject['children'].push(nestedNoNamePSetObject)
-      }
-    }
-  }
-
-  public parseModules(moduleData: any) {
-    //TODO refractor this nesting goes deeper with multiple parameters now
-    let modulesObject: NodeObject = {
-      id: ++this.idCounter,
-      name: 'Modules',
-      type: 'mods',
-      globalType: 'rootNode',
-      children: [],
-      parentNodeId: 0,
-      rootNodeId: this.idCounter,
-      referencedByIds: [],
-      iconType: '',
-      iconColor: '',
-      paremeterJSONValue: Infinity,
-      ctype: '',
-      ptype: '',
-    }
-    //let modulesIdCounter = this.idCounter
-
-    //console.log(moduleData)
-    //console.log(modulesObject)
-    for (const [key, value] of Object.entries(moduleData)) {
-      //loop over sequnces - create new Sequence object and add it to children of the seqs
-      //console.log('NAME: ' + key)
-      let moduleObject: NodeObject = {
-        id: ++this.idCounter,
-        name: key,
-        type: 'modules',
-        globalType: 'moduleNode',
-        children: [],
-        parentNodeId: modulesObject['id'],
-        rootNodeId: this.idCounter, //for the root nodes, rootNodeId = itself
-        referencedByIds: [],
-        iconType: 'module',
-        iconColor: '',
-        paremeterJSONValue: Infinity,
-        ctype: '',
-        ptype: '',
-      }
-
-      //let moduleIdCounter = this.idCounter
-      //console.log(`${key}`)
-      // eslint-disable-next-line no-unused-vars
-      for (const [key1, value1] of Object.entries(Object(value))) {
-        //loop over module entries
-        //let nestedModuleObject: Object = { children: [] }
-        //console.log(`${key1}`)
-        if (key1 === 'params') {
-          // eslint-disable-next-line no-unused-vars
-          for (const [key2, value2] of Object.entries(Object(value1))) {
-            //key2 should be parameter name
-            //aviod para_name level
-            //console.log(key2)
-
-            let nestedParameterObject: NodeObject = {} as NodeObject
-            nestedParameterObject['id'] = ++this.idCounter
-            nestedParameterObject['children'] = []
-            nestedParameterObject['globalType'] = 'parameter'
-
-            for (const [key3, value3] of Object.entries(Object(value2))) {
-              if (key3 === 'type')
-                nestedParameterObject['type'] = value3 as string
-              else if (key3 === 'value') {
-                if (
-                  nestedParameterObject['type'] == 'cms.VPSet' ||
-                  nestedParameterObject['type'] == 'cms.PSet' ||
-                  nestedParameterObject['type'] == 'cms.untracked.PSet' ||
-                  nestedParameterObject['type'] == 'cms.untracked.VPSet'
-                ) {
-                  nestedParameterObject['children'] = []
-                  nestedParameterObject['name'] = key2
-
-                  this.buildRecursiveVPSetObject(
-                    nestedParameterObject,
-                    value3,
-                    moduleObject['id']
-                  )
-                } else {
-                  nestedParameterObject['name'] = key2 + ' = '
-                  //simple type
-
-                  /*  if (nestedParameterObject['name'] == 'ErrorList = ')
-                    console.log('ErrorList INTRINSIC TYPE in: ' + typeof value3) */
-                  //TODO: SEE WHY VINT32 is a STRING!!!!
-                  nestedParameterObject['paremeterJSONValue'] = value3
-                }
-              }
-              //console.log(key3)
-            }
-            nestedParameterObject['globalType'] = 'parameter'
-            if (nestedParameterObject['type'] != undefined) {
-              let cmsTypeLenght = nestedParameterObject['type'].length
-              let cmsType = nestedParameterObject['type'].substring(
-                //cmsType is necessary for printing out in tree
-                nestedParameterObject['type'].indexOf('.') + 1,
-                cmsTypeLenght
-              )
-              nestedParameterObject['cmsType'] = cmsType
-              //console.log(nestedParameterObject)
-            }
-            nestedParameterObject['parentNodeId'] = moduleObject['id']
-            nestedParameterObject['rootNodeId'] = -1 //TODO: can this be referenced at all?
-            nestedParameterObject['referencedByIds'] = []
-            nestedParameterObject['iconType'] = ''
-            nestedParameterObject['iconColor'] = ''
-
-            this.nodeIDToNodeObjectMap[
-              nestedParameterObject['id']
-            ] = nestedParameterObject
-
-            //push parameter into module children
-            moduleObject['children'].push(nestedParameterObject)
-          }
-        } else if (key1 === 'ctype') {
-          moduleObject['ctype'] = value1 as string
-        } else if (key1 === 'pytype') {
-          moduleObject['pytype'] = value1
-        }
-        /*    console.log(
-          'NESTED MODULE OBJECT: ' + JSON.stringify(nestedModuleObject)
-        ) */
-        //console.log('NESTED MODULE TYPE ' + nestedModuleObject['type'])
-
-        //moduleObject['children'].push(nestedModuleObject)
-      }
-      modulesObject['children'].push(moduleObject)
-
-      this.nodeIDToNodeObjectMap[moduleObject['id']] = moduleObject
-    }
-
-    //TODO: substitute Vuex object map with this if it works
-    //console.log('MODULES OBJECT ID: ' + modulesObject['id'])
-    //console.log('MODULES OBJECT: ' + JSON.stringify(modulesObject))
-    this.nodeIDToNodeObjectMap[modulesObject['id']] = modulesObject
-
-    //console.log('MODULES OBJECT' + JSON.stringify(modulesObject))
-    //this.items = Object.values(modulesObject)
-    //this.items[0] = modulesObject
-    //console.log(this.items[0])
-    //console.log(this.pera)
-    //this.items = JSON.stringify(modulesObject)
-    this.globalModulesObject = modulesObject
-  }
-
-  public parsePSets(psetData: any) {
-    //console.log(psetData)
-    let psetsObject: NodeObject = {
-      id: ++this.idCounter,
-      name: 'PSets',
-      type: 'psets',
-      globalType: 'rootNode',
-      children: [],
-      parentNodeId: 0,
-      rootNodeId: this.idCounter,
-      referencedByIds: [],
-      iconType: '',
-      iconColor: '',
-      paremeterJSONValue: Infinity,
-      ctype: '',
-      ptype: '',
-    }
-
-    //let psetsIdCounter = this.idCounter
-
-    for (const [key, value] of Object.entries(psetData)) {
-      //loop over sequnces - create new Sequence object and add it to children of the seqs
-      //console.log('NAME: ' + key)
-      let psetObject: NodeObject = {
-        id: ++this.idCounter,
-        name: key,
-        type: 'pset',
-        globalType: 'psetNode',
-        children: [],
-        parentNodeId: psetsObject['id'],
-        rootNodeId: this.idCounter,
-        referencedByIds: [],
-        iconType: 'pset',
-        iconColor: 'orange',
-        paremeterJSONValue: Infinity,
-        ctype: '',
-        ptype: '',
-      }
-
-      //let psetIdCounter = this.idCounter
-
-      //console.log(`${key}`)
-      // eslint-disable-next-line no-unused-vars
-      for (const [key1, value1] of Object.entries(Object(value))) {
-        //loop over pset entries
-        //if (key == 'HLTPSetPixelLessStepTrajectoryFilter') {
-        //console.log(`${key1}, ${value1}`)
-        //}
-        let nestedPSetObject: NodeObject = {} as NodeObject
-        nestedPSetObject['id'] = ++this.idCounter
-        //console.log(`${key1}, ${value1}`)
-        //if (key1 === 'para_name') {
-        // eslint-disable-next-line no-unused-vars
-        for (const [key2, value2] of Object.entries(Object(value1))) {
-          //aviod para_name level
-          //console.log('ANYTHING')
-          //console.log(`${key2}, ${value2}`)
-          if (key2 === 'type') nestedPSetObject['type'] = value2 as string
-          else if (key2 === 'value') {
-            if (
-              nestedPSetObject['type'] == 'cms.VPSet' ||
-              nestedPSetObject['type'] == 'cms.PSet' ||
-              nestedPSetObject['type'] == 'cms.untracked.PSet' ||
-              nestedPSetObject['type'] == 'cms.untracked.VPSet'
-            ) {
-              nestedPSetObject['name'] = key1
-              nestedPSetObject['globalType'] = 'parameter'
-              nestedPSetObject['children'] = []
-
-              this.buildRecursiveVPSetObject(
-                nestedPSetObject,
-                value2,
-                psetObject['id']
-              )
-            } else {
-              nestedPSetObject['paremeterJSONValue'] = value2
-              nestedPSetObject['children'] = []
-              //if (nestedPSetObject['value'].indexOf('OR') != -1) {
-              //probably need more operators
-              //console.log('FOUND OR OPERATOR')
-              //let splitString = nestedPSetObject['value'].split('OR')
-              //console.log('SPLIT STRING: ' + splitString)
-              /*    nestedPSetObject['value'] = ''
-                    for (let i = 0; i < splitString.length; i++) {
-                      nestedPSetObject['value'] += splitString[i] + ' \r\n'
-                    } */
-              //}
-              nestedPSetObject['name'] = key1 + ' = '
-            }
-          }
-          //console.log(key3)
-        }
-        //}
-        nestedPSetObject['globalType'] = 'parameter'
-        /*    console.log(
-          'NESTED MODULE OBJECT: ' + JSON.stringify(nestedModuleObject)
-        ) */
-        //console.log('NESTED MODULE TYPE ' + nestedModuleObject['type'])
-        if (nestedPSetObject['type'] != undefined) {
-          let cmsTypeLenght = nestedPSetObject['type'].length
-          let cmsType = nestedPSetObject['type'].substring(
-            //cmsType is necessary for printing out in tree
-            nestedPSetObject['type'].indexOf('.') + 1,
-            cmsTypeLenght
-          )
-          nestedPSetObject['cmsType'] = cmsType
-          nestedPSetObject['parentNodeId'] = psetObject['id'] //TODO: who's parent?
-          nestedPSetObject['referencedByIds'] = []
-          nestedPSetObject['iconType'] = ''
-          nestedPSetObject['iconColor'] = ''
-
-          this.nodeIDToNodeObjectMap[nestedPSetObject['id']] = nestedPSetObject
-          psetObject['children'].push(nestedPSetObject)
-        }
-      }
-      psetsObject['children'].push(psetObject)
-
-      this.nodeIDToNodeObjectMap[psetObject['id']] = psetObject
-    }
-    this.nodeIDToNodeObjectMap[psetsObject['id']] = psetsObject
-
-    //console.log(psetsObject)
-    //this.items = Object.values(psetsObject)
-    //this.items[0] = psetsObject
-    //console.log(this.items[0])
-    //console.log(this.pera)
-    //this.items = JSON.stringify(psetsObject)
-    this.globalPSetsObject = psetsObject
-  }
-
-  public parseTasks(taskData: any) {
-    let tasksObject: NodeObject = {
-      id: ++this.idCounter, //TODO: continue
-      name: 'Tasks',
-      type: 'tsks',
-      globalType: 'rootNode',
-      children: [],
-      parentNodeId: 0,
-      rootNodeId: this.idCounter,
-      referencedByIds: [],
-      iconType: '',
-      iconColor: '',
-      paremeterJSONValue: Infinity,
-      ctype: '',
-      ptype: '',
-    }
-    //console.log(tasksObject)
-    for (const [key, value] of Object.entries(taskData)) {
-      //loop over sequnces - create new Sequence object and add it to children of the seqs
-      let taskObject: NodeObject = {
-        id: ++this.idCounter,
-        name: key,
-        type: 'tasks',
-        globalType: 'taskNode',
-        children: [],
-        parentNodeId: tasksObject['id'],
-        rootNodeId: this.idCounter, //for the root nodes, rootNodeId = itself
-        referencedByIds: [],
-        iconType: 'task',
-        iconColor: 'blue',
-        paremeterJSONValue: Infinity,
-        ctype: '',
-        ptype: '',
-      }
-
-      //let sequenceObjectId = this.idCounter //remember counter to use it after children are populated
-
-      //console.log(`${key}`)
-      // eslint-disable-next-line no-unused-vars
-      for (const [key1, value1] of Object.entries(Object(value))) {
-        //loop over sequence entries
-
-        //console.log(`${key1}`)
-        if (Object(value1)[0] === 'modules') {
-          //console.log('MODULE')
-          let nestedTaskObject: NodeObject = {
-            id: ++this.idCounter,
-            name: Object(value1)[1],
-            type: 'modules',
-            globalType: 'nestedModuleNode',
-            children: [],
-            parentNodeId: taskObject['id'],
-            rootNodeId: -1, //for the leaf nodes, rootNodeId will be calculated with references
-            referencedByIds: [],
-            iconType: 'module',
-            iconColor: '',
-            paremeterJSONValue: Infinity,
-            ctype: '',
-            ptype: '',
-          }
-          //TODO: substitute Vuex object map with this if it works
-          this.nodeIDToNodeObjectMap[this.idCounter] = nestedTaskObject
-          taskObject['children'].push(nestedTaskObject)
-        } else if (Object(value1)[0] === 'sequences') {
-          //console.log('SEQUENCE')
-          let nestedTaskObject: NodeObject = {
-            id: ++this.idCounter,
-            name: Object(value1)[1],
-            type: 'sequences',
-            globalType: 'nestedSequenceNode',
-            children: [],
-            parentNodeId: taskObject['id'],
-            rootNodeId: -1, //for the leaf nodes, rootNodeId will be calculated with references
-            referencedByIds: [],
-            iconType: 'sequence',
-            iconColor: 'red',
-            paremeterJSONValue: Infinity,
-            ctype: '',
-            ptype: '',
-          }
-
-          this.nodeIDToNodeObjectMap[this.idCounter] = nestedTaskObject
-          taskObject['children'].push(nestedTaskObject)
-        } else if (Object(value1)[0] === 'tasks') {
-          //console.log('SEQUENCE')
-          let nestedTaskObject: NodeObject = {
-            id: ++this.idCounter,
-            name: Object(value1)[1],
-            type: 'tasks',
-            globalType: 'nestedTaskNode',
-            children: [],
-            parentNodeId: taskObject['id'],
-            rootNodeId: -1, //for the leaf nodes, rootNodeId will be calculated with references
-            referencedByIds: [],
-            iconType: 'task',
-            iconColor: 'blue',
-            paremeterJSONValue: Infinity,
-            ctype: '',
-            ptype: '',
-          }
-
-          this.nodeIDToNodeObjectMap[this.idCounter] = nestedTaskObject
-          taskObject['children'].push(nestedTaskObject)
-        }
-      }
-      //TODO: substitute Vuex object map with this if it works
-      this.nodeIDToNodeObjectMap[taskObject['id']] = taskObject
-
-      tasksObject['children'].push(taskObject)
-    }
-    //TODO: substitute Vuex object map with this if it works
-    this.nodeIDToNodeObjectMap[tasksObject['id']] = tasksObject
-
-    //console.log(tasksObject)
-    //this.items = Object.values(tasksObject)
-    //this.items[0] = tasksObject
-    //console.log(this.items[0])
-    //console.log(this.pera)
-    //this.items = JSON.stringify(tasksObject)
-    this.globalTasksObject = tasksObject
   }
 
   /*
@@ -1134,11 +361,36 @@ export default class TreeView extends Vue {
 
       //TODO: parse all groups from main config
     ]).finally(async () => {
-      this.parseSequences(this.getConfiguration['seqs'])
-      this.parsePaths(this.getConfiguration['paths'])
-      this.parseModules(this.getConfiguration['mods'])
-      this.parsePSets(this.getConfiguration['psets'])
-      this.parseTasks(this.getConfiguration['tasks'])
+      this.idCounter = TreeParser.parseSequences(
+        this.getConfiguration['seqs'],
+        this.globalSequencesObject,
+        this.nodeIDToNodeObjectMap,
+        this.idCounter
+      )
+      this.idCounter = TreeParser.parsePaths(
+        this.getConfiguration['paths'],
+        this.globalPathsObject,
+        this.nodeIDToNodeObjectMap,
+        this.idCounter
+      )
+      this.idCounter = TreeParser.parseModules(
+        this.getConfiguration['mods'],
+        this.globalModulesObject,
+        this.nodeIDToNodeObjectMap,
+        this.idCounter
+      )
+      this.idCounter = TreeParser.parsePSets(
+        this.getConfiguration['psets'],
+        this.globalPSetsObject,
+        this.nodeIDToNodeObjectMap,
+        this.idCounter
+      )
+      this.idCounter = TreeParser.parseTasks(
+        this.getConfiguration['tasks'],
+        this.globalTasksObject,
+        this.nodeIDToNodeObjectMap,
+        this.idCounter
+      )
 
       this.$store.dispatch(
         'createNodeIDToNodeObjectMap',
@@ -1169,12 +421,36 @@ export default class TreeView extends Vue {
         fileData: fileContent,
       }), // note the "await"
     ]).finally(async () => {
-      this.parseSequences(this.getConfiguration['seqs'])
-      this.parsePaths(this.getConfiguration['paths'])
-      this.parseModules(this.getConfiguration['mods'])
-      this.parsePSets(this.getConfiguration['psets'])
-      this.parseTasks(this.getConfiguration['tasks'])
-
+      this.idCounter = TreeParser.parseSequences(
+        this.getConfiguration['seqs'],
+        this.globalSequencesObject,
+        this.nodeIDToNodeObjectMap,
+        this.idCounter
+      )
+      this.idCounter = TreeParser.parsePaths(
+        this.getConfiguration['paths'],
+        this.globalPathsObject,
+        this.nodeIDToNodeObjectMap,
+        this.idCounter
+      )
+      this.idCounter = TreeParser.parseModules(
+        this.getConfiguration['mods'],
+        this.globalModulesObject,
+        this.nodeIDToNodeObjectMap,
+        this.idCounter
+      )
+      this.idCounter = TreeParser.parsePSets(
+        this.getConfiguration['psets'],
+        this.globalPSetsObject,
+        this.nodeIDToNodeObjectMap,
+        this.idCounter
+      )
+      this.idCounter = TreeParser.parseTasks(
+        this.getConfiguration['tasks'],
+        this.globalTasksObject,
+        this.nodeIDToNodeObjectMap,
+        this.idCounter
+      )
       this.$store.dispatch(
         'createNodeIDToNodeObjectMap',
         this.nodeIDToNodeObjectMap
