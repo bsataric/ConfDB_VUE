@@ -146,11 +146,22 @@ export default class SnippetView extends Vue {
         if (i == 4 || i == 5) this.disabledTabs[i] = true
         else this.disabledTabs[i] = false
       }
+    } else if (nodeType == 'tasks') {
+      for (let i = 0; i < this.disabledTabs.length; i++) {
+        if (i == 4 || i == 5) this.disabledTabs[i] = true
+        else this.disabledTabs[i] = false
+      }
     } else if (nodeType == 'paths') {
       for (let i = 0; i < this.disabledTabs.length; i++) {
         this.disabledTabs[i] = true
       }
     } else if (nodeType == 'pset') {
+      //disable all tabs besides snippet tab
+      for (let i = 0; i < this.disabledTabs.length; i++) {
+        if (i == 3) this.disabledTabs[i] = false
+        else this.disabledTabs[i] = true
+      }
+    } else if (nodeType == 'esproducers') {
       //disable all tabs besides snippet tab
       for (let i = 0; i < this.disabledTabs.length; i++) {
         if (i == 3) this.disabledTabs[i] = false

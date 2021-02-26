@@ -120,6 +120,57 @@ export default {
 
     return moduleSnippet
   },
+  getESProducerSnippet(
+    edsProducerName: string,
+    ctype: string,
+    pytype: string,
+    edsProducerChildren: Array<NodeObject>
+  ) {
+    let edsProducerSnippet = edsProducerName + ' = '
+    let innerParameterText = ''
+    let cType = ''
+
+    edsProducerSnippet += 'cms.' + pytype + '( '
+    cType = '"' + ctype + '",</br>'
+    for (const [key, childObject] of Object.entries(edsProducerChildren)) {
+      if (
+        childObject.type == 'cms.PSet' ||
+        childObject.type == 'cms.VPSet' ||
+        childObject.type == 'cms.untracked.PSet' ||
+        childObject.type == 'cms.untracked.VPSet'
+      ) {
+        innerParameterText += '&emsp;' + childObject.name + ' = ' //parameter name
+      } else {
+        innerParameterText += '&emsp;' + childObject.name
+      }
+
+      innerParameterText += childObject.type + '( '
+      if (
+        childObject.type != 'cms.PSet' &&
+        childObject.type != 'cms.VPSet' &&
+        childObject.type != 'cms.untracked.PSet' &&
+        childObject.type != 'cms.untracked.VPSet'
+      ) {
+        if (
+          childObject.type == 'cms.string' ||
+          childObject.type == 'cms.InputTag'
+        )
+          innerParameterText +=
+            '"' + childObject.paremeterJSONValue + '" )</br>'
+        else innerParameterText += childObject.paremeterJSONValue + ' )</br>'
+      } else {
+        //complicated set type needs deconstructing
+        innerParameterText += this.buildRecursiveVPSetParameter(
+          childObject.children,
+          2
+        )
+      }
+    }
+    edsProducerSnippet = edsProducerSnippet + cType + innerParameterText
+    edsProducerSnippet += ' )'
+
+    return edsProducerSnippet
+  },
   getPathSnippet(pathName: string, pathChildren: Array<NodeObject>) {
     //console.log(path)
     //console.log(pathChildren)

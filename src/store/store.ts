@@ -257,7 +257,11 @@ export default new Vuex.Store({
             }
             //console.log('TOP MODULE NAME: ' + value.name)
             //console.log('REFERENCES: ' + value.referencedByIds)
-          } //TODO CREATE ADDITINAL MODULE AND PARAMETER REFERENCES
+          } else if (
+            state.nodeIDToNodeObjectMap[value.parentNodeId].type == 'esprods' //TOP LEVEL ESPRODUCER REFERENCES
+          ) {
+            //TODO: not sure if ESP can have references appart from tags
+          }
         }
         //take each node name and iterate through all the other nodes recurcivly to find possible references
       }
@@ -436,7 +440,7 @@ export default new Vuex.Store({
       state.snackBarOpen = payload
     },
     SET_CONFIG_LOADED(state: MainVuexState, payload: boolean) {
-      console.log('CONFIG LOADED: ' + payload)
+      //console.log('CONFIG LOADED: ' + payload)
       state.configLoaded = payload
     },
   },
@@ -506,7 +510,7 @@ export default new Vuex.Store({
       commit('SET_SNACKBAR_OPEN', payload)
     },
     setConfigLoaded({ commit }, payload) {
-      console.log('setConfigLoaded: ' + payload)
+      //console.log('setConfigLoaded: ' + payload)
       commit('SET_CONFIG_LOADED', payload)
     },
   },
@@ -588,20 +592,27 @@ export default new Vuex.Store({
       return state.snackBarColor
     },
     getSelectedNodeSnippetText(state: MainVuexState): string {
+      //console.log('SELECTED NODE: ' + state.selectedNodeType)
       if (state.selectedNodeType == 'sequences') {
         return SnippetCreator.getSequenceSnippet(
           state.selectedNodeName,
-          state.nodeIDToNodeObjectMap[state.selectedNodeId].children
+          state.nodeIDToNodeObjectMap[state.selectedNodeId].children as Array<
+            NodeObject
+          >
         )
       } else if (state.selectedNodeType == 'tasks') {
         return SnippetCreator.getTaskSnippet(
           state.selectedNodeName,
-          state.nodeIDToNodeObjectMap[state.selectedNodeId].children
+          state.nodeIDToNodeObjectMap[state.selectedNodeId].children as Array<
+            NodeObject
+          >
         )
       } else if (state.selectedNodeType == 'paths') {
         return SnippetCreator.getPathSnippet(
           state.selectedNodeName,
-          state.nodeIDToNodeObjectMap[state.selectedNodeId].children
+          state.nodeIDToNodeObjectMap[state.selectedNodeId].children as Array<
+            NodeObject
+          >
         )
       } else if (state.selectedNodeType == 'modules') {
         return SnippetCreator.getModuleSnippet(
@@ -615,6 +626,15 @@ export default new Vuex.Store({
       } else if (state.selectedNodeType == 'pset') {
         return SnippetCreator.getPSetSnippet(
           state.selectedNodeName,
+          state.nodeIDToNodeObjectMap[state.selectedNodeId].children as Array<
+            NodeObject
+          >
+        )
+      } else if (state.selectedNodeType == 'esproducers') {
+        return SnippetCreator.getESProducerSnippet(
+          state.selectedNodeName,
+          state.nodeIDToNodeObjectMap[state.selectedNodeId].ctype,
+          state.nodeIDToNodeObjectMap[state.selectedNodeId].pytype,
           state.nodeIDToNodeObjectMap[state.selectedNodeId].children as Array<
             NodeObject
           >

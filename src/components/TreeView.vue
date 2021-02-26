@@ -194,6 +194,7 @@ export default class TreeView extends Vue {
   private globalModulesObject: Object = {}
   private globalPSetsObject: Object = {}
   private globalTasksObject: Object = {}
+  private globalESProducersObject: Object = {}
 
   private idCounter = 1 //TODO: this is dummy this has to be provided from the server
 
@@ -210,6 +211,7 @@ export default class TreeView extends Vue {
     path: 'mdi-filmstrip',
     pset: 'mdi-format-list-bulleted',
     task: 'mdi-sort-reverse-variant',
+    esproducer: 'mdi-hammer-wrench',
   }
 
   get items() {
@@ -219,6 +221,7 @@ export default class TreeView extends Vue {
       this.globalModulesObject,
       this.globalPSetsObject,
       this.globalTasksObject,
+      this.globalESProducersObject,
     ]
   }
 
@@ -388,6 +391,13 @@ export default class TreeView extends Vue {
       this.idCounter = TreeParser.parseTasks(
         this.getConfiguration['tasks'],
         this.globalTasksObject,
+        this.nodeIDToNodeObjectMap,
+        this.idCounter
+      )
+
+      this.idCounter = TreeParser.parseESProducers(
+        this.getConfiguration['esprods'],
+        this.globalESProducersObject,
         this.nodeIDToNodeObjectMap,
         this.idCounter
       )
