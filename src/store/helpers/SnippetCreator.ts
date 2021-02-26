@@ -140,7 +140,6 @@ export default {
     sequenceName: string,
     sequenceChildren: Array<NodeObject>
   ) {
-    //console.log(sequence)
     //console.log(sequenceChildren)
     //console.log('getSequenceSnippet CALLED!')
     let sequenceSnippet = sequenceName + ' = cms.Sequence('
@@ -157,6 +156,24 @@ export default {
       })
     return sequenceSnippet
     //return JSON.stringify(sequenceChildren)
+  },
+  getTaskSnippet(taskName: string, taskChildren: Array<NodeObject>) {
+    //console.log(taskChildren)
+    //console.log('getTaskSnippet CALLED!')
+    let taskSnippet = taskName + ' = cms.Task('
+    if (taskChildren.length == 0) taskSnippet += ')'
+    else
+      taskChildren.forEach((val, key, taskChildren) => {
+        /*   console.log('VAL: ' + JSON.stringify(val))
+        console.log('KEY: ' + key) */
+        if (Object.is(taskChildren.length - 1, key)) {
+          taskSnippet += ' ' + val.name + ' )'
+        } else {
+          taskSnippet += ' ' + val.name + ' + '
+        }
+      })
+    return taskSnippet
+    //return JSON.stringify(taskChildren)
   },
   getPSetSnippet(psetName: string, psetChildren: Array<NodeObject>) {
     let psetSnippet = psetName + ' = '

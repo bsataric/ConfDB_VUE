@@ -305,6 +305,27 @@ export default class TreeView extends Vue {
           //TODO: substitute Vuex object map with this if it works
           this.nodeIDToNodeObjectMap[this.idCounter] = nestedSequenceObject
           sequenceObject['children'].push(nestedSequenceObject)
+        } else if (Object(value1)[0] === 'tasks') {
+          //console.log('SEQUENCE')
+          let nestedSequenceObject: NodeObject = {
+            id: ++this.idCounter,
+            name: Object(value1)[1],
+            type: 'tasks',
+            globalType: 'nestedTaskNode',
+            children: [],
+            parentNodeId: sequenceObject['id'],
+            rootNodeId: -1, //for the leaf nodes, rootNodeId will be calculated with references
+            referencedByIds: [],
+            iconType: 'task',
+            iconColor: 'blue',
+            paremeterJSONValue: Infinity,
+            ctype: '',
+            ptype: '',
+          }
+
+          //TODO: substitute Vuex object map with this if it works
+          this.nodeIDToNodeObjectMap[this.idCounter] = nestedSequenceObject
+          sequenceObject['children'].push(nestedSequenceObject)
         }
       }
       //TODO: substitute Vuex object map with this if it works

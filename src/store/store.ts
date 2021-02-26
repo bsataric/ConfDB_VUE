@@ -172,9 +172,7 @@ export default new Vuex.Store({
                 let parentType: string =
                   state.nodeIDToNodeObjectMap[value1.parentNodeId].type
                 if (
-                  (parentType == 'sequences' ||
-                    parentType == 'paths' ||
-                    parentType == 'tasks') &&
+                  (parentType == 'sequences' || parentType == 'paths') &&
                   sequenceName == value1.name
                 ) {
                   //nesting
@@ -200,7 +198,9 @@ export default new Vuex.Store({
                 let parentType: string =
                   state.nodeIDToNodeObjectMap[value1.parentNodeId].type
                 if (
-                  (parentType == 'tasks' || parentType == 'paths') &&
+                  (parentType == 'sequences' ||
+                    parentType == 'tasks' ||
+                    parentType == 'paths') &&
                   taskName == value1.name
                 ) {
                   //nesting
@@ -590,6 +590,11 @@ export default new Vuex.Store({
     getSelectedNodeSnippetText(state: MainVuexState): string {
       if (state.selectedNodeType == 'sequences') {
         return SnippetCreator.getSequenceSnippet(
+          state.selectedNodeName,
+          state.nodeIDToNodeObjectMap[state.selectedNodeId].children
+        )
+      } else if (state.selectedNodeType == 'tasks') {
+        return SnippetCreator.getTaskSnippet(
           state.selectedNodeName,
           state.nodeIDToNodeObjectMap[state.selectedNodeId].children
         )
