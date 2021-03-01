@@ -642,6 +642,15 @@ export default new Vuex.Store({
             NodeObject
           >
         )
+      } else if (state.selectedNodeType == 'services') {
+        return SnippetCreator.getServiceSnippet(
+          state.selectedNodeName,
+          state.nodeIDToNodeObjectMap[state.selectedNodeId].ctype,
+          state.nodeIDToNodeObjectMap[state.selectedNodeId].pytype,
+          state.nodeIDToNodeObjectMap[state.selectedNodeId].children as Array<
+            NodeObject
+          >
+        )
       }
       return ''
     },

@@ -201,6 +201,52 @@ export default {
 
     return esSourceSnippet
   },
+  getServiceSnippet(
+    serviceName: string,
+    ctype: string,
+    pytype: string,
+    serviceChildren: Array<NodeObject>
+  ) {
+    let servicceSnippet = serviceName + ' = '
+    let innerParameterText = ''
+    let cType = ''
+
+    servicceSnippet += 'cms.' + pytype + '( '
+    cType = '"' + ctype + '",</br>'
+    for (const [key, childObject] of Object.entries(serviceChildren)) {
+      if (
+        childObject.type == 'cms.PSet' ||
+        childObject.type == 'cms.VPSet' ||
+        childObject.type == 'cms.untracked.PSet' ||
+        childObject.type == 'cms.untracked.VPSet'
+      ) {
+        innerParameterText += '&emsp;' + childObject.name + ' = ' //parameter name
+      } else {
+        innerParameterText += '&emsp;' + childObject.name
+      }
+
+      innerParameterText += childObject.type + '( '
+      if (
+        childObject.type != 'cms.PSet' &&
+        childObject.type != 'cms.VPSet' &&
+        childObject.type != 'cms.untracked.PSet' &&
+        childObject.type != 'cms.untracked.VPSet'
+      ) {
+        innerParameterText +=
+          JSON.stringify(childObject.paremeterJSONValue, null, ' ') + ' )</br>'
+      } else {
+        //complicated set type needs deconstructing
+        innerParameterText += this.buildRecursiveVPSetParameter(
+          childObject.children,
+          2
+        )
+      }
+    }
+    servicceSnippet = servicceSnippet + cType + innerParameterText
+    servicceSnippet += ' )'
+
+    return servicceSnippet
+  },
   getPathSnippet(pathName: string, pathChildren: Array<NodeObject>) {
     //console.log(path)
     //console.log(pathChildren)

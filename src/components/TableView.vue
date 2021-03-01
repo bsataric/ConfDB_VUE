@@ -269,7 +269,8 @@ export default class TableView extends Vue {
       nodeType == 'modules' ||
       nodeType == 'pset' ||
       nodeType == 'esproducers' ||
-      nodeType == 'essources'
+      nodeType == 'essources' ||
+      nodeType == 'services'
     ) {
       // eslint-disable-next-line no-unused-vars
       for (const [key, childObject] of Object.entries(children)) {
@@ -344,7 +345,8 @@ export default class TableView extends Vue {
       nodeType == 'modules' ||
       nodeType == 'pset' ||
       nodeType == 'esproducers' ||
-      nodeType == 'essources'
+      nodeType == 'essources' ||
+      nodeType == 'services'
     ) {
       return this.parseChildren(this.getSelectedNodeChildren, nodeType)
     } else if (nodeType == 'sequences') {
@@ -368,6 +370,8 @@ export default class TableView extends Vue {
       return 'ESProducer'
     } else if (nodeType == 'essources') {
       return 'ESSource'
+    } else if (nodeType == 'services') {
+      return 'Service'
     }
     return ''
   }
@@ -376,7 +380,8 @@ export default class TableView extends Vue {
     if (
       nodeType == 'modules' ||
       nodeType == 'esproducers' ||
-      nodeType == 'essources'
+      nodeType == 'essources' ||
+      nodeType == 'services'
     ) {
       return this.getSelectedNodeCType
     } else if (nodeType == 'sequences') {
@@ -394,7 +399,8 @@ export default class TableView extends Vue {
       nodeType == 'modules' ||
       nodeType == 'pset' ||
       nodeType == 'esproducers' ||
-      nodeType == 'essources'
+      nodeType == 'essources' ||
+      nodeType == 'services'
     ) {
       return this.getSelectedNodeName
     } else if (nodeType == 'sequences') {
@@ -417,6 +423,8 @@ export default class TableView extends Vue {
     } else if (nodeType == 'esproducers') {
       return true
     } else if (nodeType == 'essources') {
+      return true
+    } else if (nodeType == 'services') {
       return true
     }
     return true
@@ -441,6 +449,8 @@ export default class TableView extends Vue {
     } else if (nodeType == 'esproducers') {
       return []
     } else if (nodeType == 'essources') {
+      return []
+    } else if (nodeType == 'services') {
       return []
     }
     return []

@@ -196,6 +196,7 @@ export default class TreeView extends Vue {
   private globalTasksObject: Object = {}
   private globalESProducersObject: Object = {}
   private globalESSourcesObject: Object = {}
+  private globalServicesObject: Object = {}
 
   private idCounter = 1 //TODO: this is dummy this has to be provided from the server
 
@@ -214,6 +215,7 @@ export default class TreeView extends Vue {
     task: 'mdi-sort-reverse-variant',
     esproducer: 'mdi-hammer-wrench',
     essource: 'mdi-source-merge',
+    service: 'mdi-room-service',
   }
 
   get items() {
@@ -225,6 +227,7 @@ export default class TreeView extends Vue {
       this.globalTasksObject,
       this.globalESProducersObject,
       this.globalESSourcesObject,
+      this.globalServicesObject,
     ]
   }
 
@@ -409,6 +412,13 @@ export default class TreeView extends Vue {
         this.idCounter
       )
 
+      this.idCounter = TreeParser.parseServices(
+        this.getConfiguration['services'],
+        this.globalServicesObject,
+        this.nodeIDToNodeObjectMap,
+        this.idCounter
+      )
+
       this.$store.dispatch(
         'createNodeIDToNodeObjectMap',
         this.nodeIDToNodeObjectMap
@@ -472,6 +482,20 @@ export default class TreeView extends Vue {
       this.idCounter = TreeParser.parseESProducers(
         this.getConfiguration['esprods'],
         this.globalESProducersObject,
+        this.nodeIDToNodeObjectMap,
+        this.idCounter
+      )
+
+      this.idCounter = TreeParser.parseESSources(
+        this.getConfiguration['essources'],
+        this.globalESSourcesObject,
+        this.nodeIDToNodeObjectMap,
+        this.idCounter
+      )
+
+      this.idCounter = TreeParser.parseServices(
+        this.getConfiguration['services'],
+        this.globalServicesObject,
         this.nodeIDToNodeObjectMap,
         this.idCounter
       )

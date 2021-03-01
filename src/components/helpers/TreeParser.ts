@@ -880,7 +880,7 @@ export default {
     let esSourcesObject: NodeObject = {
       id: ++idCounter,
       name: 'ESSources',
-      type: 'essources',
+      type: 'essour',
       globalType: 'rootNode',
       children: [],
       parentNodeId: 0,
@@ -900,7 +900,7 @@ export default {
         id: ++idCounter,
         name: key,
         type: 'essources',
-        globalType: 'esproducerNode',
+        globalType: 'essoourceNode',
         children: [],
         parentNodeId: esSourcesObject['id'],
         rootNodeId: idCounter, //for the root nodes, rootNodeId = itself
@@ -996,6 +996,133 @@ export default {
       globalESSourcesObject,
       esSourcesObject
     )
+
+    return idCounter
+  },
+
+  parseServices(
+    serviceData: any,
+    globalServicesObject: Object,
+    nodeIDToNodeObjectMap: Map<number, NodeObject>,
+    idCounter: number
+  ) {
+    //TODO refractor this nesting goes deeper with multiple parameters now
+    let servicesObject: NodeObject = {
+      id: ++idCounter,
+      name: 'Services',
+      type: 'serv', //TODO: fix JSON -> node type naming conventions
+      globalType: 'rootNode',
+      children: [],
+      parentNodeId: 0,
+      rootNodeId: idCounter,
+      referencedByIds: [],
+      iconType: '',
+      iconColor: '',
+      paremeterJSONValue: Infinity,
+      ctype: '',
+      ptype: '',
+    }
+
+    for (const [key, value] of Object.entries(serviceData)) {
+      //loop over sequnces - create new Sequence object and add it to children of the seqs
+      //console.log('NAME: ' + key)
+      let serviceObject: NodeObject = {
+        id: ++idCounter,
+        name: key,
+        type: 'services',
+        globalType: 'serviceNode',
+        children: [],
+        parentNodeId: servicesObject['id'],
+        rootNodeId: idCounter, //for the root nodes, rootNodeId = itself
+        referencedByIds: [],
+        iconType: 'service',
+        iconColor: '#D84315',
+        paremeterJSONValue: Infinity,
+        ctype: '',
+        ptype: '',
+      }
+
+      //console.log(`${key}`)
+      // eslint-disable-next-line no-unused-vars
+      for (const [key1, value1] of Object.entries(Object(value))) {
+        //loop over module entries
+        //console.log(`${key1}`)
+        if (key1 === 'params') {
+          // eslint-disable-next-line no-unused-vars
+          for (const [key2, value2] of Object.entries(Object(value1))) {
+            //console.log(key2)
+
+            let nestedParameterObject: NodeObject = {} as NodeObject
+            nestedParameterObject['id'] = ++idCounter
+            nestedParameterObject['children'] = []
+            nestedParameterObject['globalType'] = 'parameter'
+
+            for (const [key3, value3] of Object.entries(Object(value2))) {
+              if (key3 === 'type')
+                nestedParameterObject['type'] = value3 as string
+              else if (key3 === 'value') {
+                if (
+                  nestedParameterObject['type'] == 'cms.VPSet' ||
+                  nestedParameterObject['type'] == 'cms.PSet' ||
+                  nestedParameterObject['type'] == 'cms.untracked.PSet' ||
+                  nestedParameterObject['type'] == 'cms.untracked.VPSet'
+                ) {
+                  nestedParameterObject['children'] = []
+                  nestedParameterObject['name'] = key2
+
+                  idCounter = this.buildRecursiveVPSetObject(
+                    nestedParameterObject,
+                    value3,
+                    serviceObject['id'],
+                    nodeIDToNodeObjectMap,
+                    idCounter
+                  )
+                } else {
+                  nestedParameterObject['name'] = key2 + ' = '
+                  //simple type
+                  nestedParameterObject['paremeterJSONValue'] = value3
+                }
+              }
+              //console.log(key3)
+            }
+            nestedParameterObject['globalType'] = 'parameter'
+            if (nestedParameterObject['type'] != undefined) {
+              let cmsTypeLenght = nestedParameterObject['type'].length
+              let cmsType = nestedParameterObject['type'].substring(
+                //cmsType is necessary for printing out in tree
+                nestedParameterObject['type'].indexOf('.') + 1,
+                cmsTypeLenght
+              )
+              nestedParameterObject['cmsType'] = cmsType
+              //console.log(nestedParameterObject)
+            }
+            nestedParameterObject['parentNodeId'] = serviceObject['id']
+            nestedParameterObject['rootNodeId'] = -1 //TODO: can this be referenced at all?
+            nestedParameterObject['referencedByIds'] = []
+            nestedParameterObject['iconType'] = ''
+            nestedParameterObject['iconColor'] = ''
+
+            nodeIDToNodeObjectMap[
+              nestedParameterObject['id']
+            ] = nestedParameterObject
+
+            //push parameter into module children
+            serviceObject['children'].push(nestedParameterObject)
+          }
+        } else if (key1 === 'ctype') {
+          serviceObject['ctype'] = value1 as string
+        } else if (key1 === 'pytype') {
+          serviceObject['pytype'] = value1
+        }
+      }
+      servicesObject['children'].push(serviceObject)
+
+      nodeIDToNodeObjectMap[serviceObject['id']] = serviceObject
+    }
+
+    nodeIDToNodeObjectMap[servicesObject['id']] = servicesObject
+
+    globalServicesObject = Object.assign(globalServicesObject, servicesObject)
 
     return idCounter
   },
