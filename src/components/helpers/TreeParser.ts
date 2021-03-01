@@ -450,10 +450,6 @@ export default {
                 } else {
                   nestedParameterObject['name'] = key2 + ' = '
                   //simple type
-
-                  /*  if (nestedParameterObject['name'] == 'ErrorList = ')
-                    console.log('ErrorList INTRINSIC TYPE in: ' + typeof value3) */
-                  //TODO: SEE WHY VINT32 is a STRING!!!!
                   nestedParameterObject['paremeterJSONValue'] = value3
                 }
               }
@@ -824,10 +820,6 @@ export default {
                 } else {
                   nestedParameterObject['name'] = key2 + ' = '
                   //simple type
-
-                  /*  if (nestedParameterObject['name'] == 'ErrorList = ')
-                    console.log('ErrorList INTRINSIC TYPE in: ' + typeof value3) */
-                  //TODO: SEE WHY VINT32 is a STRING!!!!
                   nestedParameterObject['paremeterJSONValue'] = value3
                 }
               }
@@ -873,6 +865,136 @@ export default {
     globalESProducersObject = Object.assign(
       globalESProducersObject,
       esProducersObject
+    )
+
+    return idCounter
+  },
+
+  parseESSources(
+    esSourceData: any,
+    globalESSourcesObject: Object,
+    nodeIDToNodeObjectMap: Map<number, NodeObject>,
+    idCounter: number
+  ) {
+    //TODO refractor this nesting goes deeper with multiple parameters now
+    let esSourcesObject: NodeObject = {
+      id: ++idCounter,
+      name: 'ESSources',
+      type: 'essources',
+      globalType: 'rootNode',
+      children: [],
+      parentNodeId: 0,
+      rootNodeId: idCounter,
+      referencedByIds: [],
+      iconType: '',
+      iconColor: '',
+      paremeterJSONValue: Infinity,
+      ctype: '',
+      ptype: '',
+    }
+
+    for (const [key, value] of Object.entries(esSourceData)) {
+      //loop over sequnces - create new Sequence object and add it to children of the seqs
+      //console.log('NAME: ' + key)
+      let esSourceObject: NodeObject = {
+        id: ++idCounter,
+        name: key,
+        type: 'essources',
+        globalType: 'esproducerNode',
+        children: [],
+        parentNodeId: esSourcesObject['id'],
+        rootNodeId: idCounter, //for the root nodes, rootNodeId = itself
+        referencedByIds: [],
+        iconType: 'essource',
+        iconColor: '#1DE9B6',
+        paremeterJSONValue: Infinity,
+        ctype: '',
+        ptype: '',
+      }
+
+      //console.log(`${key}`)
+      // eslint-disable-next-line no-unused-vars
+      for (const [key1, value1] of Object.entries(Object(value))) {
+        //loop over module entries
+        //console.log(`${key1}`)
+        if (key1 === 'params') {
+          // eslint-disable-next-line no-unused-vars
+          for (const [key2, value2] of Object.entries(Object(value1))) {
+            //console.log(key2)
+
+            let nestedParameterObject: NodeObject = {} as NodeObject
+            nestedParameterObject['id'] = ++idCounter
+            nestedParameterObject['children'] = []
+            nestedParameterObject['globalType'] = 'parameter'
+
+            for (const [key3, value3] of Object.entries(Object(value2))) {
+              if (key3 === 'type')
+                nestedParameterObject['type'] = value3 as string
+              else if (key3 === 'value') {
+                if (
+                  nestedParameterObject['type'] == 'cms.VPSet' ||
+                  nestedParameterObject['type'] == 'cms.PSet' ||
+                  nestedParameterObject['type'] == 'cms.untracked.PSet' ||
+                  nestedParameterObject['type'] == 'cms.untracked.VPSet'
+                ) {
+                  nestedParameterObject['children'] = []
+                  nestedParameterObject['name'] = key2
+
+                  idCounter = this.buildRecursiveVPSetObject(
+                    nestedParameterObject,
+                    value3,
+                    esSourceObject['id'],
+                    nodeIDToNodeObjectMap,
+                    idCounter
+                  )
+                } else {
+                  nestedParameterObject['name'] = key2 + ' = '
+                  //simple type
+                  nestedParameterObject['paremeterJSONValue'] = value3
+                }
+              }
+              //console.log(key3)
+            }
+            nestedParameterObject['globalType'] = 'parameter'
+            if (nestedParameterObject['type'] != undefined) {
+              let cmsTypeLenght = nestedParameterObject['type'].length
+              let cmsType = nestedParameterObject['type'].substring(
+                //cmsType is necessary for printing out in tree
+                nestedParameterObject['type'].indexOf('.') + 1,
+                cmsTypeLenght
+              )
+              nestedParameterObject['cmsType'] = cmsType
+              //console.log(nestedParameterObject)
+            }
+            nestedParameterObject['parentNodeId'] = esSourceObject['id']
+            nestedParameterObject['rootNodeId'] = -1 //TODO: can this be referenced at all?
+            nestedParameterObject['referencedByIds'] = []
+            nestedParameterObject['iconType'] = ''
+            nestedParameterObject['iconColor'] = ''
+
+            nodeIDToNodeObjectMap[
+              nestedParameterObject['id']
+            ] = nestedParameterObject
+
+            //push parameter into module children
+            esSourceObject['children'].push(nestedParameterObject)
+          }
+        } else if (key1 === 'ctype') {
+          esSourceObject['ctype'] = value1 as string
+        } else if (key1 === 'pytype') {
+          esSourceObject['pytype'] = value1
+        }
+      }
+      esSourcesObject['children'].push(esSourceObject)
+
+      nodeIDToNodeObjectMap[esSourceObject['id']] = esSourceObject
+    }
+
+    nodeIDToNodeObjectMap[esSourcesObject['id']] = esSourcesObject
+
+    globalESSourcesObject = Object.assign(
+      globalESSourcesObject,
+      esSourcesObject
     )
 
     return idCounter

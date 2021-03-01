@@ -24,8 +24,8 @@
         class="cvs, mx-3"
       ></v-text-field>
       <v-text-field
-        :value="this.getSelectedNodeEDProducerValue(this.getSelectedNodeType)"
-        :label="this.getSelectedNodeEDProducer(this.getSelectedNodeType)"
+        :value="this.getSelectedNodeCTypeValue(this.getSelectedNodeType)"
+        :label="this.getSelectedNodeLabelType(this.getSelectedNodeType)"
         outlined
         readonly
         dense
@@ -266,7 +266,8 @@ export default class TableView extends Vue {
     if (
       nodeType == 'modules' ||
       nodeType == 'pset' ||
-      nodeType == 'esproducers'
+      nodeType == 'esproducers' ||
+      nodeType == 'essources'
     ) {
       // eslint-disable-next-line no-unused-vars
       for (const [key, childObject] of Object.entries(children)) {
@@ -338,7 +339,8 @@ export default class TableView extends Vue {
     if (
       nodeType == 'modules' ||
       nodeType == 'pset' ||
-      nodeType == 'esproducers'
+      nodeType == 'esproducers' ||
+      nodeType == 'essources'
     ) {
       return this.parseChildren(this.getSelectedNodeChildren, nodeType)
     } else if (nodeType == 'sequences') {
@@ -349,7 +351,7 @@ export default class TableView extends Vue {
     return []
   }
 
-  public getSelectedNodeEDProducer(nodeType: any) {
+  public getSelectedNodeLabelType(nodeType: string) {
     if (nodeType == 'modules') {
       return 'EDProducer'
     } else if (nodeType == 'sequences') {
@@ -360,12 +362,18 @@ export default class TableView extends Vue {
       return ''
     } else if (nodeType == 'esproducers') {
       return 'ESProducer'
+    } else if (nodeType == 'essources') {
+      return 'ESSource'
     }
     return ''
   }
 
-  public getSelectedNodeEDProducerValue(nodeType: string) {
-    if (nodeType == 'modules' || nodeType == 'esproducers') {
+  public getSelectedNodeCTypeValue(nodeType: string) {
+    if (
+      nodeType == 'modules' ||
+      nodeType == 'esproducers' ||
+      nodeType == 'essources'
+    ) {
       return this.getSelectedNodeCType
     } else if (nodeType == 'sequences') {
       return ''
@@ -381,7 +389,8 @@ export default class TableView extends Vue {
     if (
       nodeType == 'modules' ||
       nodeType == 'pset' ||
-      nodeType == 'esproducers'
+      nodeType == 'esproducers' ||
+      nodeType == 'essources'
     ) {
       return this.getSelectedNodeName
     } else if (nodeType == 'sequences') {
@@ -402,6 +411,8 @@ export default class TableView extends Vue {
     } else if (nodeType == 'pset') {
       return true
     } else if (nodeType == 'esproducers') {
+      return true
+    } else if (nodeType == 'essources') {
       return true
     }
     return true
@@ -424,6 +435,8 @@ export default class TableView extends Vue {
     } else if (nodeType == 'pset') {
       return []
     } else if (nodeType == 'esproducers') {
+      return []
+    } else if (nodeType == 'essources') {
       return []
     }
     return []

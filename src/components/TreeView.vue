@@ -195,6 +195,7 @@ export default class TreeView extends Vue {
   private globalPSetsObject: Object = {}
   private globalTasksObject: Object = {}
   private globalESProducersObject: Object = {}
+  private globalESSourcesObject: Object = {}
 
   private idCounter = 1 //TODO: this is dummy this has to be provided from the server
 
@@ -212,6 +213,7 @@ export default class TreeView extends Vue {
     pset: 'mdi-format-list-bulleted',
     task: 'mdi-sort-reverse-variant',
     esproducer: 'mdi-hammer-wrench',
+    essource: 'mdi-source-merge',
   }
 
   get items() {
@@ -222,6 +224,7 @@ export default class TreeView extends Vue {
       this.globalPSetsObject,
       this.globalTasksObject,
       this.globalESProducersObject,
+      this.globalESSourcesObject,
     ]
   }
 
@@ -238,7 +241,6 @@ export default class TreeView extends Vue {
   } */
 
   async fetchNodeById(itemId: number) {
-    //TODO: leaf nodes for now are not inserted in object map
     if (
       this.getNodeIDToNodeObjectMap[itemId] == undefined ||
       this.getNodeIDToNodeObjectMap[itemId].globalType == 'parameter'
@@ -361,8 +363,6 @@ export default class TreeView extends Vue {
         fromFile: false,
         fileData: null,
       }), // note the "await"
-
-      //TODO: parse all groups from main config
     ]).finally(async () => {
       this.idCounter = TreeParser.parseSequences(
         this.getConfiguration['seqs'],
@@ -398,6 +398,13 @@ export default class TreeView extends Vue {
       this.idCounter = TreeParser.parseESProducers(
         this.getConfiguration['esprods'],
         this.globalESProducersObject,
+        this.nodeIDToNodeObjectMap,
+        this.idCounter
+      )
+
+      this.idCounter = TreeParser.parseESSources(
+        this.getConfiguration['essources'],
+        this.globalESSourcesObject,
         this.nodeIDToNodeObjectMap,
         this.idCounter
       )
@@ -461,6 +468,14 @@ export default class TreeView extends Vue {
         this.nodeIDToNodeObjectMap,
         this.idCounter
       )
+
+      this.idCounter = TreeParser.parseESProducers(
+        this.getConfiguration['esprods'],
+        this.globalESProducersObject,
+        this.nodeIDToNodeObjectMap,
+        this.idCounter
+      )
+
       this.$store.dispatch(
         'createNodeIDToNodeObjectMap',
         this.nodeIDToNodeObjectMap

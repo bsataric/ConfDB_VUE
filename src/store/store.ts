@@ -68,11 +68,6 @@ export default new Vuex.Store({
         state.forcedActiveNodeId = state.selectedNodeId
         //console.log('FORCED NODE ID: ' + state.forcedActiveNodeId)
       }
-      //TODO FIX LEAF SEQUENCE DISPLAYING
-      /*    if (state.selectedNodeParamLength == 0) {
-        console.log('ITEM CHILDREN ZERO!')
-        return
-      } */
 
       let idIndex = state.openNodeIds.indexOf(payload.selectedNodeId)
       //console.log('SELECTED NODE ID: ' + state.selectedNodeId)
@@ -131,7 +126,6 @@ export default new Vuex.Store({
       state.nodeIDToNodeObjectMap = payload
     },
     CREATE_NODE_ID_TO_OBJECT_REFERENCES(state: MainVuexState) {
-      //TODO
       /*    id: number
       name: string
       type: string
@@ -632,6 +626,15 @@ export default new Vuex.Store({
         )
       } else if (state.selectedNodeType == 'esproducers') {
         return SnippetCreator.getESProducerSnippet(
+          state.selectedNodeName,
+          state.nodeIDToNodeObjectMap[state.selectedNodeId].ctype,
+          state.nodeIDToNodeObjectMap[state.selectedNodeId].pytype,
+          state.nodeIDToNodeObjectMap[state.selectedNodeId].children as Array<
+            NodeObject
+          >
+        )
+      } else if (state.selectedNodeType == 'essources') {
+        return SnippetCreator.getESSourceSnippet(
           state.selectedNodeName,
           state.nodeIDToNodeObjectMap[state.selectedNodeId].ctype,
           state.nodeIDToNodeObjectMap[state.selectedNodeId].pytype,

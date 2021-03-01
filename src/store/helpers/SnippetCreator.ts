@@ -121,18 +121,18 @@ export default {
     return moduleSnippet
   },
   getESProducerSnippet(
-    edsProducerName: string,
+    esProducerName: string,
     ctype: string,
     pytype: string,
-    edsProducerChildren: Array<NodeObject>
+    esProducerChildren: Array<NodeObject>
   ) {
-    let edsProducerSnippet = edsProducerName + ' = '
+    let esProducerSnippet = esProducerName + ' = '
     let innerParameterText = ''
     let cType = ''
 
-    edsProducerSnippet += 'cms.' + pytype + '( '
+    esProducerSnippet += 'cms.' + pytype + '( '
     cType = '"' + ctype + '",</br>'
-    for (const [key, childObject] of Object.entries(edsProducerChildren)) {
+    for (const [key, childObject] of Object.entries(esProducerChildren)) {
       if (
         childObject.type == 'cms.PSet' ||
         childObject.type == 'cms.VPSet' ||
@@ -166,10 +166,61 @@ export default {
         )
       }
     }
-    edsProducerSnippet = edsProducerSnippet + cType + innerParameterText
-    edsProducerSnippet += ' )'
+    esProducerSnippet = esProducerSnippet + cType + innerParameterText
+    esProducerSnippet += ' )'
 
-    return edsProducerSnippet
+    return esProducerSnippet
+  },
+  getESSourceSnippet(
+    esSourceName: string,
+    ctype: string,
+    pytype: string,
+    esSourceChildren: Array<NodeObject>
+  ) {
+    let esSourceSnippet = esSourceName + ' = '
+    let innerParameterText = ''
+    let cType = ''
+
+    esSourceSnippet += 'cms.' + pytype + '( '
+    cType = '"' + ctype + '",</br>'
+    for (const [key, childObject] of Object.entries(esSourceChildren)) {
+      if (
+        childObject.type == 'cms.PSet' ||
+        childObject.type == 'cms.VPSet' ||
+        childObject.type == 'cms.untracked.PSet' ||
+        childObject.type == 'cms.untracked.VPSet'
+      ) {
+        innerParameterText += '&emsp;' + childObject.name + ' = ' //parameter name
+      } else {
+        innerParameterText += '&emsp;' + childObject.name
+      }
+
+      innerParameterText += childObject.type + '( '
+      if (
+        childObject.type != 'cms.PSet' &&
+        childObject.type != 'cms.VPSet' &&
+        childObject.type != 'cms.untracked.PSet' &&
+        childObject.type != 'cms.untracked.VPSet'
+      ) {
+        if (
+          childObject.type == 'cms.string' ||
+          childObject.type == 'cms.InputTag'
+        )
+          innerParameterText +=
+            '"' + childObject.paremeterJSONValue + '" )</br>'
+        else innerParameterText += childObject.paremeterJSONValue + ' )</br>'
+      } else {
+        //complicated set type needs deconstructing
+        innerParameterText += this.buildRecursiveVPSetParameter(
+          childObject.children,
+          2
+        )
+      }
+    }
+    esSourceSnippet = esSourceSnippet + cType + innerParameterText
+    esSourceSnippet += ' )'
+
+    return esSourceSnippet
   },
   getPathSnippet(pathName: string, pathChildren: Array<NodeObject>) {
     //console.log(path)
