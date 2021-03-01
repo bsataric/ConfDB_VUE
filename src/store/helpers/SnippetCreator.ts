@@ -47,15 +47,9 @@ export default {
           vpSetChildObject.type != 'cms.untracked.PSet' &&
           vpSetChildObject.type != 'cms.untracked.VPSet'
         ) {
-          if (
-            vpSetChildObject.type == 'cms.string' ||
-            vpSetChildObject.type == 'cms.InputTag'
-          )
-            vPSetParameterText +=
-              '"' + vpSetChildObject.paremeterJSONValue + '" )</br>'
-          else
-            vPSetParameterText +=
-              vpSetChildObject.paremeterJSONValue + ' )</br>'
+          vPSetParameterText +=
+            JSON.stringify(vpSetChildObject.paremeterJSONValue, null, ' ') +
+            ' )</br>'
         } else {
           //complicated set type needs deconstructing
           vPSetParameterText += this.buildRecursiveVPSetParameter(
@@ -100,13 +94,8 @@ export default {
         childObject.type != 'cms.untracked.PSet' &&
         childObject.type != 'cms.untracked.VPSet'
       ) {
-        if (
-          childObject.type == 'cms.string' ||
-          childObject.type == 'cms.InputTag'
-        )
-          innerParameterText +=
-            '"' + childObject.paremeterJSONValue + '" )</br>'
-        else innerParameterText += childObject.paremeterJSONValue + ' )</br>'
+        innerParameterText +=
+          JSON.stringify(childObject.paremeterJSONValue, null, ' ') + ' )</br>'
       } else {
         //complicated set type needs deconstructing
         innerParameterText += this.buildRecursiveVPSetParameter(
@@ -151,13 +140,8 @@ export default {
         childObject.type != 'cms.untracked.PSet' &&
         childObject.type != 'cms.untracked.VPSet'
       ) {
-        if (
-          childObject.type == 'cms.string' ||
-          childObject.type == 'cms.InputTag'
-        )
-          innerParameterText +=
-            '"' + childObject.paremeterJSONValue + '" )</br>'
-        else innerParameterText += childObject.paremeterJSONValue + ' )</br>'
+        innerParameterText +=
+          JSON.stringify(childObject.paremeterJSONValue, null, ' ') + ' )</br>'
       } else {
         //complicated set type needs deconstructing
         innerParameterText += this.buildRecursiveVPSetParameter(
@@ -202,13 +186,8 @@ export default {
         childObject.type != 'cms.untracked.PSet' &&
         childObject.type != 'cms.untracked.VPSet'
       ) {
-        if (
-          childObject.type == 'cms.string' ||
-          childObject.type == 'cms.InputTag'
-        )
-          innerParameterText +=
-            '"' + childObject.paremeterJSONValue + '" )</br>'
-        else innerParameterText += childObject.paremeterJSONValue + ' )</br>'
+        innerParameterText +=
+          JSON.stringify(childObject.paremeterJSONValue, null, ' ') + ' )</br>'
       } else {
         //complicated set type needs deconstructing
         innerParameterText += this.buildRecursiveVPSetParameter(
@@ -305,13 +284,8 @@ export default {
         childObject.type != 'cms.untracked.PSet' &&
         childObject.type != 'cms.untracked.VPSet'
       ) {
-        if (
-          childObject.type == 'cms.string' ||
-          childObject.type == 'cms.InputTag'
-        )
-          innerParameterText +=
-            '"' + childObject.paremeterJSONValue + '" )</br>'
-        else innerParameterText += childObject.paremeterJSONValue + ' )</br>'
+        innerParameterText +=
+          JSON.stringify(childObject.paremeterJSONValue, null, ' ') + ' )</br>'
       } else {
         //complicated set type needs deconstructing
         innerParameterText += this.buildRecursiveVPSetParameter(

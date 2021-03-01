@@ -236,7 +236,9 @@ export default class TableView extends Vue {
         )
 
         nestedVPSetObject['value'] = JSON.stringify(
-          childObject.paremeterJSONValue
+          childObject.paremeterJSONValue,
+          null,
+          ' '
         ) //simple value
       }
 
@@ -309,7 +311,9 @@ export default class TableView extends Vue {
       )
       //simple type
       nestedParameterObject['value'] = JSON.stringify(
-        childObject.paremeterJSONValue
+        childObject.paremeterJSONValue,
+        null,
+        ' '
       ) //simple value
       if (nestedParameterObject['value'].length > 70) {
         //shorten the string and put three dots in the end

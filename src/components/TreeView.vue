@@ -47,7 +47,7 @@
                 item.paremeterJSONValue != Infinity
             "
           >
-            {{ JSON.stringify(item.paremeterJSONValue) }}
+            {{ JSON.stringify(item.paremeterJSONValue, null, ' ') }}
           </span>
           <span v-if="item.referencedByIds && item.referencedByIds.length != 0">
             {{ '(' + item.referencedByIds.length + ')' }}

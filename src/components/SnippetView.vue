@@ -17,7 +17,6 @@
     </v-tabs>
     <div @click="handleClick">
       <v-textarea
-        class="text-wrap"
         rows="17"
         name="input-7-4"
         label=""
