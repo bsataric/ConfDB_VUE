@@ -89,9 +89,10 @@ import { Component, Vue, Watch } from 'vue-property-decorator'
 import { mapGetters } from 'vuex'
 // eslint-disable-next-line no-unused-vars
 import { NodeObject } from '../types'
+import TreeParser from './helpers/TreeParser'
 // eslint-disable-next-line no-unused-vars
 //import Utils from '@/lib/utils.ts'
-import TreeParser from '@/components/helpers/TreeParser.ts'
+//import TreeParser from '@/components/helpers/TreeParser.ts'
 //import sizeof from 'object-sizeof'
 
 //const axios = require('axios').default
@@ -168,10 +169,7 @@ export default class TreeView extends Vue {
     /*    console.log('getIDCounter VAL:' + val)
     console.log('getIDCounter OLDVAL: ' + oldVal) */
   }
-  private nodeIDToNodeObjectMap: Map<number, NodeObject> = new Map<
-    number,
-    NodeObject
-  >() //ID to Node Object map
+  private nodeIDToNodeObjectMap!: Object //ID to Node Object map
   private open: any = [1]
   private active: any = []
   private forcedActive: any = []
@@ -184,14 +182,14 @@ export default class TreeView extends Vue {
   private getOpenNodeIds!: any
   private getForcedOpenNodeIds!: any
 
-  private globalSequencesObject: Object = {}
-  private globalPathsObject: Object = {}
-  private globalModulesObject: Object = {}
-  private globalPSetsObject: Object = {}
-  private globalTasksObject: Object = {}
-  private globalESProducersObject: Object = {}
-  private globalESSourcesObject: Object = {}
-  private globalServicesObject: Object = {}
+  private sequencesId!: number
+  private pathsId!: number
+  private modulesId!: number
+  private psetsId!: number
+  private tasksId!: number
+  private esProducersId!: number
+  private esSourcesId!: number
+  private servicesId!: number
 
   private idCounter = 1 //TODO: this is dummy this has to be provided from the server
 
@@ -215,14 +213,14 @@ export default class TreeView extends Vue {
 
   get items() {
     return [
-      this.globalSequencesObject,
-      this.globalPathsObject,
-      this.globalModulesObject,
-      this.globalPSetsObject,
-      this.globalTasksObject,
-      this.globalESProducersObject,
-      this.globalESSourcesObject,
-      this.globalServicesObject,
+      this.getNodeIDToNodeObjectMap[this.sequencesId],
+      this.getNodeIDToNodeObjectMap[this.pathsId],
+      this.getNodeIDToNodeObjectMap[this.modulesId],
+      this.getNodeIDToNodeObjectMap[this.psetsId],
+      this.getNodeIDToNodeObjectMap[this.tasksId],
+      this.getNodeIDToNodeObjectMap[this.esProducersId],
+      this.getNodeIDToNodeObjectMap[this.esSourcesId],
+      this.getNodeIDToNodeObjectMap[this.servicesId],
     ]
   }
 
@@ -259,10 +257,6 @@ export default class TreeView extends Vue {
 
   public addNode(nodeObject: any) {
     console.log('NODE OBJECT TO ADD: ' + JSON.stringify(nodeObject))
-
-    /*     if (nodeObject.type == 'sequences') {
-      this.globalSequencesObject['children'].push(nodeObject)
-    } */
   }
 
   public updateNodeName(nodeId: number, newNodeName: string) {
@@ -296,26 +290,17 @@ export default class TreeView extends Vue {
   } */
 
   public testFunction() {
-    //override
-    //this.open = [1] //TODO open array not working properly, either find a way to fix it or drop it after tomorrow
-    //this.active = [2]
-    //console.log('REFS: ' + this.$refs.items[0])
-    //@ts-ignore
-    //this.$refs['Sequences'].scrollIntoView()
-    /*   for (const [key, value] of Object.entries(this.$refs)) {
-      console.log('KEY: ' + key)
-      console.log('VALUE: ' + value)
-    } */
-    //console.log(this.$refs.treeReference)
-    //@ts-ignore
-    //console.log(this.$refs.treeReference.nodes[1].vnode.$el)
-    //@ts-ignore
-    /*  this.$vuetify.goTo(0, {
-      //@ts-ignore
-      container: this.$refs.treeReference.nodes[2].vnode.$el,
-    }) */
-    //this.nodeIDToNodeObjectMap[1].name = 'PERA'
-    //console.log('OPENNNNN: ' + this.open)
+    /*     console.log(
+      'this.nodeIDToNodeObjectMap: ' +
+        JSON.stringify(this.nodeIDToNodeObjectMap)
+    ) */
+    //this.nodeIDToNodeObjectMap[1]['name'] = 'PERA'
+    //this.nodeIDToNodeObjectMap[this.pathsId]['name'] = 'ZDERA'
+    this.$store.dispatch('testAction', null)
+    /*    console.log(
+      'this.nodeIDToNodeObjectMap: ' +
+        JSON.stringify(this.nodeIDToNodeObjectMap)
+    ) */
   }
 
   //Very important function, basically decides which node is clicked upon and gets all info about it
@@ -351,7 +336,7 @@ export default class TreeView extends Vue {
 
   async fetchConfiguration() {
     //reset maps and ID counters
-    this.nodeIDToNodeObjectMap = new Map<number, NodeObject>()
+    this.nodeIDToNodeObjectMap = {}
     this.idCounter = 1
 
     this.$store.dispatch('setConfigLoaded', false)
@@ -362,57 +347,69 @@ export default class TreeView extends Vue {
         fileData: null,
       }), // note the "await"
     ]).finally(async () => {
-      this.idCounter = TreeParser.parseSequences(
+      let ret = TreeParser.parseSequences(
         this.getConfiguration['seqs'],
-        this.globalSequencesObject,
         this.nodeIDToNodeObjectMap,
         this.idCounter
       )
-      this.idCounter = TreeParser.parsePaths(
+      this.sequencesId = ret['sequencesId']
+      this.idCounter = ret['idCounter']
+
+      ret = TreeParser.parsePaths(
         this.getConfiguration['paths'],
-        this.globalPathsObject,
         this.nodeIDToNodeObjectMap,
         this.idCounter
       )
-      this.idCounter = TreeParser.parseModules(
+      this.pathsId = ret['pathsId']
+      this.idCounter = ret['idCounter']
+
+      ret = TreeParser.parseModules(
         this.getConfiguration['mods'],
-        this.globalModulesObject,
         this.nodeIDToNodeObjectMap,
         this.idCounter
       )
-      this.idCounter = TreeParser.parsePSets(
+      this.modulesId = ret['modulesId']
+      this.idCounter = ret['idCounter']
+
+      ret = TreeParser.parsePSets(
         this.getConfiguration['psets'],
-        this.globalPSetsObject,
         this.nodeIDToNodeObjectMap,
         this.idCounter
       )
-      this.idCounter = TreeParser.parseTasks(
+      this.psetsId = ret['psetsId']
+      this.idCounter = ret['idCounter']
+
+      ret = TreeParser.parseTasks(
         this.getConfiguration['tasks'],
-        this.globalTasksObject,
         this.nodeIDToNodeObjectMap,
         this.idCounter
       )
+      this.tasksId = ret['tasksId']
+      this.idCounter = ret['idCounter']
 
-      this.idCounter = TreeParser.parseESProducers(
+      ret = TreeParser.parseESProducers(
         this.getConfiguration['esprods'],
-        this.globalESProducersObject,
         this.nodeIDToNodeObjectMap,
         this.idCounter
       )
+      this.esProducersId = ret['esProducersId']
+      this.idCounter = ret['idCounter']
 
-      this.idCounter = TreeParser.parseESSources(
+      ret = TreeParser.parseESSources(
         this.getConfiguration['essources'],
-        this.globalESSourcesObject,
         this.nodeIDToNodeObjectMap,
         this.idCounter
       )
+      this.esSourcesId = ret['esSourcesId']
+      this.idCounter = ret['idCounter']
 
-      this.idCounter = TreeParser.parseServices(
+      ret = TreeParser.parseServices(
         this.getConfiguration['services'],
-        this.globalServicesObject,
         this.nodeIDToNodeObjectMap,
         this.idCounter
       )
+      this.servicesId = ret['servicesId']
+      this.idCounter = ret['idCounter']
 
       this.$store.dispatch(
         'createNodeIDToNodeObjectMap',
@@ -427,23 +424,12 @@ export default class TreeView extends Vue {
         snackBarText: 'Configuration successfully loaded!',
         snackBarColor: 'green',
       })
-      /*       console.log(
-        'getConfiguration JSON size ' +
-          sizeof(this.getConfiguration) / 1000000 +
-          ' MB'
-      )
-      console.log(
-        'nodeIDToNodeObjectMap size ' +
-          sizeof(this.nodeIDToNodeObjectMap) / 1000000 +
-          ' MB'
-      )
-      console.log('items size ' + sizeof(this.items) / 1000000 + ' MB') */
     })
   }
 
   async fetchConfigurationFromFile(fileContent: any) {
     //reset maps and ID counters
-    this.nodeIDToNodeObjectMap = new Map<number, NodeObject>()
+    this.nodeIDToNodeObjectMap = {}
     this.idCounter = 1
 
     this.$store.dispatch('setConfigLoaded', false)
@@ -454,56 +440,73 @@ export default class TreeView extends Vue {
         fileData: fileContent,
       }), // note the "await"
     ]).finally(async () => {
-      this.idCounter = TreeParser.parseSequences(
+      let ret = TreeParser.parseSequences(
         this.getConfiguration['seqs'],
-        this.globalSequencesObject,
         this.nodeIDToNodeObjectMap,
         this.idCounter
       )
-      this.idCounter = TreeParser.parsePaths(
+      this.sequencesId = ret['sequencesId']
+      this.idCounter = ret['idCounter']
+
+      ret = TreeParser.parsePaths(
         this.getConfiguration['paths'],
-        this.globalPathsObject,
         this.nodeIDToNodeObjectMap,
         this.idCounter
       )
-      this.idCounter = TreeParser.parseModules(
+      this.pathsId = ret['pathsId']
+      this.idCounter = ret['idCounter']
+
+      ret = TreeParser.parseModules(
         this.getConfiguration['mods'],
-        this.globalModulesObject,
         this.nodeIDToNodeObjectMap,
         this.idCounter
       )
-      this.idCounter = TreeParser.parsePSets(
+      this.modulesId = ret['modulesId']
+      this.idCounter = ret['idCounter']
+
+      ret = TreeParser.parsePSets(
         this.getConfiguration['psets'],
-        this.globalPSetsObject,
         this.nodeIDToNodeObjectMap,
         this.idCounter
       )
-      this.idCounter = TreeParser.parseTasks(
+      this.psetsId = ret['psetsId']
+      this.idCounter = ret['idCounter']
+
+      ret = TreeParser.parseTasks(
         this.getConfiguration['tasks'],
-        this.globalTasksObject,
         this.nodeIDToNodeObjectMap,
         this.idCounter
       )
+      this.tasksId = ret['tasksId']
+      this.idCounter = ret['idCounter']
 
-      this.idCounter = TreeParser.parseESProducers(
+      ret = TreeParser.parseESProducers(
         this.getConfiguration['esprods'],
-        this.globalESProducersObject,
         this.nodeIDToNodeObjectMap,
         this.idCounter
       )
+      this.esProducersId = ret['esProducersId']
+      this.idCounter = ret['idCounter']
 
-      this.idCounter = TreeParser.parseESSources(
+      ret = TreeParser.parseESSources(
         this.getConfiguration['essources'],
-        this.globalESSourcesObject,
         this.nodeIDToNodeObjectMap,
         this.idCounter
       )
+      this.esSourcesId = ret['esSourcesId']
+      this.idCounter = ret['idCounter']
 
-      this.idCounter = TreeParser.parseServices(
+      ret = TreeParser.parseServices(
         this.getConfiguration['services'],
-        this.globalServicesObject,
         this.nodeIDToNodeObjectMap,
         this.idCounter
+      )
+      this.servicesId = ret['servicesId']
+      this.idCounter = ret['idCounter']
+
+      this.$store.dispatch(
+        'createNodeIDToNodeObjectMap',
+        this.nodeIDToNodeObjectMap
       )
 
       this.$store.dispatch(

@@ -268,11 +268,15 @@ export default new Vuex.Store({
       //delete state.JSONconfiguration
     },
     ADD_NODE(state: MainVuexState, payload) {
-      /*      console.log('ADD_NODE')
+      console.log('ADD_NODE')
       console.log(
         'payload.nodeIDToObject' + JSON.stringify(payload.nodeIDToObject)
       )
-      console.log('payload.id ' + payload.id) */
+      console.log('payload.id ' + payload.nodeId)
+      console.log(
+        'payload.nodeIDToObject.parentNodeId ' +
+          payload.nodeIDToObject.parentNodeId
+      )
 
       //add new node both to children of the parent and in the main map
       state.nodeIDToNodeObjectMap[
@@ -399,6 +403,11 @@ export default new Vuex.Store({
         childIndex++
       }
     },
+    TEST_ACTION(state: MainVuexState, payload) {
+      //console.log(JSON.stringify(state.nodeIDToNodeObjectMap[1]))
+      state.nodeIDToNodeObjectMap[1]['name'] = 'AAA'
+      //console.log(JSON.stringify(state.nodeIDToNodeObjectMap[1]))
+    },
     SET_INITIAL_ID_COUNTER(state: MainVuexState, payload) {
       //console.log('SETTING INITIAL ID COUNTER: ' + payload)
       state.idCounter = payload
@@ -506,6 +515,9 @@ export default new Vuex.Store({
     setConfigLoaded({ commit }, payload) {
       //console.log('setConfigLoaded: ' + payload)
       commit('SET_CONFIG_LOADED', payload)
+    },
+    testAction({ commit }, payload) {
+      commit('TEST_ACTION', payload)
     },
   },
   getters: {

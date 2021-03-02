@@ -3,10 +3,9 @@ import { NodeObject } from '@/types'
 export default {
   parseSequences(
     sequenceData: any,
-    globalSequencesObject: Object,
-    nodeIDToNodeObjectMap: Map<number, NodeObject>,
+    nodeIDToNodeObjectMap: Object,
     idCounter: number
-  ): number {
+  ): Object {
     let sequencesObject: NodeObject = {
       id: 1,
       name: 'Sequences',
@@ -112,22 +111,18 @@ export default {
       sequencesObject['children'].push(sequenceObject)
     }
     nodeIDToNodeObjectMap[1] = sequencesObject
-
-    globalSequencesObject = Object.assign(
-      globalSequencesObject,
+    /*     nodeIDToNodeObjectMap[1] = Object.assign(
+      nodeIDToNodeObjectMap[1],
       sequencesObject
-    )
-
-    //globalSequencesObject['AAA'] = 2
-    return idCounter
+    ) */
+    return { sequencesId: 1, idCounter: idCounter }
   },
 
   parsePaths(
     pathData: any,
-    globalPathsObject: Object,
-    nodeIDToNodeObjectMap: Map<number, NodeObject>,
+    nodeIDToNodeObjectMap: Object,
     idCounter: number
-  ): number {
+  ): Object {
     let pathsObject: NodeObject = {
       id: ++idCounter,
       name: 'Paths',
@@ -216,16 +211,14 @@ export default {
     }
     nodeIDToNodeObjectMap[pathsObject['id']] = pathsObject
 
-    globalPathsObject = Object.assign(globalPathsObject, pathsObject)
-
-    return idCounter
+    return { pathsId: pathsObject.id, idCounter: idCounter }
   },
 
   buildRecursiveVPSetObject(
     vpSetObject: NodeObject,
     body: any,
     parentID: number,
-    nodeIDToNodeObjectMap: Map<number, NodeObject>,
+    nodeIDToNodeObjectMap: Object,
     idCounter: number
   ): number {
     //console.log(JSON.stringify(vpSetObject))
@@ -372,8 +365,7 @@ export default {
 
   parseModules(
     moduleData: any,
-    globalModulesObject: Object,
-    nodeIDToNodeObjectMap: Map<number, NodeObject>,
+    nodeIDToNodeObjectMap: Object,
     idCounter: number
   ) {
     //TODO refractor this nesting goes deeper with multiple parameters now
@@ -492,17 +484,10 @@ export default {
 
     nodeIDToNodeObjectMap[modulesObject['id']] = modulesObject
 
-    globalModulesObject = Object.assign(globalModulesObject, modulesObject)
-
-    return idCounter
+    return { modulesId: modulesObject.id, idCounter: idCounter }
   },
 
-  parsePSets(
-    psetData: any,
-    globalPSetsObject: Object,
-    nodeIDToNodeObjectMap: Map<number, NodeObject>,
-    idCounter: number
-  ) {
+  parsePSets(psetData: any, nodeIDToNodeObjectMap: Object, idCounter: number) {
     //console.log(psetData)
     let psetsObject: NodeObject = {
       id: ++idCounter,
@@ -615,17 +600,10 @@ export default {
     }
     nodeIDToNodeObjectMap[psetsObject['id']] = psetsObject
 
-    globalPSetsObject = Object.assign(globalPSetsObject, psetsObject)
-
-    return idCounter
+    return { psetsId: psetsObject.id, idCounter: idCounter }
   },
 
-  parseTasks(
-    taskData: any,
-    globalTasksObject: Object,
-    nodeIDToNodeObjectMap: Map<number, NodeObject>,
-    idCounter: number
-  ) {
+  parseTasks(taskData: any, nodeIDToNodeObjectMap: Object, idCounter: number) {
     let tasksObject: NodeObject = {
       id: ++idCounter, //TODO: continue
       name: 'Tasks',
@@ -735,15 +713,12 @@ export default {
     }
     nodeIDToNodeObjectMap[tasksObject['id']] = tasksObject
 
-    globalTasksObject = Object.assign(globalTasksObject, tasksObject)
-
-    return idCounter
+    return { tasksId: tasksObject.id, idCounter: idCounter }
   },
 
   parseESProducers(
     esProducerData: any,
-    globalESProducersObject: Object,
-    nodeIDToNodeObjectMap: Map<number, NodeObject>,
+    nodeIDToNodeObjectMap: Object,
     idCounter: number
   ) {
     //TODO refractor this nesting goes deeper with multiple parameters now
@@ -862,18 +837,12 @@ export default {
 
     nodeIDToNodeObjectMap[esProducersObject['id']] = esProducersObject
 
-    globalESProducersObject = Object.assign(
-      globalESProducersObject,
-      esProducersObject
-    )
-
-    return idCounter
+    return { esProducersId: esProducersObject.id, idCounter: idCounter }
   },
 
   parseESSources(
     esSourceData: any,
-    globalESSourcesObject: Object,
-    nodeIDToNodeObjectMap: Map<number, NodeObject>,
+    nodeIDToNodeObjectMap: Object,
     idCounter: number
   ) {
     //TODO refractor this nesting goes deeper with multiple parameters now
@@ -992,18 +961,12 @@ export default {
 
     nodeIDToNodeObjectMap[esSourcesObject['id']] = esSourcesObject
 
-    globalESSourcesObject = Object.assign(
-      globalESSourcesObject,
-      esSourcesObject
-    )
-
-    return idCounter
+    return { esSourcesId: esSourcesObject.id, idCounter: idCounter }
   },
 
   parseServices(
     serviceData: any,
-    globalServicesObject: Object,
-    nodeIDToNodeObjectMap: Map<number, NodeObject>,
+    nodeIDToNodeObjectMap: Object,
     idCounter: number
   ) {
     //TODO refractor this nesting goes deeper with multiple parameters now
@@ -1122,8 +1085,6 @@ export default {
 
     nodeIDToNodeObjectMap[servicesObject['id']] = servicesObject
 
-    globalServicesObject = Object.assign(globalServicesObject, servicesObject)
-
-    return idCounter
+    return { servicesId: servicesObject.id, idCounter: idCounter }
   },
 }
