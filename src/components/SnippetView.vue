@@ -55,13 +55,12 @@ export default class SnippetView extends Vue {
   private getSequencesContainingCurrentNode!: any
   private getPathsContainingCurrentNode!: any
   private previousNodeName: string = ''
-  private areaText: any = '<br>aaaa</br>'
 
   private arrayOfSelectedObjects = []
 
   //private textFieldValueType = 'snippet'
 
-  private items: any = [
+  private items: Array<string> = [
     'Contained in Sequences',
     'Contained in Tasks',
     'Contained in Switch producers',

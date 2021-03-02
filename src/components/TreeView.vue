@@ -90,8 +90,9 @@ import { mapGetters } from 'vuex'
 // eslint-disable-next-line no-unused-vars
 import { NodeObject } from '../types'
 // eslint-disable-next-line no-unused-vars
-import Utils from '@/lib/utils.ts'
+//import Utils from '@/lib/utils.ts'
 import TreeParser from '@/components/helpers/TreeParser.ts'
+//import sizeof from 'object-sizeof'
 
 //const axios = require('axios').default
 
@@ -99,9 +100,6 @@ import TreeParser from '@/components/helpers/TreeParser.ts'
   computed: {
     ...mapGetters({
       getConfiguration: 'getConfiguration',
-      getSelectedNodeType: 'getSelectedNodeType',
-      getSelectedNodeName: 'getSelectedNodeName',
-      getSelectedNodeId: 'getSelectedNodeId',
       getNodeIDToNodeObjectMap: 'getNodeIDToNodeObjectMap',
       getOpenNodeIds: 'getOpenNodeIds',
       getForcedOpenNodeIds: 'getForcedOpenNodeIds',
@@ -181,9 +179,6 @@ export default class TreeView extends Vue {
   private getOpenFileContent!: any[]
   private getConfiguration!: any[] // are assigned via mapState
 
-  private getSelectedNodeName!: string
-  private getSelectedNodeType!: string
-  private getSelectedNodeId!: number
   private getNodeIDToNodeObjectMap!: any
 
   private getOpenNodeIds!: any
@@ -432,6 +427,17 @@ export default class TreeView extends Vue {
         snackBarText: 'Configuration successfully loaded!',
         snackBarColor: 'green',
       })
+      /*       console.log(
+        'getConfiguration JSON size ' +
+          sizeof(this.getConfiguration) / 1000000 +
+          ' MB'
+      )
+      console.log(
+        'nodeIDToNodeObjectMap size ' +
+          sizeof(this.nodeIDToNodeObjectMap) / 1000000 +
+          ' MB'
+      )
+      console.log('items size ' + sizeof(this.items) / 1000000 + ' MB') */
     })
   }
 
@@ -513,6 +519,10 @@ export default class TreeView extends Vue {
         snackBarText: 'Configuration successfully loaded!',
         snackBarColor: 'green',
       })
+
+      /*     console.log(
+        'nodeIDToNodeObjectMap size' + sizeof(this.nodeIDToNodeObjectMap)
+      ) */
     })
   }
 

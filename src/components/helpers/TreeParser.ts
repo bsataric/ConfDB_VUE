@@ -1,5 +1,5 @@
 import { NodeObject } from '@/types'
-
+//TODO: maybe reuse same function for modules, essources etc.
 export default {
   parseSequences(
     sequenceData: any,
