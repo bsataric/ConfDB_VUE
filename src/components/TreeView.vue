@@ -340,6 +340,7 @@ export default class TreeView extends Vue {
     this.idCounter = 1
 
     this.$store.dispatch('setConfigLoaded', false)
+    let t0 = performance.now()
 
     Promise.all([
       await this.$store.dispatch('fetchConfiguration', {
@@ -420,8 +421,14 @@ export default class TreeView extends Vue {
       this.$store.dispatch('setInitialIDCounter', this.idCounter)
       this.$store.dispatch('createObjectReferences')
       this.$store.dispatch('setConfigLoaded', true)
+
+      var t1 = performance.now()
+
       this.$store.dispatch('setSnackBarText', {
-        snackBarText: 'Configuration successfully loaded!',
+        snackBarText:
+          'Configuration successfully loaded! It took: ' +
+          Math.round(t1 - t0) / 1000 +
+          ' seconds',
         snackBarColor: 'green',
       })
     })
@@ -433,6 +440,7 @@ export default class TreeView extends Vue {
     this.idCounter = 1
 
     this.$store.dispatch('setConfigLoaded', false)
+    let t0 = performance.now()
 
     Promise.all([
       await this.$store.dispatch('fetchConfiguration', {
@@ -518,8 +526,13 @@ export default class TreeView extends Vue {
       this.$store.dispatch('setInitialIDCounter', this.idCounter)
       this.$store.dispatch('createObjectReferences')
       this.$store.dispatch('setConfigLoaded', true)
+      var t1 = performance.now()
+
       this.$store.dispatch('setSnackBarText', {
-        snackBarText: 'Configuration successfully loaded!',
+        snackBarText:
+          'Configuration successfully loaded! It took: ' +
+          Math.round(t1 - t0) / 1000 +
+          ' seconds',
         snackBarColor: 'green',
       })
 

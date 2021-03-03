@@ -18,7 +18,7 @@ import Utils from '@/lib/utils'
   ptype: string
 */
 export default {
-  parseMapToJSON(nodeIDToNodeObjectMap: Map<number, NodeObject>): string {
+  parseMapToJSON(nodeIDToNodeObjectMap: Object): string {
     let savedFileContentObject: Object = {
       configuration: {
         seqs: {},

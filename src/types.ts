@@ -6,7 +6,8 @@ export interface MainVuexState {
   selectedNodeId: number
   selectedNodeParamLength: number
   selectedNodeParentId: number
-  nodeIDToNodeObjectMap: any
+  nodeIDToNodeObjectMap: Object
+  nodeTypeIds: Object
   openNodeIds: Array<number>
   forcedOpenNodeIds: Array<number>
   forcedActiveNodeId: number
