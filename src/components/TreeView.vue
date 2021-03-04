@@ -52,7 +52,8 @@
           <span v-if="item.referencedByIds && item.referencedByIds.length != 0">
             {{ '(' + item.referencedByIds.length + ')' }}
           </span>
-          <span
+          <!-- TODO: FIX THIS -->
+          <!--   <span
             v-if="
               item.rootNodeId != item.id &&
                 item.rootNodeId != -1 &&
@@ -65,7 +66,7 @@
                   .length +
                 ')'
             }}
-          </span>
+          </span> -->
         </span>
       </template>
     </v-treeview>
@@ -258,10 +259,12 @@ export default class TreeView extends Vue {
     this.rightClickNodeType = itemType
     this.rightClickNodeId = itemId
     this.showMenu = false
+    console.log('SET FALSE')
     this.x = e.clientX
     this.y = e.clientY
     this.$nextTick(() => {
       this.showMenu = true
+      console.log('SET TRUE')
     })
   }
 
@@ -546,7 +549,7 @@ export default class TreeView extends Vue {
         /*  console.log(
           'this.$refs.treeReference' + this.$refs.treeReference.nodes[forced].vnode
         ) */
-        //console.log('FORCEEEED: ' + forced)
+        console.log('FORCEEEED: ' + forced)
         //@ts-ignore
         this.$refs.treeReference.nodes[forced].vnode.$el.scrollIntoView({
           behavior: 'smooth',

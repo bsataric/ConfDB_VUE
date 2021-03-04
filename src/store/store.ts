@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { MainVuexState, NodeObject } from '../types'
+import { MainVuexState, NodeObject, NodeBasicInfo } from '../types'
 import Utils from '@/lib/utils.ts'
 import JSONParser from '@/store/helpers/JSONParser'
 import GlobalService from '@/services/GlobalService.ts'
@@ -162,20 +162,21 @@ export default new Vuex.Store({
           ) {
             //TOP LEVEL SEQUENCE REFERENCES
             let sequenceName = nodeObject.name
-            for (const [key1, value1] of Object.entries(
+            for (const [key1, sequenceNodeObject] of Object.entries(
               //search through all nodes for references
               state.nodeIDToNodeObjectMap as Map<number, NodeObject>
             )) {
-              if (value1.parentNodeId > 0) {
+              if (sequenceNodeObject.parentNodeId > 0) {
                 let parentType: string =
-                  state.nodeIDToNodeObjectMap[value1.parentNodeId].type
+                  state.nodeIDToNodeObjectMap[sequenceNodeObject.parentNodeId]
+                    .type
                 if (
                   (parentType == 'sequences' || parentType == 'paths') &&
-                  sequenceName == value1.name
+                  sequenceName == sequenceNodeObject.name
                 ) {
                   //nesting
-                  nodeObject.referencedByIds.push(value1.id)
-                  value1.rootNodeId = nodeObject.id
+                  nodeObject.referencedByIds.push(sequenceNodeObject.id)
+                  sequenceNodeObject.rootNodeId = nodeObject.id
                 }
               }
             }
@@ -192,24 +193,24 @@ export default new Vuex.Store({
           ) {
             //TOP LEVEL SEQUENCE REFERENCES
             let taskName = nodeObject.name
-            for (const [key1, value1] of Object.entries(
+            for (const [key1, taskNodeObject] of Object.entries(
               //search through all nodes for references
               state.nodeIDToNodeObjectMap as Map<number, NodeObject>
             )) {
-              if (value1.parentNodeId > 0) {
-                //console.log('PARENT NODE ID: ' + value1.parentNodeId)
+              if (taskNodeObject.parentNodeId > 0) {
+                //console.log('PARENT NODE ID: ' + taskNodeObject.parentNodeId)
 
                 let parentType: string =
-                  state.nodeIDToNodeObjectMap[value1.parentNodeId].type
+                  state.nodeIDToNodeObjectMap[taskNodeObject.parentNodeId].type
                 if (
                   (parentType == 'sequences' ||
                     parentType == 'tasks' ||
                     parentType == 'paths') &&
-                  taskName == value1.name
+                  taskName == taskNodeObject.name
                 ) {
                   //nesting
-                  nodeObject.referencedByIds.push(value1.id)
-                  value1.rootNodeId = nodeObject.id
+                  nodeObject.referencedByIds.push(taskNodeObject.id)
+                  taskNodeObject.rootNodeId = nodeObject.id
                 }
               }
             }
@@ -224,17 +225,17 @@ export default new Vuex.Store({
             state.nodeIDToNodeObjectMap[nodeObject.parentNodeId].type == 'pts' //TOP LEVEL PATH REFERENCES
           ) {
             let pathName = nodeObject.name
-            for (const [key1, value1] of Object.entries(
+            for (const [key1, pathNodeObject] of Object.entries(
               //search through all nodes for references
               state.nodeIDToNodeObjectMap as Map<number, NodeObject>
             )) {
-              if (value1.parentNodeId > 0) {
+              if (pathNodeObject.parentNodeId > 0) {
                 let parentType: string =
-                  state.nodeIDToNodeObjectMap[value1.parentNodeId].type
-                if (parentType == 'paths' && pathName == value1.name) {
+                  state.nodeIDToNodeObjectMap[pathNodeObject.parentNodeId].type
+                if (parentType == 'paths' && pathName == pathNodeObject.name) {
                   //nesting
-                  nodeObject.referencedByIds.push(value1.id)
-                  value1.rootNodeId = nodeObject.id
+                  nodeObject.referencedByIds.push(pathNodeObject.id)
+                  pathNodeObject.rootNodeId = nodeObject.id
                 }
               }
             }
@@ -249,22 +250,23 @@ export default new Vuex.Store({
           ) {
             //console.log('AAAAAAAAAAAAAA')
             let moduleName = nodeObject.name
-            for (const [key1, value1] of Object.entries(
+            for (const [key1, moduleNodeObject] of Object.entries(
               //search through all nodes for references
               state.nodeIDToNodeObjectMap as Map<number, NodeObject>
             )) {
-              if (value1.parentNodeId > 0) {
+              if (moduleNodeObject.parentNodeId > 0) {
                 let parentType: string =
-                  state.nodeIDToNodeObjectMap[value1.parentNodeId].type
+                  state.nodeIDToNodeObjectMap[moduleNodeObject.parentNodeId]
+                    .type
                 if (
                   (parentType == 'sequences' ||
                     parentType == 'paths' ||
                     parentType == 'tasks') &&
-                  moduleName == value1.name
+                  moduleName == moduleNodeObject.name
                 ) {
                   //nesting
-                  nodeObject.referencedByIds.push(value1.id)
-                  value1.rootNodeId = nodeObject.id
+                  nodeObject.referencedByIds.push(moduleNodeObject.id)
+                  moduleNodeObject.rootNodeId = nodeObject.id
                 }
               }
             }
@@ -457,6 +459,28 @@ export default new Vuex.Store({
         childIndex++
       }
     },
+    INSERT_NODE_REFERENCE(state: MainVuexState, payload) {
+      //we need parent node ID plus inserted node ID. Calculate the references
+      let parentNodeObject: NodeObject =
+        state.nodeIDToNodeObjectMap[payload.parentId]
+      let childNodeObject: NodeObject =
+        state.nodeIDToNodeObjectMap[payload.childId]
+
+      //create new child node (it cannot be the same as every node needs unique ID)
+      let newChildNodeObject: NodeObject = Object.assign(childNodeObject)
+      newChildNodeObject.id = state.idCounter
+      newChildNodeObject.parentNodeId = payload.parentId //parent is the passed parent
+      newChildNodeObject.children = []
+      //add reference to root node references
+      console.log('newChildNodeObject: ' + JSON.stringify(newChildNodeObject))
+      state.nodeIDToNodeObjectMap[
+        newChildNodeObject.rootNodeId
+      ].referencedByIds.push(newChildNodeObject.id)
+      parentNodeObject.children.push(childNodeObject)
+      console.log('newChildNodeObject.id:' + newChildNodeObject.id)
+      state.nodeIDToNodeObjectMap[newChildNodeObject.id] = newChildNodeObject
+      Utils.sleep(200)
+    },
     TEST_ACTION(state: MainVuexState, payload) {
       //console.log(JSON.stringify(state.nodeIDToNodeObjectMap[1]))
       state.nodeIDToNodeObjectMap[1]['name'] = 'AAA'
@@ -540,6 +564,9 @@ export default new Vuex.Store({
     },
     deleteNode({ commit }, payload) {
       commit('DELETE_NODE', payload)
+    },
+    insertNodeReference({ commit }, payload) {
+      commit('INSERT_NODE_REFERENCE', payload)
     },
     setSelectedNodeViaID({ commit }, payload) {
       commit('SET_SELECTED_NODE_VIA_ID', payload)
@@ -816,6 +843,19 @@ export default new Vuex.Store({
     getConfigLoaded(state: MainVuexState): boolean {
       //console.log('CONFIG LOADED: ' + state.configLoaded)
       return state.configLoaded
+    },
+    getModulesInfo(state: MainVuexState): Array<NodeBasicInfo> {
+      let modulesArray: Array<NodeBasicInfo> = []
+      for (let i = 0; i < state.nodeTypeIds['modules'].length; i++) {
+        modulesArray.push({
+          id: state.nodeIDToNodeObjectMap[state.nodeTypeIds['modules'][i]].id,
+          type:
+            state.nodeIDToNodeObjectMap[state.nodeTypeIds['modules'][i]].type,
+          name:
+            state.nodeIDToNodeObjectMap[state.nodeTypeIds['modules'][i]].name,
+        })
+      }
+      return modulesArray
     },
   },
 })

@@ -36,3 +36,9 @@ export interface NodeObject {
   ctype: string
   ptype: string
 }
+
+export interface NodeBasicInfo {
+  id: number
+  name: string
+  type: string
+}

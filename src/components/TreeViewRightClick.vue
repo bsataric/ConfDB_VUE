@@ -8,16 +8,40 @@
       :dark="getDarkMode"
       :value="showMenu"
     >
-      <v-list>
+      <v-list style="max-height: 400px" class="overflow-y-auto">
         <v-list-item
           v-for="menuItem in this.getMenuItems"
           :key="menuItem[0]"
           @click="clickAction($event, menuItem[0])"
         >
-          <v-list-item-title
-            >{{ menuItem[0] }}
-            <v-divider v-if="menuItem[1] == 'Separator'"></v-divider>
-          </v-list-item-title>
+          <div v-if="menuItem[0] != 'Add Module'">
+            <v-list-item-title
+              >{{ menuItem[0] }}
+              <v-divider v-if="menuItem[1] == 'Separator'"></v-divider>
+            </v-list-item-title>
+          </div>
+          <div v-else>
+            <v-list>
+              <v-list-group>
+                <template v-slot:activator>
+                  <v-list-item-content>
+                    <v-list-item-title v-text="menuItem[0]"></v-list-item-title>
+                  </v-list-item-content>
+                </template>
+                <v-list-item
+                  v-for="moduleInfo in getModulesInfo"
+                  :key="moduleInfo.id"
+                  @click="clickSubAction($event, 'insertNode', moduleInfo)"
+                >
+                  <v-list-item-content>
+                    <v-list-item-title
+                      v-text="moduleInfo.name"
+                    ></v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-list-group>
+            </v-list>
+          </div>
         </v-list-item>
       </v-list>
     </v-menu>
@@ -54,7 +78,7 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator'
 import { mapGetters } from 'vuex'
 // eslint-disable-next-line no-unused-vars
-import { NodeObject } from '../types'
+import { NodeObject, NodeBasicInfo } from '../types'
 
 @Component({
   computed: {
@@ -63,6 +87,7 @@ import { NodeObject } from '../types'
       getNodeIDToNodeObjectMap: 'getNodeIDToNodeObjectMap',
       getDarkMode: 'getDarkMode',
       getIDCounter: 'getIDCounter',
+      getModulesInfo: 'getModulesInfo',
     }),
     // ...mapState('sequence', ['sequences']),
   },
@@ -81,15 +106,23 @@ export default class TreeViewRightClick extends Vue {
     console.log('getIDCounter from right click OLDVAL: ' + oldVal) */
   }
 
+  @Watch('showMenu')
+  // eslint-disable-next-line no-unused-vars
+  onShowMenuChanged(val: any, oldVal: any) {
+    console.log('showMenu NEW VAL:' + val)
+    //console.log('showMenu OLDVAL: ' + oldVal)
+  }
+
   private getNodeByName!: any
 
   private getNodeIDToNodeObjectMap!: any
   private getIDCounter!: any
+  private getModulesInfo!: Array<NodeObject>
 
   private menuItems: any = [
     [
       //main sequence node
-      ['Add Sequence', 'Separator'],
+      ['Add Sequence', 'Separator', true],
       ['Remove Unreferenced Sequences', 'No Separator'],
       ['Resolve Unnecessary Sequences', 'Separator'],
       ['Sort', 'No Separator'],
@@ -169,10 +202,12 @@ export default class TreeViewRightClick extends Vue {
   }
 
   // eslint-disable-next-line no-unused-vars
-  public clickAction(e, actionName: string) {
+  public clickAction(e: Event, actionName: string) {
     console.log('ACTION NAME: ' + actionName)
     console.log('NODE TYPE: ' + this.rightClickNodeType)
     console.log('NODE ID: ' + this.rightClickNodeId)
+    e.preventDefault() //prevent context menu from closing if action is clicked
+    e.stopPropagation()
     if (this.rightClickNodeType == 'seqs') {
       if (actionName == 'Add Sequence') {
         //console.log('Add Sequence')
@@ -242,6 +277,41 @@ export default class TreeViewRightClick extends Vue {
         //TODO
         console.log('Replace Sequence')
       }
+    }
+  }
+
+  public clickSubAction(
+    e: Event,
+    subactionName: string,
+    nodeBasicInfo: NodeBasicInfo
+  ) {
+    console.log('NODE OBJECT ID: ' + nodeBasicInfo.id)
+    if (subactionName == 'insertNode') {
+      Promise.all([
+        [this.$store.dispatch('incrementIDCounter')],
+        //set new object into main map
+
+        //Focus and open/active new node
+      ]).finally(() => {
+        Promise.all([
+          //set new object into main map
+          this.$store.dispatch('insertNodeReference', {
+            parentId: this.rightClickNodeId,
+            childId: nodeBasicInfo.id,
+          }),
+        ]).finally(() => {
+          //TODO: fix focus
+          /*      this.$store.dispatch('setSelectedNodeViaID', {
+            selectedNodeId: this.getIDCounter,
+            forceOpenNode: true,
+          }) */
+          //Display snackbar success
+          this.$store.dispatch('setSnackBarText', {
+            snackBarText: 'Sequence successfully created!',
+            snackBarColor: 'green',
+          })
+        })
+      })
     }
   }
 
