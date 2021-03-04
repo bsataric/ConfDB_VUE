@@ -597,11 +597,9 @@ export default new Vuex.Store({
       nodeType: string,
       nodeName: string
     ) => {
-      for (let i = 0; Object.keys(state.nodeIDToNodeObjectMap).length; i++) {
-        if (state.nodeIDToNodeObjectMap[i].type == nodeType) {
-          if (state.nodeIDToNodeObjectMap[i].name == nodeName)
-            return state.nodeIDToNodeObjectMap[i]
-        }
+      for (let i = 0; i < state.nodeTypeIds[nodeType].length; i++) {
+        if (state.nodeIDToNodeObjectMap[state.nodeTypeIds[i]].name == nodeName)
+          return state.nodeIDToNodeObjectMap[state.nodeTypeIds[i]]
       }
       return undefined
     },

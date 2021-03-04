@@ -75,9 +75,6 @@
       :showMenu="this.showMenu"
       :x="this.x"
       :y="this.y"
-      @add-node="addNode"
-      @update-node-name="updateNodeName"
-      @remove-node="removeNode"
     />
   </div>
 </template>
@@ -254,18 +251,6 @@ export default class TreeView extends Vue {
       forceOpenNode: false,
     })
   }
-
-  public addNode(nodeObject: any) {
-    console.log('NODE OBJECT TO ADD: ' + JSON.stringify(nodeObject))
-  }
-
-  public updateNodeName(nodeId: number, newNodeName: string) {
-    console.log('NODE ID: ' + nodeId)
-    console.log('NEW NODE NAME: ' + newNodeName)
-    //console.log('ITEM: ' + JSON.stringify(this.items[0]))
-  }
-
-  public removeNode() {}
 
   public showRightClickMenu(e: any, itemType: string, itemId: number): void {
     e.preventDefault()

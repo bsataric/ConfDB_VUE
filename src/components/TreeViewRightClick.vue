@@ -226,17 +226,17 @@ export default class TreeViewRightClick extends Vue {
         ].referencedByIds.length
         let sequenceName = this.getNodeIDToNodeObjectMap[this.rightClickNodeId]
           .name
-        if (referencesNumber > 0) {
-          this.enterText = false
-          this.dialog = true
-          this.dialogHeader = ''
-          this.dialogText =
-            'Do you really want to remove ' +
-            sequenceName +
-            ', which is referenced ' +
-            referencesNumber +
-            ' times?' //TODO FIX MODAL FOR RENAME
-        }
+
+        this.enterText = false
+        this.dialog = true
+        this.dialogHeader = ''
+        this.dialogText =
+          'Do you really want to remove ' +
+          sequenceName +
+          ', which is referenced ' +
+          referencesNumber +
+          ' times?' //TODO FIX MODAL FOR RENAME
+
         this.actionCallBack = this.deleteSequence
       } else if (actionName == 'Replace Sequence') {
         //TODO
@@ -249,7 +249,7 @@ export default class TreeViewRightClick extends Vue {
   async insertSequence(sequenceName: string, sequenceNodeId: number) {
     //sequenceNodeId is not used for new node
     console.log('TRYING TO INSERT SEQUENCE ' + sequenceName)
-
+    //TODO: properly add sequence and focus
     //first check if there is sequence with the same name
     if (this.getNodeByName('sequences', sequenceName) == undefined) {
       Promise.all([this.$store.dispatch('incrementIDCounter')]).finally(() => {
@@ -265,23 +265,12 @@ export default class TreeViewRightClick extends Vue {
           parentNodeId: 1,
           rootNodeId: newSequenceId, //new sequence is it's own root
           referencedByIds: [],
-          //parameters: value,
           iconType: 'sequence',
           iconColor: 'red',
           paremeterJSONValue: Infinity,
           ctype: '',
           ptype: '',
         }
-
-        //DONE in TreeView (send object to TreeView)
-        //this.$emit('add-node', newSequenceObject) //TODO: probably uncesseary
-
-        /*    let nodeIDToObject = {
-          name: sequenceName,
-          type: 'sequences',
-          itemChildrenLength: 0,
-          parentNodeId: 1,
-        } */
 
         Promise.all([
           //set new object into main map
@@ -291,6 +280,10 @@ export default class TreeViewRightClick extends Vue {
           }),
           //Focus and open/active new node
         ]).finally(() => {
+          this.$store.dispatch('setSelectedNodeViaID', {
+            selectedNodeId: newSequenceId,
+            forceOpenNode: true,
+          })
           //Display snackbar success
           this.$store.dispatch('setSnackBarText', {
             snackBarText: 'Sequence successfully created!',
@@ -317,9 +310,6 @@ export default class TreeViewRightClick extends Vue {
           nodeId: sequenceNodeId,
         }),
       ]).finally(() => {
-        //DONE in TreeView (send object to TreeView)
-        //this.$emit('update-node-name', sequenceNodeId, newSequenceName) //TODO: probably unecessary
-
         this.$store.dispatch('setSnackBarText', {
           snackBarText: 'Sequence successfully renamed!',
           snackBarColor: 'green',
@@ -343,9 +333,6 @@ export default class TreeViewRightClick extends Vue {
         nodeId: sequenceNodeId,
       }),
     ]).finally(() => {
-      //DONE in TreeView (send object to TreeView)
-      //this.$emit('delete-node-name', sequenceNodeId, newSequenceName) //TODO: probably unecessary
-
       this.$store.dispatch('setSnackBarText', {
         snackBarText: 'Sequence successfully deleted!',
         snackBarColor: 'green',
