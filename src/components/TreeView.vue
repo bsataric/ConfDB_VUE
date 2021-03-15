@@ -168,6 +168,8 @@ export default class TreeView extends Vue {
     console.log('getIDCounter OLDVAL: ' + oldVal) */
   }
   private nodeIDToNodeObjectMap!: Object //ID to Node Object map
+  private topLevelNodeTypeIds!: Object //top level node IDs
+  private nonTopLevelNodeNameIdMap!: Object //nested node name - array of IDs map
   private open: any = [1]
   private active: any = []
   private forcedActive: any = []
@@ -244,8 +246,14 @@ export default class TreeView extends Vue {
       'this.getNodeIDToNodeObjectMap[itemId].type:' +
         this.getNodeIDToNodeObjectMap[itemId].type
     ) */
-    if (this.getNodeIDToNodeObjectMap[itemId].children.length == 0)
+    /*     console.log(
+      'this.getNodeIDToNodeObjectMap[itemId].children: ' +
+        this.getNodeIDToNodeObjectMap[itemId].children
+    ) */
+    if (this.getNodeIDToNodeObjectMap[itemId].children.length == 0) {
       itemId = this.getNodeIDToNodeObjectMap[itemId].rootNodeId
+      console.log('ROOT NODE ID: ' + itemId)
+    }
 
     await this.$store.dispatch('setSelectedNodeViaID', {
       selectedNodeId: itemId,
@@ -325,10 +333,11 @@ export default class TreeView extends Vue {
   async fetchConfiguration() {
     //reset maps and ID counters
     this.nodeIDToNodeObjectMap = {}
+    this.topLevelNodeTypeIds = {}
+    this.nonTopLevelNodeNameIdMap = {}
     this.idCounter = 1
 
     this.$store.dispatch('setConfigLoaded', false)
-    let t0 = performance.now()
 
     Promise.all([
       await this.$store.dispatch('fetchConfiguration', {
@@ -339,14 +348,23 @@ export default class TreeView extends Vue {
       let ret = TreeParser.parseSequences(
         this.getConfiguration['seqs'],
         this.nodeIDToNodeObjectMap,
+        this.topLevelNodeTypeIds,
+        this.nonTopLevelNodeNameIdMap,
         this.idCounter
       )
       this.sequencesId = ret['sequencesId']
       this.idCounter = ret['idCounter']
 
+      /*      console.log(
+        'nonTopLevelNodeNameIdMap: ' +
+          JSON.stringify(this.nonTopLevelNodeNameIdMap)
+      ) */
+
       ret = TreeParser.parsePaths(
         this.getConfiguration['paths'],
         this.nodeIDToNodeObjectMap,
+        this.topLevelNodeTypeIds,
+        this.nonTopLevelNodeNameIdMap,
         this.idCounter
       )
       this.pathsId = ret['pathsId']
@@ -355,6 +373,8 @@ export default class TreeView extends Vue {
       ret = TreeParser.parseModules(
         this.getConfiguration['mods'],
         this.nodeIDToNodeObjectMap,
+        this.topLevelNodeTypeIds,
+        this.nonTopLevelNodeNameIdMap,
         this.idCounter
       )
       this.modulesId = ret['modulesId']
@@ -363,6 +383,8 @@ export default class TreeView extends Vue {
       ret = TreeParser.parsePSets(
         this.getConfiguration['psets'],
         this.nodeIDToNodeObjectMap,
+        this.topLevelNodeTypeIds,
+        this.nonTopLevelNodeNameIdMap,
         this.idCounter
       )
       this.psetsId = ret['psetsId']
@@ -371,6 +393,8 @@ export default class TreeView extends Vue {
       ret = TreeParser.parseTasks(
         this.getConfiguration['tasks'],
         this.nodeIDToNodeObjectMap,
+        this.topLevelNodeTypeIds,
+        this.nonTopLevelNodeNameIdMap,
         this.idCounter
       )
       this.tasksId = ret['tasksId']
@@ -379,6 +403,8 @@ export default class TreeView extends Vue {
       ret = TreeParser.parseESProducers(
         this.getConfiguration['esprods'],
         this.nodeIDToNodeObjectMap,
+        this.topLevelNodeTypeIds,
+        this.nonTopLevelNodeNameIdMap,
         this.idCounter
       )
       this.esProducersId = ret['esProducersId']
@@ -387,6 +413,8 @@ export default class TreeView extends Vue {
       ret = TreeParser.parseESSources(
         this.getConfiguration['essources'],
         this.nodeIDToNodeObjectMap,
+        this.topLevelNodeTypeIds,
+        this.nonTopLevelNodeNameIdMap,
         this.idCounter
       )
       this.esSourcesId = ret['esSourcesId']
@@ -395,6 +423,8 @@ export default class TreeView extends Vue {
       ret = TreeParser.parseServices(
         this.getConfiguration['services'],
         this.nodeIDToNodeObjectMap,
+        this.topLevelNodeTypeIds,
+        this.nonTopLevelNodeNameIdMap,
         this.idCounter
       )
       this.servicesId = ret['servicesId']
@@ -405,12 +435,26 @@ export default class TreeView extends Vue {
         this.nodeIDToNodeObjectMap
       )
 
+      this.$store.dispatch(
+        'createTopLevelNodeTypeIds',
+        this.topLevelNodeTypeIds
+      )
+
+      this.$store.dispatch(
+        'createNonTopLevelNodeNameIdMap',
+        this.nonTopLevelNodeNameIdMap
+      )
+
       //initilaize id counter in the store so other components can get/modify it
       this.$store.dispatch('setInitialIDCounter', this.idCounter)
+      let t0 = performance.now()
+
       this.$store.dispatch('createObjectReferences')
+      var t1 = performance.now()
+
       this.$store.dispatch('setConfigLoaded', true)
 
-      var t1 = performance.now()
+      //var t1 = performance.now()
 
       this.$store.dispatch('setSnackBarText', {
         snackBarText:
@@ -439,6 +483,8 @@ export default class TreeView extends Vue {
       let ret = TreeParser.parseSequences(
         this.getConfiguration['seqs'],
         this.nodeIDToNodeObjectMap,
+        this.topLevelNodeTypeIds,
+        this.nonTopLevelNodeNameIdMap,
         this.idCounter
       )
       this.sequencesId = ret['sequencesId']
@@ -447,6 +493,8 @@ export default class TreeView extends Vue {
       ret = TreeParser.parsePaths(
         this.getConfiguration['paths'],
         this.nodeIDToNodeObjectMap,
+        this.topLevelNodeTypeIds,
+        this.nonTopLevelNodeNameIdMap,
         this.idCounter
       )
       this.pathsId = ret['pathsId']
@@ -455,6 +503,8 @@ export default class TreeView extends Vue {
       ret = TreeParser.parseModules(
         this.getConfiguration['mods'],
         this.nodeIDToNodeObjectMap,
+        this.topLevelNodeTypeIds,
+        this.nonTopLevelNodeNameIdMap,
         this.idCounter
       )
       this.modulesId = ret['modulesId']
@@ -463,6 +513,8 @@ export default class TreeView extends Vue {
       ret = TreeParser.parsePSets(
         this.getConfiguration['psets'],
         this.nodeIDToNodeObjectMap,
+        this.topLevelNodeTypeIds,
+        this.nonTopLevelNodeNameIdMap,
         this.idCounter
       )
       this.psetsId = ret['psetsId']
@@ -471,6 +523,8 @@ export default class TreeView extends Vue {
       ret = TreeParser.parseTasks(
         this.getConfiguration['tasks'],
         this.nodeIDToNodeObjectMap,
+        this.topLevelNodeTypeIds,
+        this.nonTopLevelNodeNameIdMap,
         this.idCounter
       )
       this.tasksId = ret['tasksId']
@@ -479,6 +533,8 @@ export default class TreeView extends Vue {
       ret = TreeParser.parseESProducers(
         this.getConfiguration['esprods'],
         this.nodeIDToNodeObjectMap,
+        this.topLevelNodeTypeIds,
+        this.nonTopLevelNodeNameIdMap,
         this.idCounter
       )
       this.esProducersId = ret['esProducersId']
@@ -487,6 +543,8 @@ export default class TreeView extends Vue {
       ret = TreeParser.parseESSources(
         this.getConfiguration['essources'],
         this.nodeIDToNodeObjectMap,
+        this.topLevelNodeTypeIds,
+        this.nonTopLevelNodeNameIdMap,
         this.idCounter
       )
       this.esSourcesId = ret['esSourcesId']
@@ -495,6 +553,8 @@ export default class TreeView extends Vue {
       ret = TreeParser.parseServices(
         this.getConfiguration['services'],
         this.nodeIDToNodeObjectMap,
+        this.topLevelNodeTypeIds,
+        this.nonTopLevelNodeNameIdMap,
         this.idCounter
       )
       this.servicesId = ret['servicesId']
@@ -506,8 +566,13 @@ export default class TreeView extends Vue {
       )
 
       this.$store.dispatch(
-        'createNodeIDToNodeObjectMap',
-        this.nodeIDToNodeObjectMap
+        'createTopLevelNodeTypeIds',
+        this.topLevelNodeTypeIds
+      )
+
+      this.$store.dispatch(
+        'createNonTopLevelNodeNameIdMap',
+        this.nonTopLevelNodeNameIdMap
       )
 
       //initilaize id counter in the store so other components can get/modify it

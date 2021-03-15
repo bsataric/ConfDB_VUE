@@ -74,7 +74,6 @@
 </template>
 
 <script lang="ts">
-//TODO REFREACTOR HERE
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator'
 import { mapGetters } from 'vuex'
 // eslint-disable-next-line no-unused-vars
@@ -307,7 +306,7 @@ export default class TreeViewRightClick extends Vue {
           }) */
           //Display snackbar success
           this.$store.dispatch('setSnackBarText', {
-            snackBarText: 'Sequence successfully created!',
+            snackBarText: 'Node successfuly inserted!',
             snackBarColor: 'green',
           })
         })

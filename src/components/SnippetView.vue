@@ -182,6 +182,7 @@ export default class SnippetView extends Vue {
     return this.disabledTabs[index] as boolean
   }
   public getTextFieldValue(nodeName: string) {
+    console.log('getTextFieldValue TRIGGERED')
     //console.log('activeTab CHANGED ' + activeTab)
     //console.log('nodeName: ' + nodeName)
     //console.log('this.previousNodeName: ' + this.previousNodeName)
@@ -202,10 +203,11 @@ export default class SnippetView extends Vue {
     return ''
   }
   public handleClick(e) {
+    //console.log('HANDLECLICK TRIGGERED')
     let array = e.target.id.split('.')
-    //console.log(array[0])
-    //console.log(array[1])
-    this.openContainedInNode(array[0], parseInt(array[1]))
+    /* console.log(array[0])
+    console.log(array[1]) */
+    if (array[0] != '') this.openContainedInNode(array[0], parseInt(array[1]))
   }
 
   async openContainedInNode(nodeType: string, itemId: number) {

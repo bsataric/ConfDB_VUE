@@ -4,6 +4,8 @@ export default {
   parseSequences(
     sequenceData: any,
     nodeIDToNodeObjectMap: Object,
+    topLevelNodeTypeIds: Object,
+    nonTopLevelNodeNameIdMap: Object,
     idCounter: number
   ): Object {
     let sequencesObject: NodeObject = {
@@ -40,6 +42,11 @@ export default {
         ptype: '',
       }
 
+      if (topLevelNodeTypeIds['sequences'] == undefined) {
+        topLevelNodeTypeIds['sequences'] = []
+      }
+      topLevelNodeTypeIds['sequences'].push(sequenceObject.id)
+
       // eslint-disable-next-line no-unused-vars
       for (const [key1, value1] of Object.entries(Object(value))) {
         //loop over sequence entries
@@ -64,6 +71,15 @@ export default {
           }
           nodeIDToNodeObjectMap[idCounter] = nestedSequenceObject
           sequenceObject['children'].push(nestedSequenceObject)
+
+          if (
+            nonTopLevelNodeNameIdMap[nestedSequenceObject.name] == undefined
+          ) {
+            nonTopLevelNodeNameIdMap[nestedSequenceObject.name] = []
+          }
+          nonTopLevelNodeNameIdMap[nestedSequenceObject.name].push(
+            nestedSequenceObject.id
+          )
         } else if (Object(value1)[0] === 'sequences') {
           //console.log('SEQUENCE')
           let nestedSequenceObject: NodeObject = {
@@ -84,6 +100,15 @@ export default {
 
           nodeIDToNodeObjectMap[idCounter] = nestedSequenceObject
           sequenceObject['children'].push(nestedSequenceObject)
+
+          if (
+            nonTopLevelNodeNameIdMap[nestedSequenceObject.name] == undefined
+          ) {
+            nonTopLevelNodeNameIdMap[nestedSequenceObject.name] = []
+          }
+          nonTopLevelNodeNameIdMap[nestedSequenceObject.name].push(
+            nestedSequenceObject.id
+          )
         } else if (Object(value1)[0] === 'tasks') {
           //console.log('SEQUENCE')
           let nestedSequenceObject: NodeObject = {
@@ -104,6 +129,15 @@ export default {
 
           nodeIDToNodeObjectMap[idCounter] = nestedSequenceObject
           sequenceObject['children'].push(nestedSequenceObject)
+
+          if (
+            nonTopLevelNodeNameIdMap[nestedSequenceObject.name] == undefined
+          ) {
+            nonTopLevelNodeNameIdMap[nestedSequenceObject.name] = []
+          }
+          nonTopLevelNodeNameIdMap[nestedSequenceObject.name].push(
+            nestedSequenceObject.id
+          )
         }
       }
       nodeIDToNodeObjectMap[sequenceObject['id']] = sequenceObject
@@ -121,6 +155,8 @@ export default {
   parsePaths(
     pathData: any,
     nodeIDToNodeObjectMap: Object,
+    topLevelNodeTypeIds: Object,
+    nonTopLevelNodeNameIdMap: Object,
     idCounter: number
   ): Object {
     let pathsObject: NodeObject = {
@@ -158,6 +194,11 @@ export default {
         ptype: '',
       }
 
+      if (topLevelNodeTypeIds['paths'] == undefined) {
+        topLevelNodeTypeIds['paths'] = []
+      }
+      topLevelNodeTypeIds['paths'].push(pathObject.id)
+
       //console.log(`${key}`)
       // eslint-disable-next-line no-unused-vars
       for (const [key1, value1] of Object.entries(Object(value))) {
@@ -184,6 +225,13 @@ export default {
 
           nodeIDToNodeObjectMap[idCounter] = nestedPathObject
           pathObject['children'].push(nestedPathObject)
+
+          if (nonTopLevelNodeNameIdMap[nestedPathObject.name] == undefined) {
+            nonTopLevelNodeNameIdMap[nestedPathObject.name] = []
+          }
+          nonTopLevelNodeNameIdMap[nestedPathObject.name].push(
+            nestedPathObject.id
+          )
         } else if (Object(value1)[0] === 'sequences') {
           //console.log('SEQUENCE')
           let nestedPathObject: NodeObject = {
@@ -203,6 +251,13 @@ export default {
           }
           nodeIDToNodeObjectMap[idCounter] = nestedPathObject
           pathObject['children'].push(nestedPathObject)
+
+          if (nonTopLevelNodeNameIdMap[nestedPathObject.name] == undefined) {
+            nonTopLevelNodeNameIdMap[nestedPathObject.name] = []
+          }
+          nonTopLevelNodeNameIdMap[nestedPathObject.name].push(
+            nestedPathObject.id
+          )
         }
       }
       nodeIDToNodeObjectMap[pathObject['id']] = pathObject
@@ -366,6 +421,8 @@ export default {
   parseModules(
     moduleData: any,
     nodeIDToNodeObjectMap: Object,
+    topLevelNodeTypeIds: Object,
+    nonTopLevelNodeNameIdMap: Object,
     idCounter: number
   ) {
     //TODO refractor this nesting goes deeper with multiple parameters now
@@ -403,6 +460,11 @@ export default {
         ctype: '',
         ptype: '',
       }
+
+      if (topLevelNodeTypeIds['modules'] == undefined) {
+        topLevelNodeTypeIds['modules'] = []
+      }
+      topLevelNodeTypeIds['modules'].push(moduleObject.id)
 
       //console.log(`${key}`)
       // eslint-disable-next-line no-unused-vars
@@ -487,7 +549,13 @@ export default {
     return { modulesId: modulesObject.id, idCounter: idCounter }
   },
 
-  parsePSets(psetData: any, nodeIDToNodeObjectMap: Object, idCounter: number) {
+  parsePSets(
+    psetData: any,
+    nodeIDToNodeObjectMap: Object,
+    topLevelNodeTypeIds: Object,
+    nonTopLevelNodeNameIdMap: Object,
+    idCounter: number
+  ) {
     //console.log(psetData)
     let psetsObject: NodeObject = {
       id: ++idCounter,
@@ -526,6 +594,9 @@ export default {
         ptype: '',
       }
 
+      if (topLevelNodeTypeIds['psets'] == undefined)
+        topLevelNodeTypeIds['psets'] = []
+      topLevelNodeTypeIds['psets'].push(psetObject.id)
       //let psetIdCounter = this.idCounter
 
       //console.log(`${key}`)
@@ -603,9 +674,15 @@ export default {
     return { psetsId: psetsObject.id, idCounter: idCounter }
   },
 
-  parseTasks(taskData: any, nodeIDToNodeObjectMap: Object, idCounter: number) {
+  parseTasks(
+    taskData: any,
+    nodeIDToNodeObjectMap: Object,
+    topLevelNodeTypeIds: Object,
+    nonTopLevelNodeNameIdMap: Object,
+    idCounter: number
+  ) {
     let tasksObject: NodeObject = {
-      id: ++idCounter, //TODO: continue
+      id: ++idCounter,
       name: 'Tasks',
       type: 'tsks',
       globalType: 'rootNode',
@@ -621,7 +698,7 @@ export default {
     }
     //console.log(tasksObject)
     for (const [key, value] of Object.entries(taskData)) {
-      //loop over sequnces - create new Sequence object and add it to children of the seqs
+      //loop over tasks - create new Task object and add it to children of the tasks
       let taskObject: NodeObject = {
         id: ++idCounter,
         name: key,
@@ -638,12 +715,16 @@ export default {
         ptype: '',
       }
 
+      if (topLevelNodeTypeIds['tasks'] == undefined)
+        topLevelNodeTypeIds['tasks'] = []
+      topLevelNodeTypeIds['tasks'].push(taskObject.id)
+
       //let sequenceObjectId = this.idCounter //remember counter to use it after children are populated
 
       //console.log(`${key}`)
       // eslint-disable-next-line no-unused-vars
       for (const [key1, value1] of Object.entries(Object(value))) {
-        //loop over sequence entries
+        //loop over task entries
 
         //console.log(`${key1}`)
         if (Object(value1)[0] === 'modules') {
@@ -665,26 +746,13 @@ export default {
           }
           nodeIDToNodeObjectMap[idCounter] = nestedTaskObject
           taskObject['children'].push(nestedTaskObject)
-        } else if (Object(value1)[0] === 'sequences') {
-          //console.log('SEQUENCE')
-          let nestedTaskObject: NodeObject = {
-            id: ++idCounter,
-            name: Object(value1)[1],
-            type: 'sequences',
-            globalType: 'nestedSequenceNode',
-            children: [],
-            parentNodeId: taskObject['id'],
-            rootNodeId: -1, //for the leaf nodes, rootNodeId will be calculated with references
-            referencedByIds: [],
-            iconType: 'sequence',
-            iconColor: 'red',
-            paremeterJSONValue: Infinity,
-            ctype: '',
-            ptype: '',
-          }
 
-          nodeIDToNodeObjectMap[idCounter] = nestedTaskObject
-          taskObject['children'].push(nestedTaskObject)
+          if (nonTopLevelNodeNameIdMap[nestedTaskObject.name] == undefined) {
+            nonTopLevelNodeNameIdMap[nestedTaskObject.name] = []
+          }
+          nonTopLevelNodeNameIdMap[nestedTaskObject.name].push(
+            nestedTaskObject.id
+          )
         } else if (Object(value1)[0] === 'tasks') {
           //console.log('SEQUENCE')
           let nestedTaskObject: NodeObject = {
@@ -705,6 +773,13 @@ export default {
 
           nodeIDToNodeObjectMap[idCounter] = nestedTaskObject
           taskObject['children'].push(nestedTaskObject)
+
+          if (nonTopLevelNodeNameIdMap[nestedTaskObject.name] == undefined) {
+            nonTopLevelNodeNameIdMap[nestedTaskObject.name] = []
+          }
+          nonTopLevelNodeNameIdMap[nestedTaskObject.name].push(
+            nestedTaskObject.id
+          )
         }
       }
       nodeIDToNodeObjectMap[taskObject['id']] = taskObject
@@ -719,6 +794,8 @@ export default {
   parseESProducers(
     esProducerData: any,
     nodeIDToNodeObjectMap: Object,
+    topLevelNodeTypeIds: Object,
+    nonTopLevelNodeNameIdMap: Object,
     idCounter: number
   ) {
     //TODO refractor this nesting goes deeper with multiple parameters now
@@ -756,6 +833,10 @@ export default {
         ctype: '',
         ptype: '',
       }
+
+      if (topLevelNodeTypeIds['esproducers'] == undefined)
+        topLevelNodeTypeIds['esproducers'] = []
+      topLevelNodeTypeIds['esproducers'].push(esProducerObject.id)
 
       //console.log(`${key}`)
       // eslint-disable-next-line no-unused-vars
@@ -843,6 +924,8 @@ export default {
   parseESSources(
     esSourceData: any,
     nodeIDToNodeObjectMap: Object,
+    topLevelNodeTypeIds: Object,
+    nonTopLevelNodeNameIdMap: Object,
     idCounter: number
   ) {
     //TODO refractor this nesting goes deeper with multiple parameters now
@@ -880,6 +963,10 @@ export default {
         ctype: '',
         ptype: '',
       }
+
+      if (topLevelNodeTypeIds['essources'] == undefined)
+        topLevelNodeTypeIds['essources'] = []
+      topLevelNodeTypeIds['essources'].push(esSourceObject.id)
 
       //console.log(`${key}`)
       // eslint-disable-next-line no-unused-vars
@@ -967,6 +1054,8 @@ export default {
   parseServices(
     serviceData: any,
     nodeIDToNodeObjectMap: Object,
+    topLevelNodeTypeIds: Object,
+    nonTopLevelNodeNameIdMap: Object,
     idCounter: number
   ) {
     //TODO refractor this nesting goes deeper with multiple parameters now
@@ -1004,6 +1093,10 @@ export default {
         ctype: '',
         ptype: '',
       }
+
+      if (topLevelNodeTypeIds['services'] == undefined)
+        topLevelNodeTypeIds['services'] = []
+      topLevelNodeTypeIds['services'].push(serviceObject.id)
 
       //console.log(`${key}`)
       // eslint-disable-next-line no-unused-vars
