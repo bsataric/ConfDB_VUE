@@ -49,7 +49,7 @@ export default new Vuex.Store({
   state,
   mutations: {
     SET_SELECTED_NODE_VIA_ID(state: MainVuexState, payload) {
-      //console.log('SELECTED NODE ID: ' + payload.selectedNodeId)
+      console.log('SELECTED NODE ID: ' + payload.selectedNodeId)
       //console.log('state.openNodeIds: ' + state.openNodeIds)
       state.selectedNodeId = payload.selectedNodeId //get all info just via ID
       //console.log(typeof state.selectedNodeId)
@@ -58,7 +58,7 @@ export default new Vuex.Store({
         state.nodeIDToNodeObjectMap[payload.selectedNodeId].type
       state.selectedNodeName =
         state.nodeIDToNodeObjectMap[payload.selectedNodeId].name
-      //console.log('state.selectedNodeName ' + state.selectedNodeName)
+      console.log('state.selectedNodeName ' + state.selectedNodeName)
       state.selectedNodeCType =
         state.nodeIDToNodeObjectMap[payload.selectedNodeId].ctype
       state.selectedNodeParamLength =
@@ -401,11 +401,11 @@ export default new Vuex.Store({
       state.JSONconfiguration = payload
       //console.log('JSON: ' + JSON.stringify(state.JSONconfiguration))
     },
-    DELETE_JSON_CONFIGURATION(state) {
+    DELETE_JSON_CONFIGURATION(state: MainVuexState) {
       //delete state.JSONconfiguration
     },
     ADD_NODE(state: MainVuexState, payload) {
-      console.log('ADD_NODE')
+      /*       console.log('ADD_NODE')
       console.log(
         'payload.nodeIDToObject' + JSON.stringify(payload.nodeIDToObject)
       )
@@ -413,18 +413,18 @@ export default new Vuex.Store({
       console.log(
         'payload.nodeIDToObject.parentNodeId ' +
           payload.nodeIDToObject.parentNodeId
-      )
+      ) */
 
       //add new node both to children of the parent and in the main map
       state.nodeIDToNodeObjectMap[
         payload.nodeIDToObject.parentNodeId
       ].children.push(payload.nodeIDToObject)
       state.nodeIDToNodeObjectMap[payload.nodeId] = payload.nodeIDToObject
-      console.log('NEW NODE ID: ' + payload.nodeId)
+      /*      console.log('NEW NODE ID: ' + payload.nodeId)
       console.log(
         'NEW nodeIDToNodeObjectMap:' +
           JSON.stringify(state.nodeIDToNodeObjectMap[payload.nodeId])
-      )
+      ) */
     },
     RENAME_NODE(state: MainVuexState, payload) {
       state.nodeIDToNodeObjectMap[payload.nodeId].name = payload.newNodeName
@@ -444,16 +444,16 @@ export default new Vuex.Store({
       //console.log('NODE TO DELETE: ' + JSON.stringify(nodeToDelete))
       //first delete references to node's children as well as children nodes
       //console.log('NODE CHILDREN: ' + nodeToDelete.children)
-      for (const [nodeId, nodeObject] of Object.entries(
+      for (const [nodeId, childNodeObject] of Object.entries(
         nodeToDelete.children as NodeObject
       )) {
         //console.log('KEY: ' + nodeId)
-        //console.log('VALUE: ' + JSON.stringify(nodeObject))
+        //console.log('VALUE: ' + JSON.stringify(childNodeObject))
         //take rootNodeId of each child, go to that node and delete reference to this child
-        let childIdToDelete = nodeObject.id
-        let rootNodeId = nodeObject.rootNodeId
-        console.log('CHILD TO DELETE: ' + childIdToDelete)
-        console.log('ROOT NODE ID: ' + rootNodeId)
+        let childIdToDelete = childNodeObject.id
+        let rootNodeId = childNodeObject.rootNodeId
+        //console.log('CHILD TO DELETE: ' + childIdToDelete)
+        //console.log('ROOT NODE ID: ' + rootNodeId)
         /*         console.log(
           'ROOT NODE REFERENCES BEFORE DELETE: ' +
             state.nodeIDToNodeObjectMap[rootNodeId].referencedByIds
@@ -507,20 +507,26 @@ export default new Vuex.Store({
             .parentNodeId
         //console.log('REFERENCE PARENT NODE ID: ' + referenceParentNodeId)
         let childIndex = 0
-        for (const [key, nodeObject] of Object.entries(
+        for (const [key, referenceParentChildNodeObject] of Object.entries(
           state.nodeIDToNodeObjectMap[referenceParentNodeId]
             .children as NodeObject
         )) {
           //console.log('REFERENCE PARENT CHILD KEY: ' + key)
-          console.log('REFERENCE PARENT CHILD VALUE: ' + nodeObject)
-          //if nodeObject.id is the reference id splice that child from the parent
-          if (nodeObject.id == nodeToDelete.referencedByIds[i]) {
+          /*      console.log(
+            'REFERENCE PARENT CHILD VALUE: ' + referenceParentChildNodeObject
+          ) */
+          //if referenceParentChildNodeObject.id is the reference id splice that child from the parent
+          if (
+            referenceParentChildNodeObject.id == nodeToDelete.referencedByIds[i]
+          ) {
             state.nodeIDToNodeObjectMap[referenceParentNodeId].children.splice(
               childIndex,
               1
             )
             //then we have to delete the node object from the map
-            delete state.nodeIDToNodeObjectMap[nodeObject.id]
+            delete state.nodeIDToNodeObjectMap[
+              referenceParentChildNodeObject.id
+            ]
           }
           childIndex++
         }
@@ -529,13 +535,14 @@ export default new Vuex.Store({
       let parentId = nodeToDelete.parentNodeId
       console.log('PARENT ID: ' + parentId)
       let childIndex = 0
-      for (const [key, nodeObject] of Object.entries(
+      for (const [key, parentChildNodeObject] of Object.entries(
         state.nodeIDToNodeObjectMap[parentId].children as NodeObject
       )) {
-        if (nodeObject.id == nodeToDelete.id) {
+        if (parentChildNodeObject.id == nodeToDelete.id) {
           state.nodeIDToNodeObjectMap[parentId].children.splice(childIndex, 1)
           //then we have to delete the node object from the map
-          delete state.nodeIDToNodeObjectMap[nodeObject.id]
+          delete state.nodeIDToNodeObjectMap[parentChildNodeObject.id]
+          break
         }
         childIndex++
       }
@@ -548,19 +555,22 @@ export default new Vuex.Store({
         state.nodeIDToNodeObjectMap[payload.childId]
 
       //create new child node (it cannot be the same as every node needs unique ID)
-      let newChildNodeObject: NodeObject = Object.assign(childNodeObject)
+      let newChildNodeObject: NodeObject = Object.assign({}, childNodeObject)
       newChildNodeObject.id = state.idCounter
       newChildNodeObject.parentNodeId = payload.parentId //parent is the passed parent
+      //console.log('CHILD CHILDREN BEFORE: ' + childNodeObject.children)
       newChildNodeObject.children = []
+      newChildNodeObject.referencedByIds = []
+      //console.log('CHILD CHILDREN AFTER: ' + childNodeObject.children)
       //add reference to root node references
-      console.log('newChildNodeObject: ' + JSON.stringify(newChildNodeObject))
+      //console.log('newChildNodeObject: ' + JSON.stringify(newChildNodeObject))
       state.nodeIDToNodeObjectMap[
         newChildNodeObject.rootNodeId
       ].referencedByIds.push(newChildNodeObject.id)
-      parentNodeObject.children.push(childNodeObject)
-      console.log('newChildNodeObject.id:' + newChildNodeObject.id)
+      parentNodeObject.children.push(newChildNodeObject)
+      //console.log('newChildNodeObject.id:' + newChildNodeObject.id)
       state.nodeIDToNodeObjectMap[newChildNodeObject.id] = newChildNodeObject
-      Utils.sleep(200)
+      //Utils.sleep(200)
     },
     TEST_ACTION(state: MainVuexState, payload) {
       //console.log(JSON.stringify(state.nodeIDToNodeObjectMap[1]))
@@ -773,7 +783,7 @@ export default new Vuex.Store({
       return state.snackBarColor
     },
     getSelectedNodeSnippetText(state: MainVuexState): string {
-      //console.log('SELECTED NODE: ' + state.selectedNodeType)
+      console.log('SELECTED NODE: ' + state.selectedNodeName)
       if (state.selectedNodeType == 'sequences') {
         return SnippetCreator.getSequenceSnippet(
           state.selectedNodeName,
@@ -797,7 +807,7 @@ export default new Vuex.Store({
         )
       } else if (state.selectedNodeType == 'modules') {
         //TODO: check what happens here with added node IDs and children
-        console.log('state.selectedNodeId: ' + state.selectedNodeId)
+        /*         console.log('state.selectedNodeId: ' + state.selectedNodeId)
         console.log('state.selectedNodeName: ' + state.selectedNodeName)
         console.log(
           'state.nodeIDToNodeObjectMap[state.selectedNodeId].ctype: ' +
@@ -810,7 +820,7 @@ export default new Vuex.Store({
         console.log(
           'state.nodeIDToNodeObjectMap[state.selectedNodeId].children: ' +
             state.nodeIDToNodeObjectMap[state.selectedNodeId].children
-        )
+        ) */
         return SnippetCreator.getModuleSnippet(
           state.selectedNodeName,
           state.nodeIDToNodeObjectMap[state.selectedNodeId].ctype,

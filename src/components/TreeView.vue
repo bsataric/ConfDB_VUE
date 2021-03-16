@@ -53,7 +53,7 @@
             {{ '(' + item.referencedByIds.length + ')' }}
           </span>
           <!-- TODO: FIX THIS -->
-          <!--   <span
+          <span
             v-if="
               item.rootNodeId != item.id &&
                 item.rootNodeId != -1 &&
@@ -66,7 +66,7 @@
                   .length +
                 ')'
             }}
-          </span> -->
+          </span>
         </span>
       </template>
     </v-treeview>
@@ -307,8 +307,8 @@ export default class TreeView extends Vue {
         .filter((x) => !array.includes(x))
         .concat(array.filter((x) => !this.open.includes(x)))
     )
-    /*  console.log('DIFFERENCE:' + difference)
-    console.log('DIFFERENCE TYPE: ' + typeof difference) */
+    console.log('DIFFERENCE:' + difference)
+    console.log('DIFFERENCE TYPE: ' + typeof difference)
     if (Object.keys(this.getNodeIDToNodeObjectMap).length !== 0)
       this.fetchNodeById(difference)
     this.open = array
@@ -323,7 +323,7 @@ export default class TreeView extends Vue {
         .concat(array.filter((x) => !this.active.includes(x)))
     )
     if (array.length != 0) difference = array[0]
-    //console.log('DIFFERENCE: ' + difference)
+    console.log('DIFFERENCE: ' + difference)
     if (Object.keys(this.getNodeIDToNodeObjectMap).length !== 0)
       //if map is initialized
       this.fetchNodeById(difference)

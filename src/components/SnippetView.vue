@@ -22,7 +22,9 @@
         label=""
         placeholder=""
         readonly
-        v-html="getTextFieldValue(this.getSelectedNodeName)"
+        v-html="
+          getTextFieldValue(this.getSelectedNodeId, this.getSelectedNodeName)
+        "
       ></v-textarea>
     </div>
   </div>
@@ -36,10 +38,12 @@ import { mapGetters } from 'vuex'
   computed: {
     ...mapGetters({
       getSelectedNodeType: 'getSelectedNodeType',
+      getSelectedNodeId: 'getSelectedNodeId',
       getSelectedNodeName: 'getSelectedNodeName',
       getSelectedNodeSnippetText: 'getSelectedNodeSnippetText',
       getSequencesContainingCurrentNode: 'getSequencesContainingCurrentNode',
       getPathsContainingCurrentNode: 'getPathsContainingCurrentNode',
+      getNodeIDToNodeObjectMap: 'getNodeIDToNodeObjectMap',
       getDarkMode: 'getDarkMode',
       getConfigLoaded: 'getConfigLoaded',
     }),
@@ -50,11 +54,13 @@ export default class SnippetView extends Vue {
   private activeTab: number = 3
   //private triggered: boolean = false
   private getSelectedNodeType!: string
-  private getSelectedNodeName!: any
+  private getSelectedNodeId!: number
+  private getSelectedNodeName!: string
   private getSelectedNodeSnippetText!: any
   private getSequencesContainingCurrentNode!: any
   private getPathsContainingCurrentNode!: any
   private previousNodeName: string = ''
+  private getNodeIDToNodeObjectMap!: any
 
   private arrayOfSelectedObjects = []
 
@@ -181,11 +187,12 @@ export default class SnippetView extends Vue {
     }
     return this.disabledTabs[index] as boolean
   }
-  public getTextFieldValue(nodeName: string) {
-    console.log('getTextFieldValue TRIGGERED')
+  public getTextFieldValue(nodeId: number, nodeName: string) {
+    //console.log('getTextFieldValue TRIGGERED')
     //console.log('activeTab CHANGED ' + activeTab)
     //console.log('nodeName: ' + nodeName)
     //console.log('this.previousNodeName: ' + this.previousNodeName)
+    if (this.getNodeIDToNodeObjectMap[nodeId] == undefined) return
     if (this.previousNodeName != nodeName) {
       this.activeTab = 3 //force snippet
       //console.log('FORCING SNIPPET')
