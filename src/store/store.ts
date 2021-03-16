@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import { MainVuexState, NodeObject, NodeBasicInfo } from '../types'
 import Utils from '@/lib/utils'
-import JSONParser from '@/store/helpers/JSONParser'
+import MapToJSONParser from '@/store/helpers/MapToJSONParser'
 import GlobalService from '@/services/GlobalService'
 import SnippetCreator from '@/store/helpers/SnippetCreator'
 
@@ -592,7 +592,7 @@ export default new Vuex.Store({
     },
     PARSE_MAP_TO_JSON_FILE(state: MainVuexState) {
       //parse the map here
-      state.savedFileContent = JSONParser.parseMapToJSON(
+      state.savedFileContent = MapToJSONParser.parseMapToJSON(
         state.nodeIDToNodeObjectMap
       )
     },

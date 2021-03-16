@@ -952,7 +952,7 @@ export default {
         id: ++idCounter,
         name: key,
         type: 'essources',
-        globalType: 'essoourceNode',
+        globalType: 'essourceNode',
         children: [],
         parentNodeId: esSourcesObject['id'],
         rootNodeId: idCounter, //for the root nodes, rootNodeId = itself

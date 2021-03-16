@@ -25,12 +25,20 @@ export default {
         paths: {},
         mods: {},
         psets: {},
+        tasks: {},
+        esprods: {},
+        essources: {},
+        services: {},
       },
     }
     let sequencesObject: Object = {}
     let pathsObject: Object = {}
     let modulesObject: Object = {}
     let psetsObject: Object = {}
+    let tasksObject: Object = {}
+    let esProducersObject: Object = {}
+    let esSourcesObject: Object = {}
+    let servicesObject: Object = {}
 
     //parse the map here
     for (const [nodeId, nodeObject] of Object.entries(
@@ -108,10 +116,10 @@ export default {
         moduleObject['pytype'] = nodeIDToNodeObjectMap[nodeId].pytype
         modulesObject[nodeIDToNodeObjectMap[nodeId].name] = moduleObject
       } else if (
-        nodeIDToNodeObjectMap[nodeId].globalType == 'psetNode' //main module node
+        nodeIDToNodeObjectMap[nodeId].globalType == 'psetNode' //main pset node
       ) {
         let psetObject: Object = {}
-        //now go through all module children and add them to array
+        //now go through all pset children and add them to array
         for (const [key1, value1] of Object.entries(
           nodeIDToNodeObjectMap[nodeId].children
         )) {
@@ -142,6 +150,142 @@ export default {
           }
         }
         psetsObject[nodeIDToNodeObjectMap[nodeId].name] = psetObject
+      } else if (
+        nodeIDToNodeObjectMap[nodeId].globalType == 'taskNode' //main task node
+      ) {
+        tasksObject[nodeIDToNodeObjectMap[nodeId].name] = []
+        //now go through all task children and add them to array
+        for (const [key1, value1] of Object.entries(
+          nodeIDToNodeObjectMap[nodeId].children
+        )) {
+          let childrenObject = Array()
+          childrenObject.push(nodeIDToNodeObjectMap[nodeId].children[key1].type)
+          childrenObject.push(nodeIDToNodeObjectMap[nodeId].children[key1].name)
+          tasksObject[nodeIDToNodeObjectMap[nodeId].name].push(childrenObject)
+        }
+      } else if (
+        nodeIDToNodeObjectMap[nodeId].globalType == 'esproducerNode' //main esproducer node
+      ) {
+        let esProducerObject: Object = { params: {}, ctype: '', pytype: '' }
+
+        //now go through all esproducer children and add them to array
+        for (const [key1, value1] of Object.entries(
+          nodeIDToNodeObjectMap[nodeId].children
+        )) {
+          let paramObject: Object = {}
+          paramObject['type'] =
+            nodeIDToNodeObjectMap[nodeId].children[key1].type
+          if (
+            paramObject['type'] == 'cms.VPSet' ||
+            paramObject['type'] == 'cms.PSet' ||
+            paramObject['type'] == 'cms.untracked.PSet' ||
+            paramObject['type'] == 'cms.untracked.VPSet'
+          ) {
+            //parse children here recursivly to elementary parameter objects
+            this.parseRecursiveVPSetObject(
+              paramObject,
+              nodeIDToNodeObjectMap[nodeId].children[key1].children
+            )
+            esProducerObject['params'][
+              nodeIDToNodeObjectMap[nodeId].children[key1].name
+            ] = paramObject
+          } else {
+            paramObject['value'] =
+              nodeIDToNodeObjectMap[nodeId].children[key1].paremeterJSONValue
+
+            esProducerObject['params'][
+              nodeIDToNodeObjectMap[nodeId].children[key1].name.substring(
+                0,
+                nodeIDToNodeObjectMap[nodeId].children[key1].name.length - 3
+              )
+            ] = paramObject
+          }
+        }
+        esProducerObject['ctype'] = nodeIDToNodeObjectMap[nodeId].ctype
+        esProducerObject['pytype'] = nodeIDToNodeObjectMap[nodeId].pytype
+        esProducersObject[nodeIDToNodeObjectMap[nodeId].name] = esProducerObject
+      } else if (
+        nodeIDToNodeObjectMap[nodeId].globalType == 'essourceNode' //main essource node
+      ) {
+        let esSourceObject: Object = { params: {}, ctype: '', pytype: '' }
+
+        //now go through all essource children and add them to array
+        for (const [key1, value1] of Object.entries(
+          nodeIDToNodeObjectMap[nodeId].children
+        )) {
+          let paramObject: Object = {}
+          paramObject['type'] =
+            nodeIDToNodeObjectMap[nodeId].children[key1].type
+          if (
+            paramObject['type'] == 'cms.VPSet' ||
+            paramObject['type'] == 'cms.PSet' ||
+            paramObject['type'] == 'cms.untracked.PSet' ||
+            paramObject['type'] == 'cms.untracked.VPSet'
+          ) {
+            //parse children here recursivly to elementary parameter objects
+            this.parseRecursiveVPSetObject(
+              paramObject,
+              nodeIDToNodeObjectMap[nodeId].children[key1].children
+            )
+            esSourceObject['params'][
+              nodeIDToNodeObjectMap[nodeId].children[key1].name
+            ] = paramObject
+          } else {
+            paramObject['value'] =
+              nodeIDToNodeObjectMap[nodeId].children[key1].paremeterJSONValue
+
+            esSourceObject['params'][
+              nodeIDToNodeObjectMap[nodeId].children[key1].name.substring(
+                0,
+                nodeIDToNodeObjectMap[nodeId].children[key1].name.length - 3
+              )
+            ] = paramObject
+          }
+        }
+        esSourceObject['ctype'] = nodeIDToNodeObjectMap[nodeId].ctype
+        esSourceObject['pytype'] = nodeIDToNodeObjectMap[nodeId].pytype
+        esSourcesObject[nodeIDToNodeObjectMap[nodeId].name] = esSourceObject
+      } else if (
+        nodeIDToNodeObjectMap[nodeId].globalType == 'serviceNode' //main service node
+      ) {
+        let serviceObject: Object = { params: {}, ctype: '', pytype: '' }
+
+        //now go through all essource children and add them to array
+        for (const [key1, value1] of Object.entries(
+          nodeIDToNodeObjectMap[nodeId].children
+        )) {
+          let paramObject: Object = {}
+          paramObject['type'] =
+            nodeIDToNodeObjectMap[nodeId].children[key1].type
+          if (
+            paramObject['type'] == 'cms.VPSet' ||
+            paramObject['type'] == 'cms.PSet' ||
+            paramObject['type'] == 'cms.untracked.PSet' ||
+            paramObject['type'] == 'cms.untracked.VPSet'
+          ) {
+            //parse children here recursivly to elementary parameter objects
+            this.parseRecursiveVPSetObject(
+              paramObject,
+              nodeIDToNodeObjectMap[nodeId].children[key1].children
+            )
+            serviceObject['params'][
+              nodeIDToNodeObjectMap[nodeId].children[key1].name
+            ] = paramObject
+          } else {
+            paramObject['value'] =
+              nodeIDToNodeObjectMap[nodeId].children[key1].paremeterJSONValue
+
+            serviceObject['params'][
+              nodeIDToNodeObjectMap[nodeId].children[key1].name.substring(
+                0,
+                nodeIDToNodeObjectMap[nodeId].children[key1].name.length - 3
+              )
+            ] = paramObject
+          }
+        }
+        serviceObject['ctype'] = nodeIDToNodeObjectMap[nodeId].ctype
+        serviceObject['pytype'] = nodeIDToNodeObjectMap[nodeId].pytype
+        servicesObject[nodeIDToNodeObjectMap[nodeId].name] = serviceObject
       }
     }
 
@@ -149,6 +293,11 @@ export default {
     savedFileContentObject['configuration']['paths'] = pathsObject
     savedFileContentObject['configuration']['mods'] = modulesObject
     savedFileContentObject['configuration']['psets'] = psetsObject
+    savedFileContentObject['configuration']['tasks'] = tasksObject
+    savedFileContentObject['configuration']['esprods'] = esProducersObject
+    savedFileContentObject['configuration']['essources'] = esSourcesObject
+    savedFileContentObject['configuration']['services'] = servicesObject
+
     let savedFileContent = JSON.stringify(savedFileContentObject, undefined, 2)
     return savedFileContent
   },
