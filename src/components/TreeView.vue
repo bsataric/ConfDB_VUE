@@ -337,6 +337,7 @@ export default class TreeView extends Vue {
     this.nonTopLevelNodeNameIdMap = {}
     this.idCounter = 1
 
+    let t0 = performance.now()
     this.$store.dispatch('setConfigLoaded', false)
 
     Promise.all([
@@ -447,14 +448,10 @@ export default class TreeView extends Vue {
 
       //initilaize id counter in the store so other components can get/modify it
       this.$store.dispatch('setInitialIDCounter', this.idCounter)
-      let t0 = performance.now()
-
       this.$store.dispatch('createObjectReferences')
-      var t1 = performance.now()
-
       this.$store.dispatch('setConfigLoaded', true)
 
-      //var t1 = performance.now()
+      let t1 = performance.now()
 
       this.$store.dispatch('setSnackBarText', {
         snackBarText:
@@ -469,10 +466,13 @@ export default class TreeView extends Vue {
   async fetchConfigurationFromFile(fileContent: any) {
     //reset maps and ID counters
     this.nodeIDToNodeObjectMap = {}
+    this.topLevelNodeTypeIds = {}
+    this.nonTopLevelNodeNameIdMap = {}
     this.idCounter = 1
 
-    this.$store.dispatch('setConfigLoaded', false)
     let t0 = performance.now()
+
+    this.$store.dispatch('setConfigLoaded', false)
 
     Promise.all([
       await this.$store.dispatch('fetchConfiguration', {
