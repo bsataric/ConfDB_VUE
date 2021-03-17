@@ -136,16 +136,6 @@ export default new Vuex.Store({
       state.nonTopLevelNodeNameIdMap = payload
     },
     CREATE_NODE_ID_TO_OBJECT_REFERENCES(state: MainVuexState) {
-      /*    id: number
-      name: string
-      type: string
-      globalType: string
-      children: Array<Object>
-      parentNodeId: number
-      referencedByIds: Array<number>
-      iconType: string
-      iconColor: string
-      value: string */
       //console.log('CREATING REFERENCES')
       //now pass through all the parameters of
       //console.log('MAP 1: ' + state.nodeIDToNodeObjectMap[1].globalType)
@@ -160,13 +150,14 @@ export default new Vuex.Store({
         'services',
       ]
 
-      //first go through all top level sequences
+      //go through all top level nodes
       for (
         let nameCounter = 0;
         nameCounter < nodeNameArray.length;
         nameCounter++
       ) {
         for (
+          //go through all top level node IDs of a particular type
           let i = 0;
           i < state.topLevelNodeTypeIds[nodeNameArray[nameCounter]].length;
           i++
@@ -176,11 +167,11 @@ export default new Vuex.Store({
           let topLevelNodeName =
             state.nodeIDToNodeObjectMap[topLevelNodeId].name
           //console.log('TOP LEVEL SEQUENCE: ' + topLevelNodeName)
-          let referenceIds = state.nonTopLevelNodeNameIdMap[topLevelNodeName]
+          let referenceIds = state.nonTopLevelNodeNameIdMap[topLevelNodeName] //get all references of a node name
           if (referenceIds != undefined)
             state.nodeIDToNodeObjectMap[
               topLevelNodeId
-            ].referencedByIds = referenceIds.slice()
+            ].referencedByIds = referenceIds.slice() //copy all reference IDs in node map object reference IDs
           /*   if (nodeNameArray[nameCounter] == 'modules')
             console.log(
               'TOP LEVEL ' + nodeNameArray[nameCounter] + ' referenceIds: ' +
@@ -191,14 +182,14 @@ export default new Vuex.Store({
           for (
             let j = 0;
             j <
-            state.nodeIDToNodeObjectMap[topLevelNodeId].referencedByIds.length;
+            state.nodeIDToNodeObjectMap[topLevelNodeId].referencedByIds.length; //go through all references
             j++
           ) {
             let nonTopLevelId =
-              state.nodeIDToNodeObjectMap[topLevelNodeId].referencedByIds[j]
+              state.nodeIDToNodeObjectMap[topLevelNodeId].referencedByIds[j] //take the id of reference
             state.nodeIDToNodeObjectMap[
               nonTopLevelId
-            ].rootNodeId = topLevelNodeId
+            ].rootNodeId = topLevelNodeId //connect the root node to this reference
             /*       if (nodeNameArray[nameCounter] == 'modules')
               console.log(
                 'Leaf' +
@@ -209,193 +200,6 @@ export default new Vuex.Store({
           }
         }
       }
-
-      /*      let counter = 0
-      for (const [nodeId, nodeObject] of Object.entries(
-        state.nodeIDToNodeObjectMap as Map<number, NodeObject>
-      )) { */
-      /*       if (Number.parseInt(nodeId) == 3818) {
-          console.log('ID: ' + nodeObject.id)
-          console.log('NAME: ' + nodeObject.name)
-          console.log('TYPE: ' + nodeObject.type)
-          console.log('GLOBALTYPE: ' + nodeObject.globalType)
-          console.log('PARENTNODEID:' + nodeObject.parentNodeId)
-        } */
-
-      //if (nodeObject.parentNodeId > 0) {
-      /*  console.log(
-            'TYPE:' + state.nodeIDToNodeObjectMap[nodeObject.parentNodeId].type
-          ) */
-      /*      if (
-            state.nodeIDToNodeObjectMap[nodeObject.parentNodeId].type == 'seqs'
-          ) {
-            //TOP LEVEL SEQUENCE REFERENCES
-            let sequenceName = nodeObject.name
-            for (const [key1, sequenceNodeObject] of Object.entries(
-              //search through all nodes for references
-              state.nodeIDToNodeObjectMap as Map<number, NodeObject>
-            )) {
-              if (sequenceNodeObject.parentNodeId > 0) {
-                let parentType: string =
-                  state.nodeIDToNodeObjectMap[sequenceNodeObject.parentNodeId]
-                    .type
-                if (
-                  (parentType == 'sequences' || parentType == 'paths') &&
-                  sequenceName == sequenceNodeObject.name
-                ) {
-                  //nesting
-                  nodeObject.referencedByIds.push(sequenceNodeObject.id)
-                  sequenceNodeObject.rootNodeId = nodeObject.id
-                }
-              }
-            }
-            //push this sequence ID in sequence IDs array
-            if (state.topLevelNodeTypeIds['sequences'] == undefined) {
-              state.topLevelNodeTypeIds['sequences'] = []
-              state.topLevelNodeTypeIds['sequences'].push(nodeObject.id)
-            } else state.topLevelNodeTypeIds['sequences'].push(nodeObject.id)
-            //console.log('TOP SEQUENCE NAME: ' + nodeObject.name)
-            //console.log('REFERENCES: ' + nodeObject.referencedByIds)
-          } else */
-      /* if (
-            state.nodeIDToNodeObjectMap[nodeObject.parentNodeId].type == 'tsks'
-          ) {
-            //TOP LEVEL SEQUENCE REFERENCES
-            let taskName = nodeObject.name
-            for (const [key1, taskNodeObject] of Object.entries(
-              //search through all nodes for references
-              state.nodeIDToNodeObjectMap as Map<number, NodeObject>
-            )) {
-              if (taskNodeObject.parentNodeId > 0) {
-                //console.log('PARENT NODE ID: ' + taskNodeObject.parentNodeId)
-
-                let parentType: string =
-                  state.nodeIDToNodeObjectMap[taskNodeObject.parentNodeId].type
-                if (
-                  (parentType == 'sequences' ||
-                    parentType == 'tasks' ||
-                    parentType == 'paths') &&
-                  taskName == taskNodeObject.name
-                ) {
-                  //nesting
-                  nodeObject.referencedByIds.push(taskNodeObject.id)
-                  taskNodeObject.rootNodeId = nodeObject.id
-                }
-              }
-            }
-
-            if (state.topLevelNodeTypeIds['tasks'] == undefined) {
-              state.topLevelNodeTypeIds['tasks'] = []
-              state.topLevelNodeTypeIds['tasks'].push(nodeObject.id)
-            } else state.topLevelNodeTypeIds['tasks'].push(nodeObject.id)
-            //console.log('TOP SEQUENCE NAME: ' + nodeObject.name)
-            //console.log('REFERENCES: ' + nodeObject.referencedByIds)
-          } else */
-      /*  if (
-            state.nodeIDToNodeObjectMap[nodeObject.parentNodeId].type == 'pts' //TOP LEVEL PATH REFERENCES
-          ) {
-            let pathName = nodeObject.name
-            for (const [key1, pathNodeObject] of Object.entries(
-              //search through all nodes for references
-              state.nodeIDToNodeObjectMap as Map<number, NodeObject>
-            )) {
-              if (pathNodeObject.parentNodeId > 0) {
-                let parentType: string =
-                  state.nodeIDToNodeObjectMap[pathNodeObject.parentNodeId].type
-                if (parentType == 'paths' && pathName == pathNodeObject.name) {
-                  //nesting
-                  nodeObject.referencedByIds.push(pathNodeObject.id)
-                  pathNodeObject.rootNodeId = nodeObject.id
-                }
-              }
-            }
-            if (state.topLevelNodeTypeIds['paths'] == undefined) {
-              state.topLevelNodeTypeIds['paths'] = []
-              state.topLevelNodeTypeIds['paths'].push(nodeObject.id)
-            } else state.topLevelNodeTypeIds['paths'].push(nodeObject.id)
-            //console.log('TOP PATH NAME: ' + nodeObject.name)
-            //console.log('REFERENCES: ' + nodeObject.referencedByIds)
-          } else */
-      /*  if (
-            state.nodeIDToNodeObjectMap[nodeObject.parentNodeId].type == 'mods' //TOP LEVEL MODULE REFERENCES
-          ) {
-            counter++
-
-            //console.log('AAAAAAAAAAAAAA')
-            let moduleName = nodeObject.name
-            for (const [key1, moduleNodeObject] of Object.entries(
-              //search through all nodes for references
-              state.nodeIDToNodeObjectMap as Map<number, NodeObject>
-            )) {
-              counter++
-
-              if (moduleNodeObject.parentNodeId > 0) {
-                let parentType: string =
-                  state.nodeIDToNodeObjectMap[moduleNodeObject.parentNodeId]
-                    .type
-                if (
-                  (parentType == 'sequences' ||
-                    parentType == 'paths' ||
-                    parentType == 'tasks') &&
-                  moduleName == moduleNodeObject.name
-                ) {
-                  //nesting
-                  nodeObject.referencedByIds.push(moduleNodeObject.id)
-                  moduleNodeObject.rootNodeId = nodeObject.id
-                }
-              }
-            }
-            if (state.topLevelNodeTypeIds['modules'] == undefined) {
-              state.topLevelNodeTypeIds['modules'] = []
-              state.topLevelNodeTypeIds['modules'].push(nodeObject.id)
-            } else state.topLevelNodeTypeIds['modules'].push(nodeObject.id)
-            //console.log('TOP MODULE NAME: ' + nodeObject.name)
-            //console.log('REFERENCES: ' + nodeObject.referencedByIds)
-          } else  */
-      /* if (
-            state.nodeIDToNodeObjectMap[nodeObject.parentNodeId].type ==
-            'esprods' //TOP LEVEL ESPRODUCER REFERENCES
-          ) {
-            //TODO: not sure if ESP can have references appart from tags
-            if (state.topLevelNodeTypeIds['esproducers'] == undefined) {
-              state.topLevelNodeTypeIds['esproducers'] = []
-              state.topLevelNodeTypeIds['esproducers'].push(nodeObject.id)
-            } else state.topLevelNodeTypeIds['esproducers'].push(nodeObject.id)
-          } else */
-      /*  if (
-            state.nodeIDToNodeObjectMap[nodeObject.parentNodeId].type == 'psets' //TOP LEVEL PSET REFERENCES
-          ) {
-            //TODO: not sure if PSETS can have references appart from tags
-            if (state.topLevelNodeTypeIds['psets'] == undefined) {
-              state.topLevelNodeTypeIds['psets'] = []
-              state.topLevelNodeTypeIds['psets'].push(nodeObject.id)
-            } else state.topLevelNodeTypeIds['psets'].push(nodeObject.id)
-          } else  */
-      /* if (
-            state.nodeIDToNodeObjectMap[nodeObject.parentNodeId].type ==
-            'essour' //TOP LEVEL ESSOURCE REFERENCES
-          ) {
-            //TODO: not sure if ESSOURCES can have references appart from tags
-            if (state.topLevelNodeTypeIds['essources'] == undefined) {
-              state.topLevelNodeTypeIds['essources'] = []
-              state.topLevelNodeTypeIds['essources'].push(nodeObject.id)
-            } else state.topLevelNodeTypeIds['essources'].push(nodeObject.id)
-          } else  */
-      /* if (
-            state.nodeIDToNodeObjectMap[nodeObject.parentNodeId].type == 'serv' //TOP LEVEL SERVICE REFERENCES
-          ) {
-            //TODO: not sure if SERVICES can have references appart from tags
-            if (state.topLevelNodeTypeIds['services'] == undefined) {
-              state.topLevelNodeTypeIds['services'] = []
-              state.topLevelNodeTypeIds['services'].push(nodeObject.id)
-            } else state.topLevelNodeTypeIds['services'].push(nodeObject.id)
-          } */
-      //}
-      //take each node name and iterate through all the other nodes recurcivly to find possible references
-      //}
-
-      //console.log('COUNTER: ' + counter)
-      //console.log('state.topLevelNodeTypeIds: ' + JSON.stringify(state.topLevelNodeTypeIds))
     },
     SET_JSON_CONFIGURATION(state: MainVuexState, payload) {
       state.JSONconfiguration = payload
