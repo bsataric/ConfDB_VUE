@@ -14,13 +14,7 @@
           :key="menuItem[0]"
           @click="clickAction($event, menuItem[0])"
         >
-          <div v-if="menuItem[0] != 'Add Module'">
-            <v-list-item-title
-              >{{ menuItem[0] }}
-              <v-divider v-if="menuItem[1] == 'Separator'"></v-divider>
-            </v-list-item-title>
-          </div>
-          <div v-else>
+          <div v-if="menuItem[0] == 'Add Module'">
             <v-list>
               <v-list-group>
                 <template v-slot:activator>
@@ -41,6 +35,12 @@
                 </v-list-item>
               </v-list-group>
             </v-list>
+          </div>
+          <div v-else>
+            <v-list-item-title
+              >{{ menuItem[0] }}
+              <v-divider v-if="menuItem[1] == 'Separator'"></v-divider>
+            </v-list-item-title>
           </div>
         </v-list-item>
       </v-list>
@@ -74,6 +74,7 @@
 </template>
 
 <script lang="ts">
+//import utils from '@/lib/utils'
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator'
 import { mapGetters } from 'vuex'
 // eslint-disable-next-line no-unused-vars
@@ -108,7 +109,7 @@ export default class TreeViewRightClick extends Vue {
   @Watch('showMenu')
   // eslint-disable-next-line no-unused-vars
   onShowMenuChanged(val: any, oldVal: any) {
-    console.log('showMenu NEW VAL:' + val)
+    //console.log('showMenu NEW VAL:' + val)
     //console.log('showMenu OLDVAL: ' + oldVal)
   }
 
@@ -202,9 +203,9 @@ export default class TreeViewRightClick extends Vue {
 
   // eslint-disable-next-line no-unused-vars
   public clickAction(e: Event, actionName: string) {
-    console.log('ACTION NAME: ' + actionName)
+    /*     console.log('ACTION NAME: ' + actionName)
     console.log('NODE TYPE: ' + this.rightClickNodeType)
-    console.log('NODE ID: ' + this.rightClickNodeId)
+    console.log('NODE ID: ' + this.rightClickNodeId) */
     e.preventDefault() //prevent context menu from closing if action is clicked
     e.stopPropagation()
     if (this.rightClickNodeType == 'seqs') {
@@ -279,12 +280,15 @@ export default class TreeViewRightClick extends Vue {
     }
   }
 
-  public clickSubAction(
+  async clickSubAction(
     e: Event,
     subactionName: string,
     nodeBasicInfo: NodeBasicInfo
   ) {
-    console.log('NODE OBJECT ID: ' + nodeBasicInfo.id)
+    //e.preventDefault() //prevent context menu from closing if action is clicked
+    //e.stopPropagation()
+    //console.log('ROOT NODE ID: ' + nodeBasicInfo.id)
+    console.log('clickSubAction called')
     if (subactionName == 'insertNode') {
       Promise.all([
         [this.$store.dispatch('incrementIDCounter')],
@@ -292,17 +296,28 @@ export default class TreeViewRightClick extends Vue {
 
         //Focus and open/active new node
       ]).finally(() => {
+        let referenceId = this.getIDCounter
+
         Promise.all([
           //set new object into main map
           this.$store.dispatch('insertNodeReference', {
             parentId: this.rightClickNodeId,
-            childId: nodeBasicInfo.id,
+            rootNodeId: nodeBasicInfo.id,
           }),
         ]).finally(() => {
           //TODO: fix focus
-          /*      this.$store.dispatch('setSelectedNodeViaID', {
-            selectedNodeId: this.getIDCounter,
+          //utils.sleep(1000)
+          this.$store.dispatch('setSelectedNodeViaID', {
+            selectedNodeId: referenceId,
             forceOpenNode: true,
+            forceOpenReferenceIds: false,
+          })
+
+          /*    let rootNodeId = this.getNodeIDToNodeObjectMap[referenceId].rootNodeId
+
+          this.$store.dispatch('setSelectedNodeViaID', {
+            selectedNodeId: rootNodeId,
+            forceOpenNode: false,
           }) */
           //Display snackbar success
           this.$store.dispatch('setSnackBarText', {
@@ -352,6 +367,7 @@ export default class TreeViewRightClick extends Vue {
           this.$store.dispatch('setSelectedNodeViaID', {
             selectedNodeId: newSequenceId,
             forceOpenNode: true,
+            forceOpenReferenceIds: false,
           })
           //Display snackbar success
           this.$store.dispatch('setSnackBarText', {

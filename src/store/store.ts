@@ -21,6 +21,8 @@ const state: MainVuexState = {
   selectedNodeId: -1,
   selectedNodeParamLength: 0,
   selectedNodeParentId: 0,
+  selectedNodeParentParentId: 0,
+  //nodePreviousReferenceId: -1,
   //node ID to Object map containing all information about every node in the configuration tree
   nodeIDToNodeObjectMap: {},
   //arrays holding IDs of specific node types
@@ -49,34 +51,74 @@ export default new Vuex.Store({
   state,
   mutations: {
     SET_SELECTED_NODE_VIA_ID(state: MainVuexState, payload) {
-      console.log('SELECTED NODE ID: ' + payload.selectedNodeId)
+      console.log('SET_SELECTED_NODE_VIA_ID : ' + payload.selectedNodeId)
+      /*console.log(
+        'SELECTED NODE ROOT ID: ' +
+          state.nodeIDToNodeObjectMap[payload.selectedNodeId].rootNodeId
+      ) */
+      //if (state.nodePreviousReferenceId != -1) {
+      //splice prefious reference from open nodes if it exists
+      //}
+
+      let referenceNode =
+        payload.selectedNodeId ==
+        state.nodeIDToNodeObjectMap[payload.selectedNodeId].rootNodeId
+          ? false
+          : true
       //console.log('state.openNodeIds: ' + state.openNodeIds)
-      state.selectedNodeId = payload.selectedNodeId //get all info just via ID
+      console.log('REFERENCE NODE: ' + referenceNode)
+
+      /*   if (!referenceNode) */ state.selectedNodeId = payload.selectedNodeId
+      /*       else
+        state.selectedNodeId =
+          state.nodeIDToNodeObjectMap[payload.selectedNodeId].rootNodeId */
+
+      //get all info just via ID
+      //console.log('state.selectedNodeId: ' + state.selectedNodeId)
       //console.log(typeof state.selectedNodeId)
       //override leaf nodes
       state.selectedNodeType =
-        state.nodeIDToNodeObjectMap[payload.selectedNodeId].type
+        state.nodeIDToNodeObjectMap[state.selectedNodeId].type
       state.selectedNodeName =
-        state.nodeIDToNodeObjectMap[payload.selectedNodeId].name
-      console.log('state.selectedNodeName ' + state.selectedNodeName)
+        state.nodeIDToNodeObjectMap[state.selectedNodeId].name
+      //console.log('state.selectedNodeName ' + state.selectedNodeName)
       state.selectedNodeCType =
-        state.nodeIDToNodeObjectMap[payload.selectedNodeId].ctype
+        state.nodeIDToNodeObjectMap[state.selectedNodeId].ctype
       state.selectedNodeParamLength =
-        state.nodeIDToNodeObjectMap[payload.selectedNodeId].children.length
-      state.selectedNodeParentId =
-        state.nodeIDToNodeObjectMap[payload.selectedNodeId].parentNodeId
-      let forceOpenNode = payload.forceOpenNode //if node is opened by foce open it's parent as well
+        state.nodeIDToNodeObjectMap[state.selectedNodeId].children.length
 
-      //console.log('FORCED OPEN NODE: ' + forceOpenNode)
-      if (forceOpenNode) {
-        state.forcedActiveNodeId = state.selectedNodeId
-        //console.log('FORCED NODE ID: ' + state.forcedActiveNodeId)
+      if (!referenceNode)
+        state.selectedNodeParentId =
+          state.nodeIDToNodeObjectMap[state.selectedNodeId].parentNodeId
+      else {
+        state.selectedNodeParentId =
+          state.nodeIDToNodeObjectMap[state.selectedNodeId].parentNodeId
+        state.selectedNodeParentParentId =
+          state.nodeIDToNodeObjectMap[state.selectedNodeParentId].parentNodeId
       }
+      let forceOpenNode = payload.forceOpenNode //if node is opened by foce open it's parent as well
+      let forceOpenReferenceIds = payload.forceOpenReferenceIds
 
-      let idIndex = state.openNodeIds.indexOf(payload.selectedNodeId)
+      //console.log('state.selectedNodeParentId ' + state.selectedNodeParentId)
+      //console.log('FORCED OPEN NODE: ' + forceOpenNode)
+      let idIndex = -1
+      //if (!referenceNode) {
+      if (forceOpenNode) state.forcedActiveNodeId = state.selectedNodeId
+      idIndex = state.openNodeIds.indexOf(state.selectedNodeId)
+      //}
+      //root and selected are same
+      //else {
+      /*    if (forceOpenNode) state.forcedActiveNodeId = payload.selectedNodeId //selected is reference, different then root
+        idIndex = state.openNodeIds.indexOf(payload.selectedNodeId) */
+
+      /*      console.log('state.forcedActiveNodeId: ' + state.forcedActiveNodeId)
+          console.log('idIndex: ' + idIndex) */
+      // }
+      //console.log('FORCED NODE ID: ' + state.forcedActiveNodeId)
+
       //console.log('SELECTED NODE ID: ' + state.selectedNodeId)
       //console.log('OPEN NODES BEFORE: ' + state.openNodeIds)
-      //console.log('IDINDEX: ' + idIndex)
+      console.log('IDINDEX: ' + idIndex)
 
       if (idIndex == -1) {
         //console.log('OVDE USAO')
@@ -88,15 +130,37 @@ export default new Vuex.Store({
           let parentNodeIndex = state.openNodeIds.indexOf(
             state.selectedNodeParentId
           )
-          //console.log('PARENT NODE INDEX: ' + parentNodeIndex)
-          //console.log('state.selectedNodeParentId' + state.selectedNodeParentId)
+          let parentParentNodeIndex = -1
+          if (referenceNode) {
+            parentParentNodeIndex = state.openNodeIds.indexOf(
+              state.selectedNodeParentParentId
+            )
+          }
+          /*     console.log('PARENT NODE INDEX: ' + parentNodeIndex)
+          console.log(
+            'state.selectedNodeParentId ' + state.selectedNodeParentId
+          )  */
           if (parentNodeIndex == -1) {
             //push parent node on array as well
             state.openNodeIds.push(state.selectedNodeParentId)
           }
-          //else do nothing (TODO MAYBE FOCUS OR ACTIVATE)
+          if (referenceNode && parentParentNodeIndex == -1) {
+            //if reference push parent's parent on array as well (hopefully only 2 levels)
+            state.openNodeIds.push(state.selectedNodeParentParentId)
+          }
         }
+        //if (!referenceNode) {
+        console.log('state.openNodeIds.push ' + state.selectedNodeId)
         state.openNodeIds.push(state.selectedNodeId)
+        //console.log('NON REFERENCE NODE INSERTED!')
+        //console.log('state.openNodeIds: ' + state.openNodeIds)
+        //} else {
+        //for reference node we have to open parent of parent as well
+        //state
+        //state.openNodeIds.push(payload.selectedNodeId)
+        //console.log('REFERENCE NODE INSERTED!')
+        //console.log('state.openNodeIds: ' + state.openNodeIds)
+        //}
       } else {
         if (forceOpenNode) {
           //if force is enwoked both node and it's parent have to be opened
@@ -114,18 +178,22 @@ export default new Vuex.Store({
           }
           //else do nothing (both nodes are already open - TODO MAYBE FOCUS OR ACTIVATE)
         }
-        //console.log('SPLICE')
-        if (!forceOpenNode) state.openNodeIds.splice(idIndex, 1) //close the node if already open (not if forced)
+        if (!forceOpenNode) {
+          console.log('state.openNodeIds.splice at index ' + idIndex)
+          state.openNodeIds.splice(idIndex, 1) //close the node if already open (not if forced)
+        }
       }
 
-      //console.log('OPEN NODES AFTER: ' + state.openNodeIds)
+      console.log('OPEN NODES AFTER: ' + state.openNodeIds)
       if (forceOpenNode) {
         //console.log('FORCED OPEN!')
         state.forcedOpenNodeIds = [...state.openNodeIds] //cannot assign by reference, but copy whole array
         //console.log('FORCED ARRAY: ' + state.forcedOpenNodeIds)
       }
+
       //state.openNodeIds = [1]
     },
+    SET_SELECTED_NODE_FOCUS_VIA_ID(state: MainVuexState, payload) {},
     SET_ID_TO_NODE_OBJECT_MAP(state: MainVuexState, payload) {
       state.nodeIDToNodeObjectMap = payload
     },
@@ -353,13 +421,11 @@ export default new Vuex.Store({
     },
     INSERT_NODE_REFERENCE(state: MainVuexState, payload) {
       //we need parent node ID plus inserted node ID. Calculate the references
-      let parentNodeObject: NodeObject =
-        state.nodeIDToNodeObjectMap[payload.parentId]
-      let childNodeObject: NodeObject =
-        state.nodeIDToNodeObjectMap[payload.childId]
-
       //create new child node (it cannot be the same as every node needs unique ID)
-      let newChildNodeObject: NodeObject = Object.assign({}, childNodeObject)
+      let newChildNodeObject: NodeObject = Object.assign(
+        {},
+        state.nodeIDToNodeObjectMap[payload.rootNodeId]
+      )
       newChildNodeObject.id = state.idCounter
       newChildNodeObject.parentNodeId = payload.parentId //parent is the passed parent
       //console.log('CHILD CHILDREN BEFORE: ' + childNodeObject.children)
@@ -371,10 +437,16 @@ export default new Vuex.Store({
       state.nodeIDToNodeObjectMap[
         newChildNodeObject.rootNodeId
       ].referencedByIds.push(newChildNodeObject.id)
-      parentNodeObject.children.push(newChildNodeObject)
+      state.nodeIDToNodeObjectMap[payload.parentId].children.push(
+        newChildNodeObject
+      )
       //console.log('newChildNodeObject.id:' + newChildNodeObject.id)
       state.nodeIDToNodeObjectMap[newChildNodeObject.id] = newChildNodeObject
-      //Utils.sleep(200)
+      /*  console.log(
+        'state.nodeIDToNodeObjectMap[newChildNodeObject.id]: ' +
+          JSON.stringify(state.nodeIDToNodeObjectMap[newChildNodeObject.id])
+      ) */
+      //Utils.sleep(1000)
     },
     TEST_ACTION(state: MainVuexState, payload) {
       //console.log(JSON.stringify(state.nodeIDToNodeObjectMap[1]))
@@ -471,6 +543,9 @@ export default new Vuex.Store({
     },
     setSelectedNodeViaID({ commit }, payload) {
       commit('SET_SELECTED_NODE_VIA_ID', payload)
+    },
+    setSelectedNodeFocusViaID({ commit }, payload) {
+      commit('SET_SELECTED_NODE_FOCUS_VIA_ID', payload)
     },
     setInitialIDCounter({ commit }, payload) {
       commit('SET_INITIAL_ID_COUNTER', payload)
@@ -587,7 +662,7 @@ export default new Vuex.Store({
       return state.snackBarColor
     },
     getSelectedNodeSnippetText(state: MainVuexState): string {
-      console.log('SELECTED NODE: ' + state.selectedNodeName)
+      //console.log('SELECTED NODE: ' + state.selectedNodeName)
       if (state.selectedNodeType == 'sequences') {
         return SnippetCreator.getSequenceSnippet(
           state.selectedNodeName,

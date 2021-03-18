@@ -181,6 +181,7 @@ export default class TreeView extends Vue {
 
   private getOpenNodeIds!: any
   private getForcedOpenNodeIds!: any
+  private getIDCounter!: number
 
   private sequencesId!: number
   private pathsId!: number
@@ -250,15 +251,24 @@ export default class TreeView extends Vue {
       'this.getNodeIDToNodeObjectMap[itemId].children: ' +
         this.getNodeIDToNodeObjectMap[itemId].children
     ) */
+    console.log('ITEM ID: ' + itemId)
     if (this.getNodeIDToNodeObjectMap[itemId].children.length == 0) {
       itemId = this.getNodeIDToNodeObjectMap[itemId].rootNodeId
       console.log('ROOT NODE ID: ' + itemId)
-    }
 
-    await this.$store.dispatch('setSelectedNodeViaID', {
-      selectedNodeId: itemId,
-      forceOpenNode: false,
-    })
+      await this.$store.dispatch('setSelectedNodeViaID', {
+        selectedNodeId: itemId,
+        forceOpenNode: false,
+        forceOpenReferenceIds: true,
+      })
+    }
+    //console.log('fetchNodeById CALLED')
+    else
+      await this.$store.dispatch('setSelectedNodeViaID', {
+        selectedNodeId: itemId,
+        forceOpenNode: false,
+        forceOpenReferenceIds: false,
+      })
   }
 
   public showRightClickMenu(e: any, itemType: string, itemId: number): void {
@@ -267,12 +277,12 @@ export default class TreeView extends Vue {
     this.rightClickNodeType = itemType
     this.rightClickNodeId = itemId
     this.showMenu = false
-    console.log('SET FALSE')
+    //console.log('SET FALSE')
     this.x = e.clientX
     this.y = e.clientY
     this.$nextTick(() => {
       this.showMenu = true
-      console.log('SET TRUE')
+      //console.log('SET TRUE')
     })
   }
 
@@ -301,18 +311,31 @@ export default class TreeView extends Vue {
 
   //Very important function, basically decides which node is clicked upon and gets all info about it
   public updateOpenNodes(array: any) {
-    //console.log('THIS OPEN BEFORE: ' + this.open)
+    console.log('THIS OPEN BEFORE: ' + this.open)
+    console.log('array BEFORE: ' + array)
     let difference: number = parseInt(
       this.open
         .filter((x) => !array.includes(x))
         .concat(array.filter((x) => !this.open.includes(x)))
     )
-    console.log('DIFFERENCE:' + difference)
-    console.log('DIFFERENCE TYPE: ' + typeof difference)
-    if (Object.keys(this.getNodeIDToNodeObjectMap).length !== 0)
+
+    if (Object.keys(this.getNodeIDToNodeObjectMap).length !== 0) {
+      console.log('updateOpenNodes DIFFERENCE:' + difference)
       this.fetchNodeById(difference)
-    this.open = array
-    //console.log('THIS OPEN AFTER: ' + array)
+      //console.log('updateOpenNodes DIFFERENCE TYPE: ' + typeof difference)
+    }
+    if (!isNaN(difference)) {
+      if (this.open.indexOf(difference) == -1)
+        if (array.indexOf(difference) == -1)
+          //special case for forced references
+          this.open = [...array, difference]
+        else this.open = array
+      else {
+        console.log('DIFFERENCE INDEX: ' + this.open.indexOf(difference))
+        this.open.splice(this.open.indexOf(difference), 1)
+      }
+    }
+    console.log('THIS OPEN AFTER: ' + this.open)
   }
 
   public updateActiveNodes(array: any) {
@@ -323,10 +346,13 @@ export default class TreeView extends Vue {
         .concat(array.filter((x) => !this.active.includes(x)))
     )
     if (array.length != 0) difference = array[0]
-    console.log('DIFFERENCE: ' + difference)
-    if (Object.keys(this.getNodeIDToNodeObjectMap).length !== 0)
+    if (Object.keys(this.getNodeIDToNodeObjectMap).length !== 0) {
       //if map is initialized
+      console.log('updateActiveNodes DIFFERENCE: ' + difference)
       this.fetchNodeById(difference)
+      /*       console.log('updateActiveNodes DIFFERENCE TYPE: ' + typeof difference)
+       */
+    }
     this.active = array
   }
 
@@ -608,13 +634,20 @@ export default class TreeView extends Vue {
 
   updated() {
     //console.log('UPDATED')
-    this.$nextTick(() => {
+    this.$nextTick().then(() => {
       if (this.forcedActive.length != 0) {
         let forced = this.forcedActive[0]
-        /*  console.log(
-          'this.$refs.treeReference' + this.$refs.treeReference.nodes[forced].vnode
+        /*       console.log(
+          'this.$refs.treeReference ' + //@ts-ignore
+            this.$refs.treeReference.nodes[forced].vnode
+        )
+        console.log(
+          'this.getNodeIDToNodeObjectMap[forced] ' +
+            JSON.stringify(this.getNodeIDToNodeObjectMap[forced])
         ) */
-        console.log('FORCEEEED: ' + forced)
+        //console.log('ID COUNTER: ' + this.getIDCounter)
+        //console.log('FORCEEEED: ' + forced)
+        //forced = this.getIDCounter
         //@ts-ignore
         this.$refs.treeReference.nodes[forced].vnode.$el.scrollIntoView({
           behavior: 'smooth',

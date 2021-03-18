@@ -221,6 +221,7 @@ export default class SnippetView extends Vue {
     await this.$store.dispatch('setSelectedNodeViaID', {
       selectedNodeId: itemId,
       forceOpenNode: true,
+      forceOpenReferenceIds: false,
     })
   }
 }
