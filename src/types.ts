@@ -43,4 +43,5 @@ export interface NodeBasicInfo {
   id: number
   name: string
   type: string
+  text: string
 }

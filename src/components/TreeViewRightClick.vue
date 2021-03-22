@@ -14,34 +14,9 @@
           :key="menuItem[0]"
           @click="clickAction($event, menuItem[0])"
         >
-          <div v-if="menuItem[0] == 'Add Module'">
-            <v-list>
-              <v-list-group>
-                <template v-slot:activator>
-                  <v-list-item-content>
-                    <v-list-item-title v-text="menuItem[0]"></v-list-item-title>
-                  </v-list-item-content>
-                </template>
-                <v-list-item
-                  v-for="moduleInfo in getModulesInfo"
-                  :key="moduleInfo.id"
-                  @click="clickSubAction($event, 'insertNode', moduleInfo)"
-                >
-                  <v-list-item-content>
-                    <v-list-item-title
-                      v-text="moduleInfo.name"
-                    ></v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </v-list-group>
-            </v-list>
-          </div>
-          <div v-else>
-            <v-list-item-title
-              >{{ menuItem[0] }}
-              <v-divider v-if="menuItem[1] == 'Separator'"></v-divider>
-            </v-list-item-title>
-          </div>
+          <v-list-item-content>
+            <v-list-item-title v-text="menuItem[0]"></v-list-item-title>
+          </v-list-item-content>
         </v-list-item>
       </v-list>
     </v-menu>
@@ -64,6 +39,34 @@
               Cancel
             </v-btn>
             <v-btn color="green darken-1" text @click="okClicked()">
+              OK
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <v-dialog
+        v-model="dialogList"
+        persistent
+        width="unset"
+        :dark="getDarkMode"
+      >
+        <v-card>
+          <v-card-title class="headline">
+            {{ this.dialogListHeader }}
+          </v-card-title>
+          <div style="margin-left: 40px; margin-right: 40px">
+            <v-autocomplete
+              v-model="selectedNode"
+              :items="getModulesInfo"
+              return-object
+            ></v-autocomplete>
+          </div>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="green darken-1" text @click="cancelListClicked()">
+              Cancel
+            </v-btn>
+            <v-btn color="green darken-1" text @click="okListClicked()">
               OK
             </v-btn>
           </v-card-actions>
@@ -117,7 +120,7 @@ export default class TreeViewRightClick extends Vue {
 
   private getNodeIDToNodeObjectMap!: any
   private getIDCounter!: any
-  private getModulesInfo!: Array<NodeObject>
+  private getModulesInfo!: Array<NodeBasicInfo>
 
   private menuItems: any = [
     [
@@ -178,12 +181,20 @@ export default class TreeViewRightClick extends Vue {
     ],
   ]
 
-  private dialog: boolean = false
+  private dialog: boolean = false //regular dialog for adding new/removing/renaming sequences etc.
   private dialogHeader: string = ''
   private dialogText: string = ''
   private dialogValue: string = ''
   private enterText: boolean = false
-  private actionCallBack!: (name: string, id: number) => void
+
+  private dialogList: boolean = false //list dialog containing node entries to be added to a particular node
+  private dialogListHeader: string = ''
+  //private rootNodeId: number = -1
+
+  private selectedNode: NodeBasicInfo = { id: -1, name: '', type: '', text: '' }
+
+  private actionCallBack!: (...args: any[]) => void
+  private actionListCallBack!: (...args: any[]) => void
 
   get getMenuItems() {
     //TODO CHANGE THIS INTO NORMAL MAP
@@ -230,6 +241,9 @@ export default class TreeViewRightClick extends Vue {
       if (actionName == 'Add Module') {
         console.log('Add Module')
         //TODO
+        this.dialogList = true
+        this.dialogListHeader = 'Modules list:'
+        this.actionListCallBack = this.insertNodeReference
       } else if (actionName == 'Add Sequence') {
         //TODO
         console.log('Add Sequence')
@@ -280,57 +294,42 @@ export default class TreeViewRightClick extends Vue {
     }
   }
 
-  async clickSubAction(
-    e: Event,
-    subactionName: string,
-    nodeBasicInfo: NodeBasicInfo
-  ) {
-    //e.preventDefault() //prevent context menu from closing if action is clicked
-    //e.stopPropagation()
-    //console.log('ROOT NODE ID: ' + nodeBasicInfo.id)
-    console.log('clickSubAction called')
-    if (subactionName == 'insertNode') {
+  async insertNodeReference() {
+    console.log('insertNodeReference called')
+    Promise.all([
+      [this.$store.dispatch('incrementIDCounter')],
+      //set new object into main map
+
+      //Focus and open/active new node
+    ]).finally(() => {
+      let referenceId = this.getIDCounter
+
       Promise.all([
-        [this.$store.dispatch('incrementIDCounter')],
         //set new object into main map
-
-        //Focus and open/active new node
+        this.$store.dispatch('insertNodeReference', {
+          parentId: this.rightClickNodeId,
+          rootNodeId: this.selectedNode.id,
+        }),
       ]).finally(() => {
-        let referenceId = this.getIDCounter
+        //utils.sleep(1000)
+        this.$store.dispatch('setSelectedNodeViaID', {
+          selectedNodeId: referenceId,
+          forceOpenNode: true,
+        })
 
-        Promise.all([
-          //set new object into main map
-          this.$store.dispatch('insertNodeReference', {
-            parentId: this.rightClickNodeId,
-            rootNodeId: nodeBasicInfo.id,
-          }),
-        ]).finally(() => {
-          //TODO: fix focus
-          //utils.sleep(1000)
-          this.$store.dispatch('setSelectedNodeViaID', {
-            selectedNodeId: referenceId,
-            forceOpenNode: true,
-          })
-
-          /*    let rootNodeId = this.getNodeIDToNodeObjectMap[referenceId].rootNodeId
-
-          this.$store.dispatch('setSelectedNodeViaID', {
-            selectedNodeId: rootNodeId,
-            forceOpenNode: false,
-          }) */
-          //Display snackbar success
-          this.$store.dispatch('setSnackBarText', {
-            snackBarText: 'Node successfuly inserted!',
-            snackBarColor: 'green',
-          })
+        //Display snackbar success
+        this.$store.dispatch('setSnackBarText', {
+          snackBarText: 'Node successfuly inserted!',
+          snackBarColor: 'green',
         })
       })
-    }
+    })
   }
 
   // eslint-disable-next-line no-unused-vars
-  async insertSequence(sequenceName: string, sequenceNodeId: number) {
+  async insertSequence() {
     //sequenceNodeId is not used for new node
+    let sequenceName = this.dialogValue
     console.log('TRYING TO INSERT SEQUENCE ' + sequenceName)
     //TODO: properly add sequence and focus
     //first check if there is sequence with the same name
@@ -383,8 +382,10 @@ export default class TreeViewRightClick extends Vue {
   }
 
   // eslint-disable-next-line no-unused-vars
-  async renameSequence(newSequenceName: string, sequenceNodeId: number) {
-    console.log('TRYING TO RENAME SEQUENCE ' + newSequenceName)
+  async renameSequence() {
+    //console.log('TRYING TO RENAME SEQUENCE ' + newSequenceName)
+    let newSequenceName = this.dialogValue
+    let sequenceNodeId = this.rightClickNodeId
     //first check if there is sequence with the same name TODO: refractor
     if (this.getNodeByName('sequences', newSequenceName) == undefined) {
       Promise.all([
@@ -407,7 +408,10 @@ export default class TreeViewRightClick extends Vue {
   }
 
   // eslint-disable-next-line no-unused-vars
-  async deleteSequence(oldSequenceName: string, sequenceNodeId: number) {
+  async deleteSequence() {
+    let oldSequenceName = this.dialogValue
+    let sequenceNodeId = this.rightClickNodeId
+
     console.log('TRYING TO DELETE SEQUENCE ' + oldSequenceName)
 
     Promise.all([
@@ -424,8 +428,8 @@ export default class TreeViewRightClick extends Vue {
   }
 
   async okClicked() {
-    console.log('DIALOG VALUE: ' + this.dialogValue)
-    this.actionCallBack(this.dialogValue, this.rightClickNodeId)
+    //console.log('DIALOG VALUE: ' + this.dialogValue)
+    this.actionCallBack()
 
     this.dialog = false
   }
@@ -433,6 +437,17 @@ export default class TreeViewRightClick extends Vue {
   public cancelClicked() {
     this.dialog = false
     console.log('CANCEL CLICKED')
+  }
+
+  async okListClicked() {
+    console.log('OBJ: ' + JSON.stringify(this.selectedNode))
+
+    this.actionListCallBack()
+    this.dialogList = false
+  }
+
+  async cancelListClicked() {
+    this.dialogList = false
   }
 
   public onKeyDown(e) {
