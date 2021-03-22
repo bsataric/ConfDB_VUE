@@ -259,7 +259,6 @@ export default class TreeView extends Vue {
       await this.$store.dispatch('setSelectedNodeViaID', {
         selectedNodeId: itemId,
         forceOpenNode: false,
-        forceOpenReferenceIds: true,
       })
     }
     //console.log('fetchNodeById CALLED')
@@ -267,7 +266,6 @@ export default class TreeView extends Vue {
       await this.$store.dispatch('setSelectedNodeViaID', {
         selectedNodeId: itemId,
         forceOpenNode: false,
-        forceOpenReferenceIds: false,
       })
   }
 
@@ -312,7 +310,6 @@ export default class TreeView extends Vue {
   //Very important function, basically decides which node is clicked upon and gets all info about it
   public updateOpenNodes(array: any) {
     console.log('THIS OPEN BEFORE: ' + this.open)
-    console.log('array BEFORE: ' + array)
     let difference: number = parseInt(
       this.open
         .filter((x) => !array.includes(x))
@@ -320,18 +317,11 @@ export default class TreeView extends Vue {
     )
 
     if (Object.keys(this.getNodeIDToNodeObjectMap).length !== 0) {
-      console.log('updateOpenNodes DIFFERENCE:' + difference)
       this.fetchNodeById(difference)
-      //console.log('updateOpenNodes DIFFERENCE TYPE: ' + typeof difference)
     }
     if (!isNaN(difference)) {
-      if (this.open.indexOf(difference) == -1)
-        if (array.indexOf(difference) == -1)
-          //special case for forced references
-          this.open = [...array, difference]
-        else this.open = array
+      if (this.open.indexOf(difference) == -1) this.open = array
       else {
-        console.log('DIFFERENCE INDEX: ' + this.open.indexOf(difference))
         this.open.splice(this.open.indexOf(difference), 1)
       }
     }
@@ -339,7 +329,6 @@ export default class TreeView extends Vue {
   }
 
   public updateActiveNodes(array: any) {
-    //console.log('THIS ACTIVE: ' + array)
     let difference: number = parseInt(
       this.active
         .filter((x) => !array.includes(x))
@@ -347,11 +336,7 @@ export default class TreeView extends Vue {
     )
     if (array.length != 0) difference = array[0]
     if (Object.keys(this.getNodeIDToNodeObjectMap).length !== 0) {
-      //if map is initialized
-      console.log('updateActiveNodes DIFFERENCE: ' + difference)
       this.fetchNodeById(difference)
-      /*       console.log('updateActiveNodes DIFFERENCE TYPE: ' + typeof difference)
-       */
     }
     this.active = array
   }

@@ -310,7 +310,6 @@ export default class TreeViewRightClick extends Vue {
           this.$store.dispatch('setSelectedNodeViaID', {
             selectedNodeId: referenceId,
             forceOpenNode: true,
-            forceOpenReferenceIds: false,
           })
 
           /*    let rootNodeId = this.getNodeIDToNodeObjectMap[referenceId].rootNodeId
@@ -367,7 +366,6 @@ export default class TreeViewRightClick extends Vue {
           this.$store.dispatch('setSelectedNodeViaID', {
             selectedNodeId: newSequenceId,
             forceOpenNode: true,
-            forceOpenReferenceIds: false,
           })
           //Display snackbar success
           this.$store.dispatch('setSnackBarText', {

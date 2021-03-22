@@ -22,7 +22,6 @@ const state: MainVuexState = {
   selectedNodeParamLength: 0,
   selectedNodeParentId: 0,
   selectedNodeParentParentId: 0,
-  //nodePreviousReferenceId: -1,
   //node ID to Object map containing all information about every node in the configuration tree
   nodeIDToNodeObjectMap: {},
   //arrays holding IDs of specific node types
@@ -52,36 +51,20 @@ export default new Vuex.Store({
   mutations: {
     SET_SELECTED_NODE_VIA_ID(state: MainVuexState, payload) {
       console.log('SET_SELECTED_NODE_VIA_ID : ' + payload.selectedNodeId)
-      /*console.log(
-        'SELECTED NODE ROOT ID: ' +
-          state.nodeIDToNodeObjectMap[payload.selectedNodeId].rootNodeId
-      ) */
-      //if (state.nodePreviousReferenceId != -1) {
-      //splice prefious reference from open nodes if it exists
-      //}
 
       let referenceNode =
         payload.selectedNodeId ==
         state.nodeIDToNodeObjectMap[payload.selectedNodeId].rootNodeId
           ? false
           : true
-      //console.log('state.openNodeIds: ' + state.openNodeIds)
-      console.log('REFERENCE NODE: ' + referenceNode)
 
-      /*   if (!referenceNode) */ state.selectedNodeId = payload.selectedNodeId
-      /*       else
-        state.selectedNodeId =
-          state.nodeIDToNodeObjectMap[payload.selectedNodeId].rootNodeId */
+      state.selectedNodeId = payload.selectedNodeId
 
       //get all info just via ID
-      //console.log('state.selectedNodeId: ' + state.selectedNodeId)
-      //console.log(typeof state.selectedNodeId)
-      //override leaf nodes
       state.selectedNodeType =
         state.nodeIDToNodeObjectMap[state.selectedNodeId].type
       state.selectedNodeName =
         state.nodeIDToNodeObjectMap[state.selectedNodeId].name
-      //console.log('state.selectedNodeName ' + state.selectedNodeName)
       state.selectedNodeCType =
         state.nodeIDToNodeObjectMap[state.selectedNodeId].ctype
       state.selectedNodeParamLength =
@@ -97,36 +80,14 @@ export default new Vuex.Store({
           state.nodeIDToNodeObjectMap[state.selectedNodeParentId].parentNodeId
       }
       let forceOpenNode = payload.forceOpenNode //if node is opened by foce open it's parent as well
-      let forceOpenReferenceIds = payload.forceOpenReferenceIds
 
-      //console.log('state.selectedNodeParentId ' + state.selectedNodeParentId)
-      //console.log('FORCED OPEN NODE: ' + forceOpenNode)
       let idIndex = -1
-      //if (!referenceNode) {
       if (forceOpenNode) state.forcedActiveNodeId = state.selectedNodeId
       idIndex = state.openNodeIds.indexOf(state.selectedNodeId)
-      //}
-      //root and selected are same
-      //else {
-      /*    if (forceOpenNode) state.forcedActiveNodeId = payload.selectedNodeId //selected is reference, different then root
-        idIndex = state.openNodeIds.indexOf(payload.selectedNodeId) */
-
-      /*      console.log('state.forcedActiveNodeId: ' + state.forcedActiveNodeId)
-          console.log('idIndex: ' + idIndex) */
-      // }
-      //console.log('FORCED NODE ID: ' + state.forcedActiveNodeId)
-
-      //console.log('SELECTED NODE ID: ' + state.selectedNodeId)
-      //console.log('OPEN NODES BEFORE: ' + state.openNodeIds)
-      console.log('IDINDEX: ' + idIndex)
 
       if (idIndex == -1) {
-        //console.log('OVDE USAO')
         if (forceOpenNode) {
           //if force is enwoked both node and it's parent have to be opened
-          //console.log('SELECTED NODE TYPE: ' + state.selectedNodeType)
-
-          //console.log('PARENT NODE ID: ' + state.selectedNodeParentId)
           let parentNodeIndex = state.openNodeIds.indexOf(
             state.selectedNodeParentId
           )
@@ -136,10 +97,7 @@ export default new Vuex.Store({
               state.selectedNodeParentParentId
             )
           }
-          /*     console.log('PARENT NODE INDEX: ' + parentNodeIndex)
-          console.log(
-            'state.selectedNodeParentId ' + state.selectedNodeParentId
-          )  */
+
           if (parentNodeIndex == -1) {
             //push parent node on array as well
             state.openNodeIds.push(state.selectedNodeParentId)
@@ -149,49 +107,26 @@ export default new Vuex.Store({
             state.openNodeIds.push(state.selectedNodeParentParentId)
           }
         }
-        //if (!referenceNode) {
-        console.log('state.openNodeIds.push ' + state.selectedNodeId)
         state.openNodeIds.push(state.selectedNodeId)
-        //console.log('NON REFERENCE NODE INSERTED!')
-        //console.log('state.openNodeIds: ' + state.openNodeIds)
-        //} else {
-        //for reference node we have to open parent of parent as well
-        //state
-        //state.openNodeIds.push(payload.selectedNodeId)
-        //console.log('REFERENCE NODE INSERTED!')
-        //console.log('state.openNodeIds: ' + state.openNodeIds)
-        //}
       } else {
         if (forceOpenNode) {
           //if force is enwoked both node and it's parent have to be opened
-          //console.log('PARENT NODE ID: ' + state.selectedNodeParentId)
-
           let parentNodeIndex = state.openNodeIds.indexOf(
             state.selectedNodeParentId
           )
-          //console.log('PARENT NODE INDEX: ' + parentNodeIndex)
-          //console.log('state.selectedNodeParentId' + state.selectedNodeParentId)
-
           if (parentNodeIndex == -1) {
             //push parent node on array as well
             state.openNodeIds.push(state.selectedNodeParentId)
           }
-          //else do nothing (both nodes are already open - TODO MAYBE FOCUS OR ACTIVATE)
         }
         if (!forceOpenNode) {
-          console.log('state.openNodeIds.splice at index ' + idIndex)
           state.openNodeIds.splice(idIndex, 1) //close the node if already open (not if forced)
         }
       }
 
-      console.log('OPEN NODES AFTER: ' + state.openNodeIds)
       if (forceOpenNode) {
-        //console.log('FORCED OPEN!')
         state.forcedOpenNodeIds = [...state.openNodeIds] //cannot assign by reference, but copy whole array
-        //console.log('FORCED ARRAY: ' + state.forcedOpenNodeIds)
       }
-
-      //state.openNodeIds = [1]
     },
     SET_SELECTED_NODE_FOCUS_VIA_ID(state: MainVuexState, payload) {},
     SET_ID_TO_NODE_OBJECT_MAP(state: MainVuexState, payload) {
