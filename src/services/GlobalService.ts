@@ -11,6 +11,9 @@ const apiClient = axios.create({
 
 export default {
   getConfiguration() {
+    console.log(
+      'GET CONFIGURATION KEYCLOKAER: ' + JSON.stringify(globalThis.keyCloaker)
+    )
     return apiClient.get('configuration')
   },
   getAllFromFile(fileData) {

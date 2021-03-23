@@ -295,6 +295,7 @@ export default class TreeViewRightClick extends Vue {
   }
 
   async insertNodeReference() {
+    //TODO: do the enter/escape keydown, as well as adding multiple references
     console.log('insertNodeReference called')
     Promise.all([
       [this.$store.dispatch('incrementIDCounter')],
