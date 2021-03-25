@@ -772,6 +772,9 @@ export default new Vuex.Store({
     getSelectedNodeChildren(state: MainVuexState): Array<NodeObject> {
       return state.nodeIDToNodeObjectMap[state.selectedNodeId].children
     },
+    getRightClickedNodeChildren(state: MainVuexState): Array<NodeObject> {
+      return state.nodeIDToNodeObjectMap[state.selectedNodeId].children
+    },
     getConfigLoaded(state: MainVuexState): boolean {
       //console.log('CONFIG LOADED: ' + state.configLoaded)
       return state.configLoaded
