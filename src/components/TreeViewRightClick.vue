@@ -124,12 +124,15 @@
 <script lang="ts">
 //import utils from '@/lib/utils'
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator'
-import { mapGetters } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 // eslint-disable-next-line no-unused-vars
 import { NodeObject, NodeBasicInfo } from '../types'
 
 @Component({
   computed: {
+    ...mapActions({
+      insertNodeReference: 'insertNodeReference',
+    }),
     ...mapGetters({
       getNodeByName: 'getNodeByName',
       getNodeIDToNodeObjectMap: 'getNodeIDToNodeObjectMap',
@@ -169,6 +172,8 @@ export default class TreeViewRightClick extends Vue {
   }
 
   private getNodeByName!: any
+
+  private insertNodeReference!: any
 
   private getNodeIDToNodeObjectMap!: any
   private getIDCounter!: any
@@ -312,10 +317,6 @@ export default class TreeViewRightClick extends Vue {
     } else if (this.rightClickNodeType == 'sequences') {
       if (actionName == 'Add Module') {
         console.log('Add Module')
-        //TODO
-        /*       this.dialogList = true
-        this.dialogListHeader = 'Modules list:'
-        this.actionListCallBack = this.insertNodeReference */
       } else if (actionName == 'Add Sequence') {
         //TODO
         console.log('Add Sequence')
@@ -375,11 +376,11 @@ export default class TreeViewRightClick extends Vue {
       //
       this.dialogList = true
       this.dialogListHeader = 'Modules list:'
-      this.actionListCallBack = this.insertNodeReference
+      this.actionListCallBack = this.insertStoreNodeReference
     }
   }
 
-  async insertNodeReference() {
+  async insertStoreNodeReference() {
     //TODO: do the enter/escape keydown, as well as adding multiple references
     //console.log('insertNodeReference called')
     //let lastReferemceId
@@ -388,15 +389,23 @@ export default class TreeViewRightClick extends Vue {
     for (let i = 0; i < this.selectedNodes.length; i++) {
       console.log('IDDDDD: ' + this.selectedNodes[i].id)
       let id = this.selectedNodes[i].id
+
       this.$store.dispatch('insertNodeReference', {
         parentId: this.rightClickNodeId,
         rootNodeId: id,
       })
-    } //TODO FIX THIS
+      //TODO try to map actions with payload
+      /*     this.insertNodeReference({
+        parentId: this.rightClickNodeId,
+        rootNodeId: id,
+      }) */
+
+      //TODO if the node already exists clone
+    }
 
     //utils.sleep(1000)
-    /*     this.$store.dispatch('setSelectedNodeViaID', {
-      selectedNodeId: lastReferemceId,
+    this.$store.dispatch('setSelectedNodeViaID', {
+      selectedNodeId: this.getIDCounter,
       forceOpenNode: true,
     })
 
@@ -404,7 +413,7 @@ export default class TreeViewRightClick extends Vue {
     this.$store.dispatch('setSnackBarText', {
       snackBarText: 'Node(s) successfuly inserted!',
       snackBarColor: 'green',
-    }) */
+    })
   }
 
   // eslint-disable-next-line no-unused-vars

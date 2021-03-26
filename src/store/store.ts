@@ -357,6 +357,7 @@ export default new Vuex.Store({
     INSERT_NODE_REFERENCE(state: MainVuexState, payload) {
       //we need parent node ID plus inserted node ID. Calculate the references
       //create new child node (it cannot be the same as every node needs unique ID)
+      console.log('payload: ' + payload)
       let newChildNodeObject: NodeObject = Object.assign(
         {},
         state.nodeIDToNodeObjectMap[payload.rootNodeId]
