@@ -23,6 +23,9 @@ export default {
       ctype: '',
       ptype: '',
     }
+
+    topLevelNodeTypeIds['sequences'] = []
+
     //console.log(sequencesObject)
     for (const [key, value] of Object.entries(sequenceData)) {
       //loop over sequnces - create new Sequence object and add it to children of the seqs
@@ -42,9 +45,6 @@ export default {
         ptype: '',
       }
 
-      if (topLevelNodeTypeIds['sequences'] == undefined) {
-        topLevelNodeTypeIds['sequences'] = []
-      }
       topLevelNodeTypeIds['sequences'].push(sequenceObject.id)
 
       // eslint-disable-next-line no-unused-vars
@@ -175,6 +175,8 @@ export default {
       ptype: '',
     }
 
+    topLevelNodeTypeIds['paths'] = []
+
     //console.log(pathsObject)
     for (const [key, value] of Object.entries(pathData)) {
       //loop over sequnces - create new Sequence object and add it to children of the seqs
@@ -194,9 +196,6 @@ export default {
         ptype: '',
       }
 
-      if (topLevelNodeTypeIds['paths'] == undefined) {
-        topLevelNodeTypeIds['paths'] = []
-      }
       topLevelNodeTypeIds['paths'].push(pathObject.id)
 
       //console.log(`${key}`)
@@ -442,6 +441,8 @@ export default {
       ptype: '',
     }
 
+    topLevelNodeTypeIds['modules'] = []
+
     for (const [key, value] of Object.entries(moduleData)) {
       //loop over sequnces - create new Sequence object and add it to children of the seqs
       //console.log('NAME: ' + key)
@@ -461,9 +462,6 @@ export default {
         ptype: '',
       }
 
-      if (topLevelNodeTypeIds['modules'] == undefined) {
-        topLevelNodeTypeIds['modules'] = []
-      }
       topLevelNodeTypeIds['modules'].push(moduleObject.id)
 
       //console.log(`${key}`)
@@ -572,6 +570,7 @@ export default {
       ctype: '',
       ptype: '',
     }
+    topLevelNodeTypeIds['psets'] = []
 
     //let psetsIdCounter = this.idCounter
 
@@ -594,8 +593,6 @@ export default {
         ptype: '',
       }
 
-      if (topLevelNodeTypeIds['psets'] == undefined)
-        topLevelNodeTypeIds['psets'] = []
       topLevelNodeTypeIds['psets'].push(psetObject.id)
       //let psetIdCounter = this.idCounter
 
@@ -696,6 +693,8 @@ export default {
       ctype: '',
       ptype: '',
     }
+    topLevelNodeTypeIds['tasks'] = []
+
     //console.log(tasksObject)
     for (const [key, value] of Object.entries(taskData)) {
       //loop over tasks - create new Task object and add it to children of the tasks
@@ -715,8 +714,6 @@ export default {
         ptype: '',
       }
 
-      if (topLevelNodeTypeIds['tasks'] == undefined)
-        topLevelNodeTypeIds['tasks'] = []
       topLevelNodeTypeIds['tasks'].push(taskObject.id)
 
       //let sequenceObjectId = this.idCounter //remember counter to use it after children are populated
@@ -815,6 +812,8 @@ export default {
       ptype: '',
     }
 
+    topLevelNodeTypeIds['esproducers'] = []
+
     for (const [key, value] of Object.entries(esProducerData)) {
       //loop over sequnces - create new Sequence object and add it to children of the seqs
       //console.log('NAME: ' + key)
@@ -834,8 +833,6 @@ export default {
         ptype: '',
       }
 
-      if (topLevelNodeTypeIds['esproducers'] == undefined)
-        topLevelNodeTypeIds['esproducers'] = []
       topLevelNodeTypeIds['esproducers'].push(esProducerObject.id)
 
       //console.log(`${key}`)
@@ -945,6 +942,8 @@ export default {
       ptype: '',
     }
 
+    topLevelNodeTypeIds['essources'] = []
+
     for (const [key, value] of Object.entries(esSourceData)) {
       //loop over sequnces - create new Sequence object and add it to children of the seqs
       //console.log('NAME: ' + key)
@@ -964,8 +963,6 @@ export default {
         ptype: '',
       }
 
-      if (topLevelNodeTypeIds['essources'] == undefined)
-        topLevelNodeTypeIds['essources'] = []
       topLevelNodeTypeIds['essources'].push(esSourceObject.id)
 
       //console.log(`${key}`)
@@ -1075,6 +1072,8 @@ export default {
       ptype: '',
     }
 
+    topLevelNodeTypeIds['services'] = []
+
     for (const [key, value] of Object.entries(serviceData)) {
       //loop over sequnces - create new Sequence object and add it to children of the seqs
       //console.log('NAME: ' + key)
@@ -1094,8 +1093,6 @@ export default {
         ptype: '',
       }
 
-      if (topLevelNodeTypeIds['services'] == undefined)
-        topLevelNodeTypeIds['services'] = []
       topLevelNodeTypeIds['services'].push(serviceObject.id)
 
       //console.log(`${key}`)

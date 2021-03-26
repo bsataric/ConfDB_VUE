@@ -276,7 +276,7 @@ export default class TreeViewRightClick extends Vue {
   }
 
   public nodeChildExistsColor(name: string) {
-    console.log('NODE NAME: ' + name)
+    //console.log('NODE NAME: ' + name)
     let selectedNodeChildren = this.getSelectedNodeChildren
     for (let i = 0; i < selectedNodeChildren.length; i++) {
       if (selectedNodeChildren[i].name == name) return 'red'
@@ -381,27 +381,16 @@ export default class TreeViewRightClick extends Vue {
 
   async insertNodeReference() {
     //TODO: do the enter/escape keydown, as well as adding multiple references
-    console.log('insertNodeReference called')
+    //console.log('insertNodeReference called')
     //let lastReferemceId
-    console.log('this.selectedNodes.length ' + this.selectedNodes.length)
+    //console.log('this.selectedNodes.length ' + this.selectedNodes.length)
+
     for (let i = 0; i < this.selectedNodes.length; i++) {
-      console.log('this.selectedNodes[i].id: ' + this.selectedNodes[i].id)
+      console.log('IDDDDD: ' + this.selectedNodes[i].id)
       let id = this.selectedNodes[i].id
-      Promise.all([
-        [this.$store.dispatch('incrementIDCounter')],
-        //set new object into main map
-
-        //Focus and open/active new node
-      ]).finally(() => {
-        //lastReferemceId = this.getIDCounter
-
-        Promise.all([
-          //set new object into main map
-          this.$store.dispatch('insertNodeReference', {
-            parentId: this.rightClickNodeId,
-            rootNodeId: id,
-          }),
-        ])
+      this.$store.dispatch('insertNodeReference', {
+        parentId: this.rightClickNodeId,
+        rootNodeId: id,
       })
     } //TODO FIX THIS
 

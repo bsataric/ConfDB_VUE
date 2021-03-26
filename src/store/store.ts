@@ -361,7 +361,7 @@ export default new Vuex.Store({
         {},
         state.nodeIDToNodeObjectMap[payload.rootNodeId]
       )
-      newChildNodeObject.id = state.idCounter
+      newChildNodeObject.id = ++state.idCounter
       newChildNodeObject.parentNodeId = payload.parentId //parent is the passed parent
       //console.log('CHILD CHILDREN BEFORE: ' + childNodeObject.children)
       newChildNodeObject.children = []
