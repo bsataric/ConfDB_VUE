@@ -326,6 +326,7 @@ export default class TreeView extends Vue {
       }
     }
     console.log('THIS OPEN AFTER: ' + this.open)
+    this.active = [] //clear active when node opens
   }
 
   public updateActiveNodes(array: any) {

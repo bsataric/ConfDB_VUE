@@ -130,9 +130,6 @@ import { NodeObject, NodeBasicInfo } from '../types'
 
 @Component({
   computed: {
-    ...mapActions({
-      insertNodeReference: 'insertNodeReference',
-    }),
     ...mapGetters({
       getNodeByName: 'getNodeByName',
       getNodeIDToNodeObjectMap: 'getNodeIDToNodeObjectMap',
@@ -142,6 +139,17 @@ import { NodeObject, NodeBasicInfo } from '../types'
       getSelectedNodeChildren: 'getSelectedNodeChildren',
     }),
     // ...mapState('sequence', ['sequences']),
+  },
+  methods: {
+    ...mapActions({
+      insertNodeReference: 'insertNodeReference',
+      setSelectedNodeViaID: 'setSelectedNodeViaID',
+      setSnackBarText: 'setSnackBarText',
+      incrementIDCounter: 'incrementIDCounter',
+      addNode: 'addNode',
+      renameNode: 'renameNode',
+      deleteNode: 'deleteNode',
+    }),
   },
 })
 export default class TreeViewRightClick extends Vue {
@@ -173,10 +181,36 @@ export default class TreeViewRightClick extends Vue {
 
   private getNodeByName!: any
 
-  private insertNodeReference!: any
+  //store actions
+  private insertNodeReference!: (payload: {
+    parentId: number
+    rootNodeId: number
+  }) => void
+  private setSelectedNodeViaID!: (payload: {
+    selectedNodeId: number
+    forceOpenNode: boolean
+  }) => void
+  private setSnackBarText!: (payload: {
+    snackBarText: string
+    snackBarColor: string
+  }) => void
+  private incrementIDCounter!: () => void
+  private addNode!: (payload: {
+    nodeId: number
+    nodeIDToObject: NodeObject
+  }) => void
+  private renameNode!: (payload: {
+    newNodeName: string
+    nodeId: number
+  }) => void
+  private deleteNode!: (payload: {
+    oldSequenceName: string
+    nodeId: number
+  }) => void
 
-  private getNodeIDToNodeObjectMap!: any
-  private getIDCounter!: any
+  //store getters
+  private getNodeIDToNodeObjectMap!: Object
+  private getIDCounter!: number
   private getModulesInfo!: Array<NodeBasicInfo>
   private getSelectedNodeChildren!: Array<NodeObject>
 
@@ -254,7 +288,7 @@ export default class TreeViewRightClick extends Vue {
   //private rootNodeId: number = -1
 
   private selectedNode: NodeBasicInfo = { id: -1, name: '', type: '', text: '' }
-  private selectedNodes: Array<any> = []
+  private selectedNodes: Array<NodeBasicInfo> = []
 
   private actionCallBack!: (...args: any[]) => void
   private actionListCallBack!: (...args: any[]) => void
@@ -275,7 +309,7 @@ export default class TreeViewRightClick extends Vue {
     return []
   }
 
-  public remove(item: Object) {
+  public remove(item: NodeBasicInfo) {
     const index = this.selectedNodes.indexOf(item)
     if (index >= 0) this.selectedNodes.splice(index, 1)
   }
@@ -381,36 +415,30 @@ export default class TreeViewRightClick extends Vue {
   }
 
   async insertStoreNodeReference() {
-    //TODO: do the enter/escape keydown, as well as adding multiple references
     //console.log('insertNodeReference called')
     //let lastReferemceId
     //console.log('this.selectedNodes.length ' + this.selectedNodes.length)
 
     for (let i = 0; i < this.selectedNodes.length; i++) {
       console.log('IDDDDD: ' + this.selectedNodes[i].id)
-      let id = this.selectedNodes[i].id
+      //let id = this.selectedNodes[i].id
 
-      this.$store.dispatch('insertNodeReference', {
+      this.insertNodeReference({
         parentId: this.rightClickNodeId,
-        rootNodeId: id,
+        rootNodeId: this.selectedNodes[i].id,
       })
-      //TODO try to map actions with payload
-      /*     this.insertNodeReference({
-        parentId: this.rightClickNodeId,
-        rootNodeId: id,
-      }) */
 
       //TODO if the node already exists clone
     }
 
     //utils.sleep(1000)
-    this.$store.dispatch('setSelectedNodeViaID', {
+    this.setSelectedNodeViaID({
       selectedNodeId: this.getIDCounter,
       forceOpenNode: true,
     })
 
     //Display snackbar success
-    this.$store.dispatch('setSnackBarText', {
+    this.setSnackBarText({
       snackBarText: 'Node(s) successfuly inserted!',
       snackBarColor: 'green',
     })
@@ -424,7 +452,7 @@ export default class TreeViewRightClick extends Vue {
     //TODO: properly add sequence and focus
     //first check if there is sequence with the same name
     if (this.getNodeByName('sequences', sequenceName) == undefined) {
-      Promise.all([this.$store.dispatch('incrementIDCounter')]).finally(() => {
+      Promise.all([this.incrementIDCounter()]).finally(() => {
         let newSequenceId = this.getIDCounter
         console.log('NEW SEQUENCE ID: ' + newSequenceId)
 
@@ -446,25 +474,25 @@ export default class TreeViewRightClick extends Vue {
 
         Promise.all([
           //set new object into main map
-          this.$store.dispatch('addNode', {
+          this.addNode({
             nodeId: newSequenceId,
             nodeIDToObject: newSequenceObject,
           }),
           //Focus and open/active new node
         ]).finally(() => {
-          this.$store.dispatch('setSelectedNodeViaID', {
-            selectedNodeId: newSequenceId,
+          this.setSelectedNodeViaID({
+            selectedNodeId: this.getIDCounter,
             forceOpenNode: true,
           })
           //Display snackbar success
-          this.$store.dispatch('setSnackBarText', {
+          this.setSnackBarText({
             snackBarText: 'Sequence successfully created!',
             snackBarColor: 'green',
           })
         })
       })
     } else {
-      await this.$store.dispatch('setSnackBarText', {
+      await this.setSnackBarText({
         snackBarText: 'ERROR: There is sequence with the same name!',
         snackBarColor: 'red',
       })
@@ -479,18 +507,18 @@ export default class TreeViewRightClick extends Vue {
     //first check if there is sequence with the same name TODO: refractor
     if (this.getNodeByName('sequences', newSequenceName) == undefined) {
       Promise.all([
-        this.$store.dispatch('renameNode', {
+        this.renameNode({
           newNodeName: newSequenceName,
           nodeId: sequenceNodeId,
         }),
       ]).finally(() => {
-        this.$store.dispatch('setSnackBarText', {
+        this.setSnackBarText({
           snackBarText: 'Sequence successfully renamed!',
           snackBarColor: 'green',
         })
       })
     } else {
-      await this.$store.dispatch('setSnackBarText', {
+      await this.setSnackBarText({
         snackBarText: 'ERROR: There is sequence with the same name!',
         snackBarColor: 'red',
       })
@@ -505,12 +533,12 @@ export default class TreeViewRightClick extends Vue {
     console.log('TRYING TO DELETE SEQUENCE ' + oldSequenceName)
 
     Promise.all([
-      this.$store.dispatch('deleteNode', {
+      this.deleteNode({
         oldSequenceName: oldSequenceName,
         nodeId: sequenceNodeId,
       }),
     ]).finally(() => {
-      this.$store.dispatch('setSnackBarText', {
+      this.setSnackBarText({
         snackBarText: 'Sequence successfully deleted!',
         snackBarColor: 'green',
       })
