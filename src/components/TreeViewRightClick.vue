@@ -73,7 +73,7 @@
         width="unset"
         :dark="getDarkMode"
       >
-        <v-card height="400px" width="600px">
+        <v-card height="400px" width="1000px">
           <v-card-title class="headline">
             {{ this.dialogListHeader }}
           </v-card-title>
@@ -82,7 +82,7 @@
               <v-col cols="12">
                 <v-autocomplete
                   v-model="selectedNodes"
-                  :items="getModulesInfo"
+                  :items="getModulesInsertInfo"
                   return-object
                   multiple
                   chips
@@ -92,15 +92,34 @@
                   prepend-icon="mdi-text-search"
                 >
                   <template v-slot:selection="data">
-                    <v-chip
-                      v-bind="data.attrs"
-                      :input-value="data.selected"
-                      close
-                      :color="nodeChildExistsColor(data.item.name)"
-                      @click="data.select"
-                      @click:close="remove(data.item)"
-                      >{{ data.item.name }}</v-chip
-                    >
+                    <v-container @click="preventTextFieldPropagation($event)">
+                      <v-row dense no-gutters>
+                        <v-col cols="6">
+                          <v-chip
+                            v-bind="data.attrs"
+                            :input-value="data.selected"
+                            close
+                            :color="nodeChildExistsColor(data.item.name)"
+                            @click="data.select"
+                            @click:close="remove(data.item)"
+                            >{{ data.item.name }}</v-chip
+                          >
+                        </v-col>
+                        <v-col cols="2">
+                          <v-checkbox
+                            label="Clone"
+                            v-model="data.item.clone"
+                          ></v-checkbox>
+                        </v-col>
+                        <v-col cols="4">
+                          <v-text-field
+                            hint="New name"
+                            v-model="data.item.name"
+                          ></v-text-field>
+                          <!-- TODO UNDERSTAND HOW TO ENABLE TEXT FIELD HERE-->
+                        </v-col>
+                      </v-row>
+                    </v-container>
                   </template>
                 </v-autocomplete>
               </v-col>
@@ -126,7 +145,7 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator'
 import { mapActions, mapGetters } from 'vuex'
 // eslint-disable-next-line no-unused-vars
-import { NodeObject, NodeBasicInfo } from '../types'
+import { NodeObject, NodeInsertInfo } from '../types'
 
 @Component({
   computed: {
@@ -135,7 +154,7 @@ import { NodeObject, NodeBasicInfo } from '../types'
       getNodeIDToNodeObjectMap: 'getNodeIDToNodeObjectMap',
       getDarkMode: 'getDarkMode',
       getIDCounter: 'getIDCounter',
-      getModulesInfo: 'getModulesInfo',
+      getModulesInsertInfo: 'getModulesInsertInfo',
       getSelectedNodeChildren: 'getSelectedNodeChildren',
     }),
     // ...mapState('sequence', ['sequences']),
@@ -211,7 +230,7 @@ export default class TreeViewRightClick extends Vue {
   //store getters
   private getNodeIDToNodeObjectMap!: Object
   private getIDCounter!: number
-  private getModulesInfo!: Array<NodeBasicInfo>
+  private getModulesInsertInfo!: Array<NodeInsertInfo>
   private getSelectedNodeChildren!: Array<NodeObject>
 
   private menuItems: any = [
@@ -286,9 +305,7 @@ export default class TreeViewRightClick extends Vue {
   private dialogList: boolean = false //list dialog containing node entries to be added to a particular node
   private dialogListHeader: string = ''
   //private rootNodeId: number = -1
-
-  private selectedNode: NodeBasicInfo = { id: -1, name: '', type: '', text: '' }
-  private selectedNodes: Array<NodeBasicInfo> = []
+  private selectedNodes: Array<NodeInsertInfo> = []
 
   private actionCallBack!: (...args: any[]) => void
   private actionListCallBack!: (...args: any[]) => void
@@ -309,7 +326,7 @@ export default class TreeViewRightClick extends Vue {
     return []
   }
 
-  public remove(item: NodeBasicInfo) {
+  public remove(item: NodeInsertInfo) {
     const index = this.selectedNodes.indexOf(item)
     if (index >= 0) this.selectedNodes.splice(index, 1)
   }
@@ -321,6 +338,13 @@ export default class TreeViewRightClick extends Vue {
       if (selectedNodeChildren[i].name == name) return 'red'
     }
     return 'green'
+  }
+
+  //prevent textfield auto focus propagation
+  public preventTextFieldPropagation(e: Event) {
+    e.preventDefault() //prevent context menu from closing if action is clicked
+    e.stopPropagation()
+    //TODO: try to prevent text hinding from the textfields
   }
 
   // eslint-disable-next-line no-unused-vars
@@ -416,13 +440,10 @@ export default class TreeViewRightClick extends Vue {
 
   async insertStoreNodeReference() {
     //console.log('insertNodeReference called')
-    //let lastReferemceId
     //console.log('this.selectedNodes.length ' + this.selectedNodes.length)
 
     for (let i = 0; i < this.selectedNodes.length; i++) {
-      console.log('IDDDDD: ' + this.selectedNodes[i].id)
-      //let id = this.selectedNodes[i].id
-
+      //console.log('IDDDDD: ' + this.selectedNodes[i].id)
       this.insertNodeReference({
         parentId: this.rightClickNodeId,
         rootNodeId: this.selectedNodes[i].id,
@@ -559,7 +580,7 @@ export default class TreeViewRightClick extends Vue {
   }
 
   async okListClicked() {
-    console.log('OBJ: ' + JSON.stringify(this.selectedNode))
+    console.log('OBJ: ' + JSON.stringify(this.selectedNodes))
     this.actionListCallBack()
     this.dialogList = false
     this.selectedNodes = []

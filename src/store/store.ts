@@ -1,6 +1,11 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { MainVuexState, NodeObject, NodeBasicInfo } from '../types'
+import {
+  MainVuexState,
+  NodeObject,
+  NodeBasicInfo,
+  NodeInsertInfo,
+} from '../types'
 import Utils from '@/lib/utils'
 import MapToJSONParser from '@/store/helpers/MapToJSONParser'
 import GlobalService from '@/services/GlobalService'
@@ -796,6 +801,27 @@ export default new Vuex.Store({
           text:
             state.nodeIDToNodeObjectMap[state.topLevelNodeTypeIds['modules'][i]]
               .name,
+        })
+      }
+      return modulesArray
+    },
+    getModulesInsertInfo(state: MainVuexState): Array<NodeInsertInfo> {
+      let modulesArray: Array<NodeInsertInfo> = []
+      for (let i = 0; i < state.topLevelNodeTypeIds['modules'].length; i++) {
+        modulesArray.push({
+          id:
+            state.nodeIDToNodeObjectMap[state.topLevelNodeTypeIds['modules'][i]]
+              .id,
+          type:
+            state.nodeIDToNodeObjectMap[state.topLevelNodeTypeIds['modules'][i]]
+              .type,
+          name:
+            state.nodeIDToNodeObjectMap[state.topLevelNodeTypeIds['modules'][i]]
+              .name,
+          text:
+            state.nodeIDToNodeObjectMap[state.topLevelNodeTypeIds['modules'][i]]
+              .name,
+          clone: false,
         })
       }
       return modulesArray

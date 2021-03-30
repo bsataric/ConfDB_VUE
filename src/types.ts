@@ -45,3 +45,11 @@ export interface NodeBasicInfo {
   type: string
   text: string
 }
+
+export interface NodeInsertInfo {
+  id: number
+  name: string
+  type: string
+  text: string
+  clone: boolean
+}
