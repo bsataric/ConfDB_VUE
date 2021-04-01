@@ -119,13 +119,12 @@
                             auto-grow
                             :disabled="!data.item.clone"
                             hint="Clone name"
-                            :value="[
-                              data.item.clone ? data.item.cloneName : '',
-                            ]"
+                            v-model="data.item.cloneName"
                             outlined
                             dense
                             class="package, mx-3"
                           ></v-textarea>
+                          <!-- TODO: FIX VMODEL TO PRODUCE EMPTY STRING HERE-->
                         </v-col>
                       </v-row>
                     </v-container>
@@ -139,7 +138,12 @@
             <v-btn color="green darken-1" text @click="cancelListClicked()">
               Cancel
             </v-btn>
-            <v-btn color="green darken-1" text @click="okListClicked()">
+            <v-btn
+              :disabled="this.selectedNodes.length == 0"
+              color="green darken-1"
+              text
+              @click="okListClicked()"
+            >
               OK
             </v-btn>
           </v-card-actions>
@@ -171,6 +175,7 @@ import { NodeObject, NodeInsertInfo } from '../types'
   methods: {
     ...mapActions({
       insertNodeReference: 'insertNodeReference',
+      cloneNode: 'cloneNode',
       setSelectedNodeViaID: 'setSelectedNodeViaID',
       setSnackBarText: 'setSnackBarText',
       incrementIDCounter: 'incrementIDCounter',
@@ -213,6 +218,10 @@ export default class TreeViewRightClick extends Vue {
   private insertNodeReference!: (payload: {
     parentId: number
     rootNodeId: number
+  }) => void
+  private cloneNode!: (payload: {
+    rootNodeId: number
+    cloneName: string
   }) => void
   private setSelectedNodeViaID!: (payload: {
     selectedNodeId: number
@@ -447,16 +456,25 @@ export default class TreeViewRightClick extends Vue {
     }
   }
 
-  async insertStoreNodeReference() {
-    //console.log('insertNodeReference called')
-    //console.log('this.selectedNodes.length ' + this.selectedNodes.length)
-
+  public insertStoreNodeReference() {
     for (let i = 0; i < this.selectedNodes.length; i++) {
-      //console.log('IDDDDD: ' + this.selectedNodes[i].id)
-      this.insertNodeReference({
-        parentId: this.rightClickNodeId,
-        rootNodeId: this.selectedNodes[i].id,
-      })
+      console.log('NODE TO INSERT:' + JSON.stringify(this.selectedNodes[i]))
+      if (!this.selectedNodes[i].clone) {
+        this.insertNodeReference({
+          parentId: this.rightClickNodeId,
+          rootNodeId: this.selectedNodes[i].id,
+        })
+      } else {
+        this.cloneNode({
+          rootNodeId: this.selectedNodes[i].id,
+          cloneName: this.selectedNodes[i].cloneName,
+        })
+
+        this.insertNodeReference({
+          parentId: this.rightClickNodeId,
+          rootNodeId: this.getIDCounter,
+        })
+      }
 
       //TODO if the node already exists clone
     }

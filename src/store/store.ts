@@ -33,6 +33,8 @@ const state: MainVuexState = {
   topLevelNodeTypeIds: {},
   //nested node name - array of IDs map
   nonTopLevelNodeNameIdMap: {},
+  //root node IDs
+  rootNodeIds: {},
   //arrays with node id's - open nodes and forced open nodes
   openNodeIds: [],
   forcedOpenNodeIds: [],
@@ -142,6 +144,10 @@ export default new Vuex.Store({
     },
     SET_NON_TOP_LEVEL_NODE_NAME_ID_MAP(state: MainVuexState, payload) {
       state.nonTopLevelNodeNameIdMap = payload
+    },
+    SET_ROOT_NODE_IDS(state: MainVuexState, payload) {
+      state.rootNodeIds = payload
+      //console.log(JSON.stringify(state.rootNodeIds))
     },
     CREATE_NODE_ID_TO_OBJECT_REFERENCES(state: MainVuexState) {
       //console.log('CREATING REFERENCES')
@@ -359,6 +365,30 @@ export default new Vuex.Store({
         childIndex++
       }
     },
+    CLONE_NODE(state: MainVuexState, payload) {
+      //we need parent node ID plus inserted node ID. Calculate the references
+      //create new child node (it cannot be the same as every node needs unique ID)
+      console.log('payload: ' + payload)
+      let cloneNodeObject: NodeObject = Object.assign(
+        {},
+        state.nodeIDToNodeObjectMap[payload.rootNodeId]
+      )
+      cloneNodeObject.name = payload.cloneName
+      console.log('CLONE NAME: ' + payload.cloneName)
+      cloneNodeObject.id = ++state.idCounter
+      cloneNodeObject.rootNodeId = state.idCounter
+      cloneNodeObject.referencedByIds = []
+      state.nodeIDToNodeObjectMap[cloneNodeObject.parentNodeId].children.push(
+        cloneNodeObject
+      )
+      //console.log('cloneNodeObject.id:' + cloneNodeObject.id)
+      state.nodeIDToNodeObjectMap[cloneNodeObject.id] = cloneNodeObject
+      /*  console.log(
+        'state.nodeIDToNodeObjectMap[cloneNodeObject.id]: ' +
+          JSON.stringify(state.nodeIDToNodeObjectMap[cloneNodeObject.id])
+      ) */
+      //Utils.sleep(1000)
+    },
     INSERT_NODE_REFERENCE(state: MainVuexState, payload) {
       //we need parent node ID plus inserted node ID. Calculate the references
       //create new child node (it cannot be the same as every node needs unique ID)
@@ -443,6 +473,9 @@ export default new Vuex.Store({
     createNonTopLevelNodeNameIdMap({ commit }, payload) {
       commit('SET_NON_TOP_LEVEL_NODE_NAME_ID_MAP', payload)
     },
+    createRootNodeIds({ commit }, payload) {
+      commit('SET_ROOT_NODE_IDS', payload)
+    },
     createObjectReferences({ commit }) {
       commit('CREATE_NODE_ID_TO_OBJECT_REFERENCES')
     },
@@ -478,6 +511,9 @@ export default new Vuex.Store({
     },
     deleteNode({ commit }, payload) {
       commit('DELETE_NODE', payload)
+    },
+    cloneNode({ commit }, payload) {
+      commit('CLONE_NODE', payload)
     },
     insertNodeReference({ commit }, payload) {
       commit('INSERT_NODE_REFERENCE', payload)

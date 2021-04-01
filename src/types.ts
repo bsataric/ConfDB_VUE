@@ -10,6 +10,7 @@ export interface MainVuexState {
   nodeIDToNodeObjectMap: Object
   topLevelNodeTypeIds: Object
   nonTopLevelNodeNameIdMap: Object
+  rootNodeIds: Object
   openNodeIds: Array<number>
   forcedOpenNodeIds: Array<number>
   forcedActiveNodeId: number

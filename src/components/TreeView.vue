@@ -168,8 +168,9 @@ export default class TreeView extends Vue {
     console.log('getIDCounter OLDVAL: ' + oldVal) */
   }
   private nodeIDToNodeObjectMap!: Object //ID to Node Object map
-  private topLevelNodeTypeIds!: Object //top level node IDs
+  private topLevelNodeTypeIds!: Object //top level node IDs map
   private nonTopLevelNodeNameIdMap!: Object //nested node name - array of IDs map
+  private rootNodeIds!: Object //all root node IDs map
   private open: any = [1]
   private active: any = []
   private forcedActive: any = []
@@ -347,6 +348,7 @@ export default class TreeView extends Vue {
     this.nodeIDToNodeObjectMap = {}
     this.topLevelNodeTypeIds = {}
     this.nonTopLevelNodeNameIdMap = {}
+    this.rootNodeIds = {}
     this.idCounter = 1
 
     let t0 = performance.now()
@@ -367,6 +369,7 @@ export default class TreeView extends Vue {
       )
       this.sequencesId = ret['sequencesId']
       this.idCounter = ret['idCounter']
+      this.rootNodeIds['sequences'] = this.sequencesId
 
       /*      console.log(
         'nonTopLevelNodeNameIdMap: ' +
@@ -382,6 +385,7 @@ export default class TreeView extends Vue {
       )
       this.pathsId = ret['pathsId']
       this.idCounter = ret['idCounter']
+      this.rootNodeIds['paths'] = this.pathsId
 
       ret = TreeParser.parseModules(
         this.getConfiguration['mods'],
@@ -392,6 +396,7 @@ export default class TreeView extends Vue {
       )
       this.modulesId = ret['modulesId']
       this.idCounter = ret['idCounter']
+      this.rootNodeIds['mods'] = this.modulesId
 
       ret = TreeParser.parsePSets(
         this.getConfiguration['psets'],
@@ -402,6 +407,7 @@ export default class TreeView extends Vue {
       )
       this.psetsId = ret['psetsId']
       this.idCounter = ret['idCounter']
+      this.rootNodeIds['psets'] = this.psetsId
 
       ret = TreeParser.parseTasks(
         this.getConfiguration['tasks'],
@@ -412,6 +418,7 @@ export default class TreeView extends Vue {
       )
       this.tasksId = ret['tasksId']
       this.idCounter = ret['idCounter']
+      this.rootNodeIds['tasks'] = this.tasksId
 
       ret = TreeParser.parseESProducers(
         this.getConfiguration['esprods'],
@@ -422,6 +429,7 @@ export default class TreeView extends Vue {
       )
       this.esProducersId = ret['esProducersId']
       this.idCounter = ret['idCounter']
+      this.rootNodeIds['esprods'] = this.esProducersId
 
       ret = TreeParser.parseESSources(
         this.getConfiguration['essources'],
@@ -432,6 +440,7 @@ export default class TreeView extends Vue {
       )
       this.esSourcesId = ret['esSourcesId']
       this.idCounter = ret['idCounter']
+      this.rootNodeIds['essources'] = this.esSourcesId
 
       ret = TreeParser.parseServices(
         this.getConfiguration['services'],
@@ -442,6 +451,7 @@ export default class TreeView extends Vue {
       )
       this.servicesId = ret['servicesId']
       this.idCounter = ret['idCounter']
+      this.rootNodeIds['services'] = this.servicesId
 
       this.$store.dispatch(
         'createNodeIDToNodeObjectMap',
@@ -457,6 +467,8 @@ export default class TreeView extends Vue {
         'createNonTopLevelNodeNameIdMap',
         this.nonTopLevelNodeNameIdMap
       )
+
+      this.$store.dispatch('createRootNodeIds', this.rootNodeIds)
 
       //initilaize id counter in the store so other components can get/modify it
       this.$store.dispatch('setInitialIDCounter', this.idCounter)
@@ -480,6 +492,7 @@ export default class TreeView extends Vue {
     this.nodeIDToNodeObjectMap = {}
     this.topLevelNodeTypeIds = {}
     this.nonTopLevelNodeNameIdMap = {}
+    this.rootNodeIds = {}
     this.idCounter = 1
 
     let t0 = performance.now()
@@ -501,6 +514,7 @@ export default class TreeView extends Vue {
       )
       this.sequencesId = ret['sequencesId']
       this.idCounter = ret['idCounter']
+      this.rootNodeIds['sequences'] = this.sequencesId
 
       ret = TreeParser.parsePaths(
         this.getConfiguration['paths'],
@@ -511,6 +525,7 @@ export default class TreeView extends Vue {
       )
       this.pathsId = ret['pathsId']
       this.idCounter = ret['idCounter']
+      this.rootNodeIds['paths'] = this.pathsId
 
       ret = TreeParser.parseModules(
         this.getConfiguration['mods'],
@@ -521,6 +536,7 @@ export default class TreeView extends Vue {
       )
       this.modulesId = ret['modulesId']
       this.idCounter = ret['idCounter']
+      this.rootNodeIds['mods'] = this.modulesId
 
       ret = TreeParser.parsePSets(
         this.getConfiguration['psets'],
@@ -531,6 +547,7 @@ export default class TreeView extends Vue {
       )
       this.psetsId = ret['psetsId']
       this.idCounter = ret['idCounter']
+      this.rootNodeIds['psets'] = this.psetsId
 
       ret = TreeParser.parseTasks(
         this.getConfiguration['tasks'],
@@ -541,6 +558,7 @@ export default class TreeView extends Vue {
       )
       this.tasksId = ret['tasksId']
       this.idCounter = ret['idCounter']
+      this.rootNodeIds['tasks'] = this.tasksId
 
       ret = TreeParser.parseESProducers(
         this.getConfiguration['esprods'],
@@ -551,6 +569,7 @@ export default class TreeView extends Vue {
       )
       this.esProducersId = ret['esProducersId']
       this.idCounter = ret['idCounter']
+      this.rootNodeIds['esprods'] = this.esProducersId
 
       ret = TreeParser.parseESSources(
         this.getConfiguration['essources'],
@@ -561,6 +580,7 @@ export default class TreeView extends Vue {
       )
       this.esSourcesId = ret['esSourcesId']
       this.idCounter = ret['idCounter']
+      this.rootNodeIds['essources'] = this.esSourcesId
 
       ret = TreeParser.parseServices(
         this.getConfiguration['services'],
@@ -571,6 +591,7 @@ export default class TreeView extends Vue {
       )
       this.servicesId = ret['servicesId']
       this.idCounter = ret['idCounter']
+      this.rootNodeIds['services'] = this.servicesId
 
       this.$store.dispatch(
         'createNodeIDToNodeObjectMap',
@@ -586,6 +607,8 @@ export default class TreeView extends Vue {
         'createNonTopLevelNodeNameIdMap',
         this.nonTopLevelNodeNameIdMap
       )
+
+      this.$store.dispatch('createRootNodeIds', this.rootNodeIds)
 
       //initilaize id counter in the store so other components can get/modify it
       this.$store.dispatch('setInitialIDCounter', this.idCounter)
