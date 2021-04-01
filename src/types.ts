@@ -52,4 +52,5 @@ export interface NodeInsertInfo {
   type: string
   text: string
   clone: boolean
+  cloneName: string
 }

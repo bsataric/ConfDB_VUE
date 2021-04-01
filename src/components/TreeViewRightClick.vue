@@ -72,8 +72,9 @@
         persistent
         width="unset"
         :dark="getDarkMode"
+        ref="testRef"
       >
-        <v-card height="400px" width="1000px">
+        <v-card height="600px" width="1100px">
           <v-card-title class="headline">
             {{ this.dialogListHeader }}
           </v-card-title>
@@ -87,20 +88,21 @@
                   multiple
                   chips
                   flat
+                  clearable
+                  open-on-clear
+                  :dark="getDarkMode"
                   :deletable-chips="true"
                   placeholder="Start typing to Search"
                   prepend-icon="mdi-text-search"
                 >
                   <template v-slot:selection="data">
                     <v-container @click="preventTextFieldPropagation($event)">
-                      <v-row dense no-gutters>
+                      <v-row no-gutters>
                         <v-col cols="6">
                           <v-chip
-                            v-bind="data.attrs"
                             :input-value="data.selected"
                             close
                             :color="nodeChildExistsColor(data.item.name)"
-                            @click="data.select"
                             @click:close="remove(data.item)"
                             >{{ data.item.name }}</v-chip
                           >
@@ -112,11 +114,18 @@
                           ></v-checkbox>
                         </v-col>
                         <v-col cols="4">
-                          <v-text-field
-                            hint="New name"
-                            v-model="data.item.name"
-                          ></v-text-field>
-                          <!-- TODO UNDERSTAND HOW TO ENABLE TEXT FIELD HERE-->
+                          <v-textarea
+                            rows="1"
+                            auto-grow
+                            :disabled="!data.item.clone"
+                            hint="Clone name"
+                            :value="[
+                              data.item.clone ? data.item.cloneName : '',
+                            ]"
+                            outlined
+                            dense
+                            class="package, mx-3"
+                          ></v-textarea>
                         </v-col>
                       </v-row>
                     </v-container>
@@ -342,7 +351,7 @@ export default class TreeViewRightClick extends Vue {
 
   //prevent textfield auto focus propagation
   public preventTextFieldPropagation(e: Event) {
-    e.preventDefault() //prevent context menu from closing if action is clicked
+    e.preventDefault()
     e.stopPropagation()
     //TODO: try to prevent text hinding from the textfields
   }
@@ -609,6 +618,10 @@ export default class TreeViewRightClick extends Vue {
 
   mounted() {
     document.addEventListener('keydown', this.onKeyDown)
+    //const ac = this.$refs.aaa as HTMLElement
+    //ac.addEventListener('blur', this.doSomething, true)
+    //console.log(document.getElementById('autoComplete_id'))
+    //console.log(this.$refs.testRef)
   }
 
   beforeDestroy() {
@@ -619,7 +632,7 @@ export default class TreeViewRightClick extends Vue {
 
 <style lang="scss" scoped>
 .v-text-field {
-  max-height: 200px;
+  max-height: 400px;
   overflow-y: auto;
   overflow-x: hidden;
 }

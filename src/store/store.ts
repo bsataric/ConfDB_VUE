@@ -822,6 +822,9 @@ export default new Vuex.Store({
             state.nodeIDToNodeObjectMap[state.topLevelNodeTypeIds['modules'][i]]
               .name,
           clone: false,
+          cloneName:
+            state.nodeIDToNodeObjectMap[state.topLevelNodeTypeIds['modules'][i]]
+              .name + '_clone',
         })
       }
       return modulesArray
